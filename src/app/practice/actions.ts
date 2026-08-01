@@ -72,7 +72,7 @@ export async function createSession(
 
   if (sessionError || !session) {
     console.error("Session insert failed:", sessionError);
-    return { error: "Couldn't save that practice session. Try again." };
+    return { error: describeDbError("saving the session", sessionError) };
   }
 
   const { data: inserted, error: questionsError } = await admin
@@ -99,7 +99,7 @@ export async function createSession(
 
   if (questionsError || !inserted) {
     console.error("Question insert failed:", questionsError);
-    return { error: "Couldn't save the generated questions. Try again." };
+    return { error: describeDbError("saving the questions", questionsError) };
   }
 
   const links = inserted.map((q, index) => ({
@@ -114,7 +114,7 @@ export async function createSession(
 
   if (linkError) {
     console.error("session_questions insert failed:", linkError);
-    return { error: "Couldn't assemble that session. Try again." };
+    return { error: describeDbError("assembling the session", linkError) };
   }
 
   // Answer keys are stored separately and never exposed to the client.
@@ -181,4 +181,40 @@ function describeGenerationError(error: unknown): string {
   }
 
   return "Couldn't build questions from that job post. Try again, or paste a more detailed one.";
+}
+
+/**
+ * Surfaces the underlying database error instead of a generic retry
+ * message. The generation step is now working, so failures here are
+ * configuration or schema problems that a retry will never fix, and
+ * hiding the cause just costs another round trip.
+ */
+function describeDbError(
+  during: string,
+  error: { message?: string; code?: string; hint?: string } | null,
+): string {
+  if (!error) return `Something went wrong ${during}.`;
+
+  const message = error.message ?? "";
+
+  // A service-role key that the project rejects is the most likely
+  // cause once generation itself works.
+  if (
+    message.toLowerCase().includes("invalid api key") ||
+    message.toLowerCase().includes("jwt") ||
+    error.code === "PGRST301"
+  ) {
+    return "The database rejected our credentials. SUPABASE_SERVICE_ROLE_KEY may be the wrong key for this project.";
+  }
+
+  if (error.code === "42P01") {
+    return "A required table is missing. The schema migration may not have run.";
+  }
+
+  if (error.code === "42501") {
+    return "Permission denied writing to the database. The service role key may be wrong.";
+  }
+
+  const code = error.code ? ` [${error.code}]` : "";
+  return `Failed while ${during}${code}: ${message}`;
 }
