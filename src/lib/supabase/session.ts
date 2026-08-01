@@ -6,7 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * signed-out users away from protected routes. Add new public pages to
  * PUBLIC_ROUTES as they are built.
  */
-const PUBLIC_ROUTES = ["/", "/login", "/signup"];
+const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth/confirm", "/auth/error"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -40,9 +40,16 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch (error) {
+    // Supabase unreachable. Fail closed on protected routes rather than
+    // letting an outage either expose them or break public pages.
+    console.error("Supabase auth check failed:", error);
+  }
 
   const isPublicRoute = PUBLIC_ROUTES.includes(request.nextUrl.pathname);
 
