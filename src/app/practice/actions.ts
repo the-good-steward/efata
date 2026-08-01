@@ -1,0 +1,141 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { generateQuestions, type EnglishLevel } from "@/lib/questions/generate";
+
+export type SessionState = { error?: string };
+
+const MIN_JOB_POST = 80;
+const MAX_JOB_POST = 12000;
+
+export async function createSession(
+  _prev: SessionState,
+  formData: FormData,
+): Promise<SessionState> {
+  const jobPost = String(formData.get("job_post") ?? "").trim();
+
+  if (jobPost.length < MIN_JOB_POST) {
+    return {
+      error:
+        "That's too short to work from. Paste the full job post, including the responsibilities.",
+    };
+  }
+  if (jobPost.length > MAX_JOB_POST) {
+    return { error: "That job post is too long. Paste just the role details." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("english_level")
+    .eq("id", user.id)
+    .single();
+
+  const englishLevel = (profile?.english_level ?? "conversational") as EnglishLevel;
+
+  let generated;
+  try {
+    generated = await generateQuestions(jobPost, englishLevel);
+  } catch (error) {
+    console.error("Question generation failed:", error);
+    return {
+      error:
+        "Couldn't build questions from that job post. Try again, or paste a more detailed one.",
+    };
+  }
+
+  // Service role: generated questions use source 'generated', which the
+  // client-facing insert policy deliberately rejects.
+  const admin = createAdminClient();
+
+  const { data: role } = await admin
+    .from("roles")
+    .select("id")
+    .eq("slug", generated.role_slug)
+    .single();
+
+  const { data: session, error: sessionError } = await admin
+    .from("sessions")
+    .insert({
+      user_id: user.id,
+      role_id: role?.id ?? null,
+      job_post: jobPost,
+      title: generated.title,
+    })
+    .select("id")
+    .single();
+
+  if (sessionError || !session) {
+    console.error("Session insert failed:", sessionError);
+    return { error: "Couldn't save that practice session. Try again." };
+  }
+
+  const { data: inserted, error: questionsError } = await admin
+    .from("questions")
+    .insert(
+      generated.questions.map((q) => ({
+        role_id: role?.id ?? null,
+        type: q.type,
+        // Hypotheticals are scored on situational judgment, not STAR;
+        // STAR only applies to genuine recall questions.
+        rubric: q.type === "technical" ? "technical" : "situational",
+        body: q.body,
+        context: q.context ?? null,
+        difficulty: q.difficulty,
+        tier: "free",
+        source: "generated",
+        status: "pending",
+        // Ownership is what makes these readable under RLS: the read
+        // policy allows approved questions OR your own submissions.
+        submitted_by: user.id,
+      })),
+    )
+    .select("id");
+
+  if (questionsError || !inserted) {
+    console.error("Question insert failed:", questionsError);
+    return { error: "Couldn't save the generated questions. Try again." };
+  }
+
+  const links = inserted.map((q, index) => ({
+    session_id: session.id,
+    question_id: q.id,
+    position: index + 1,
+  }));
+
+  const { error: linkError } = await admin
+    .from("session_questions")
+    .insert(links);
+
+  if (linkError) {
+    console.error("session_questions insert failed:", linkError);
+    return { error: "Couldn't assemble that session. Try again." };
+  }
+
+  // Answer keys are stored separately and never exposed to the client.
+  const keys = generated.questions
+    .map((q, index) =>
+      q.markers ? { question_id: inserted[index].id, markers: q.markers } : null,
+    )
+    .filter((k) => k !== null);
+
+  if (keys.length > 0) {
+    const { error: keyError } = await admin
+      .from("question_answer_keys")
+      .insert(keys);
+    // Non-fatal: the session is still usable without keys, they only
+    // affect how precisely technical answers get scored later.
+    if (keyError) console.error("Answer key insert failed:", keyError);
+  }
+
+  revalidatePath("/practice");
+  redirect(`/practice/${session.id}`);
+}

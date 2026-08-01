@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/auth/actions";
+import { JobPostForm } from "@/components/job-post-form";
 
 export const metadata = { title: "Practice · Efata" };
 
@@ -10,9 +12,13 @@ export default async function PracticePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Belt and braces: the proxy redirects too, but a protected page
-  // should never render without verifying for itself.
   if (!user) redirect("/login");
+
+  const { data: sessions } = await supabase
+    .from("sessions")
+    .select("id, title, created_at")
+    .order("created_at", { ascending: false })
+    .limit(10);
 
   return (
     <main className="flex flex-1 flex-col px-6 py-16">
@@ -39,13 +45,38 @@ export default async function PracticePage() {
 
         <div className="border-rule mt-12 border-t pt-12">
           <h1 className="text-parchment font-display text-4xl">
-            Nothing to practice yet
+            Start a practice session
           </h1>
-          <p className="text-ash font-body mt-4 max-w-md text-sm leading-relaxed">
-            Question generation and recorded answers land here next. Your
-            account is set up and ready.
+          <p className="text-ash font-body mt-4 text-sm leading-relaxed">
+            Paste a job post and Efata builds the questions you&rsquo;re
+            likely to face, including the ones about scope, rates, and
+            deadlines that most people freeze on.
           </p>
+
+          <div className="mt-8">
+            <JobPostForm />
+          </div>
         </div>
+
+        {sessions && sessions.length > 0 && (
+          <div className="border-rule mt-16 border-t pt-12">
+            <h2 className="text-ash font-body text-xs tracking-[0.3em] uppercase">
+              Recent sessions
+            </h2>
+            <ul className="mt-6 flex flex-col gap-3">
+              {sessions.map((session) => (
+                <li key={session.id}>
+                  <Link
+                    href={`/practice/${session.id}`}
+                    className="text-parchment font-body hover:text-gold text-sm underline underline-offset-4 transition-colors"
+                  >
+                    {session.title ?? "Untitled session"}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </main>
   );
