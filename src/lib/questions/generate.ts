@@ -18,14 +18,30 @@ THE TWO QUESTION TYPES
 
 The most valuable hypotheticals are the ones where poor communication costs real money: scope creep, defending a rate, missing a deadline, disagreeing with a client who is confidently wrong, chasing late payment, delivering bad news, saying no without sounding difficult. Include at least two of these in every set, even when the job post does not mention them, because they are what the freelancer will actually face.
 
-"technical" — craft knowledge specific to the role. These must genuinely separate someone who has done the work from someone who has watched a course about it. Ask about diagnosis and judgment under real constraints, not definitions. Bad: "What is a reconciliation?" Good: "The bank balance is off by exactly one transaction amount but every line looks matched. Where do you look first?"
+"technical" — craft knowledge specific to the role. These are the questions a client uses to work out whether someone can actually do the job. They must be hard enough that a person who has only watched a course cannot bluff through them.
+
+Every technical question must do at least one of these:
+- Ask HOW they would move a specific number (reach, engagement, response time, days-to-close, page load time) and what levers they would pull first
+- Give a concrete broken situation with real symptoms and ask what they check, in what order
+- Force a tradeoff between two defensible options and make them justify the choice
+
+Never ask for a definition. Never ask "what is X" or "how familiar are you with X". Name real tools, real metrics, and real numbers wherever the job post gives you any.
+
+Territory by role, use the one matching role_slug:
+- social-media: organic reach dropping, what changes first; engagement rate versus follower count and which matters to a client; hooks and the first three seconds; posting cadence and format mix; reading analytics to decide what to make next; why a post that performed well last month flops now
+- admin-va: inbox triage systems and what gets touched first; calendar conflicts across time zones; building an SOP someone else can follow; catching a double booking before the client sees it; deciding what to escalate versus handle
+- customer-support: cutting first response time without dropping quality; when a macro helps and when it makes things worse; triage order when the queue is deep; the refund or exception call the policy does not cover; turning an angry ticket around
+- bookkeeping: reconciliation that will not balance and where to look first; AR chasing that keeps the relationship intact; month-end close order; miscategorised transactions found late; what the client's P&L is actually telling them
+- web-dev: a page that loads slowly and what you measure first; forms silently not sending; a plugin or dependency update that broke the site; staging and backups before a risky change; what you check before telling a client it is fixed
+
+Difficulty for technical questions should be 4 or 5. These are meant to be demanding.
 
 RULES
 - Questions must be answerable out loud in 60 to 120 seconds.
 - Plain, direct English. Short sentences. No idioms or corporate jargon, since many users are practicing in a second language.
 - Ground the questions in the specific job post. Use the actual tools, industry, and responsibilities it names.
 - Never ask for personal information, salary history, age, marital status, religion, or anything an employer should not ask.
-- For technical questions only, include "markers": what a strong answer must mention, and red flags that reveal someone bluffing.
+- For technical questions only, include "markers". "must_mention" lists the specific levers, metrics, or checks a strong answer names — concrete things like "checks posting time against when the audience is active", not vague ones like "shows good understanding". "red_flags" lists what a bluffer says instead, such as naming a tactic with no way to measure whether it worked.
 - difficulty is 1 to 5, where 3 is a competent freelancer with a year of relevant experience.
 
 Return ONLY valid JSON, no markdown fences and no commentary, in exactly this shape:
@@ -75,7 +91,7 @@ export async function generateQuestions(
         role: "user",
         content: `English level of the person practicing: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
 
-Write 6 questions for this job post: 4 hypothetical and 2 technical.
+Write 7 questions for this job post: 4 hypothetical and 3 technical.
 
 --- JOB POST ---
 ${jobPost}
