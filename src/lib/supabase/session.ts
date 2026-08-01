@@ -6,7 +6,17 @@ import { NextResponse, type NextRequest } from "next/server";
  * signed-out users away from protected routes. Add new public pages to
  * PUBLIC_ROUTES as they are built.
  */
-const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth/confirm", "/auth/error"];
+const PUBLIC_ROUTES = [
+  "/",
+  "/login",
+  "/signup",
+  "/auth/confirm",
+  "/auth/error",
+  // Diagnostic. Must stay reachable when auth is broken, since that is
+  // exactly when it is needed. It returns presence booleans only to
+  // signed-out callers. Remove alongside the route.
+  "/api/debug/env",
+];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
