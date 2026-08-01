@@ -36,6 +36,13 @@ Territory by role, use the one matching role_slug:
 
 Difficulty for technical questions should be 4 or 5. These are meant to be demanding.
 
+RESEARCH
+You have web search. Use it before writing technical questions. Look up what is genuinely asked for this role and what practitioners say separates a competent hire from a weak one. Prefer what real hiring managers and freelancers describe over generic career-advice listicles.
+
+Synthesise what you find into your own questions. Never copy a question list verbatim from any page, and never reproduce more than a short phrase from a source. The point of searching is to make the questions realistic and current, not to republish someone else's content.
+
+If search turns up nothing useful for the role, say so by keeping the questions grounded in the job post itself rather than inventing generic ones.
+
 RULES
 - Questions must be answerable out loud in 60 to 120 seconds.
 - Plain, direct English. Short sentences. No idioms or corporate jargon, since many users are practicing in a second language.
@@ -80,6 +87,17 @@ export async function generateQuestions(
 
   const message = await client.messages.create({
     model: MODEL,
+    // Grounds the questions in what employers and clients actually ask
+    // for this role, instead of the model recalling the genre from
+    // training data. This is the difference between plausible-sounding
+    // questions and real ones.
+    tools: [
+      {
+        type: "web_search_20250305",
+        name: "web_search",
+        max_uses: 5,
+      },
+    ],
     // Generous budget on purpose. This model reasons before answering
     // and that reasoning is charged against max_tokens, so a tight
     // budget truncates the JSON mid-structure and surfaces as a parse
@@ -91,7 +109,9 @@ export async function generateQuestions(
         role: "user",
         content: `English level of the person practicing: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
 
-Write 7 questions for this job post: 4 hypothetical and 3 technical.
+First, search the web for what is actually asked in interviews and client calls for this kind of role. Search two or three times with different angles, for example the role title plus "interview questions", the specific tools named in the job post, and what clients ask when hiring for this remotely. Read what you find before writing anything.
+
+Then write 7 questions for this job post: 4 hypothetical and 3 technical.
 
 --- JOB POST ---
 ${jobPost}
@@ -100,11 +120,17 @@ ${jobPost}
     ],
   });
 
-  const text = message.content
+  const textBlocks = message.content
     .filter((block): block is Anthropic.TextBlock => block.type === "text")
-    .map((block) => block.text)
-    .join("")
-    .trim();
+    .map((block) => block.text.trim())
+    .filter(Boolean);
+
+  // With web search enabled the reply is not one clean block: the model
+  // narrates between searches and the JSON arrives last. Concatenating
+  // everything and grabbing the outermost braces would swallow any
+  // brace that appeared in that commentary, so work backwards through
+  // the blocks and take the first one that parses.
+  const text = textBlocks.length > 0 ? textBlocks[textBlocks.length - 1] : "";
 
   // Truncation is the most likely parse failure, and it is worth
   // naming explicitly: the JSON will look valid right up to the point
@@ -121,31 +147,30 @@ ${jobPost}
     );
   }
 
-  // Strip fences if the model adds them despite instructions, and take
-  // the outermost JSON object if it wraps the result in any prose.
-  let cleaned = text
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/, "")
-    .trim();
+  // Try the last block first, then work backwards. The JSON normally
+  // arrives last, but a stray brace in the model's narration used to be
+  // enough to derail extraction.
+  const candidates = [text, ...textBlocks.slice().reverse()];
 
-  if (!cleaned.startsWith("{")) {
-    const start = cleaned.indexOf("{");
-    const end = cleaned.lastIndexOf("}");
-    if (start !== -1 && end > start) cleaned = cleaned.slice(start, end + 1);
-  }
+  for (const block of candidates) {
+    let parsed: unknown;
+    let found = false;
 
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(cleaned);
-  } catch {
-    // Log enough to diagnose without dumping the whole response.
-    console.error("Unparseable model output (first 800 chars):", cleaned.slice(0, 800));
-    console.error("stop_reason:", message.stop_reason, "length:", cleaned.length);
-    throw new Error("The model did not return valid JSON.");
-  }
+    for (const cleaned of extractJson(block)) {
+      try {
+        parsed = JSON.parse(cleaned);
+        found = true;
+        break;
+      } catch {
+        continue;
+      }
+    }
 
-  const result = generationResult.safeParse(parsed);
-  if (!result.success) {
+    if (!found) continue;
+
+    const result = generationResult.safeParse(parsed);
+    if (result.success) return result.data;
+
     console.error(
       "Model output failed validation. Payload:",
       JSON.stringify(parsed).slice(0, 800),
@@ -157,5 +182,44 @@ ${jobPost}
     );
   }
 
-  return result.data;
+  console.error(
+    "No parseable JSON in model output. Last block (first 800 chars):",
+    text.slice(0, 800),
+  );
+  console.error("stop_reason:", message.stop_reason, "blocks:", textBlocks.length);
+  throw new Error("The model did not return valid JSON.");
+}
+
+
+/**
+ * Pulls a JSON object out of a block of model text, tolerating code
+ * fences and surrounding prose. Returns an empty string when the block
+ * contains no object at all, which is the common case for the model's
+ * narration between web searches.
+ */
+function extractJson(raw: string): string[] {
+  const stripped = raw
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  const end = stripped.lastIndexOf("}");
+  if (end === -1) return [];
+
+  const candidates: string[] = [];
+  if (stripped.startsWith("{")) candidates.push(stripped);
+
+  // From the first brace: correct when the object follows plain prose.
+  const first = stripped.indexOf("{");
+  if (first !== -1 && end > first) candidates.push(stripped.slice(first, end + 1));
+
+  // From the last opening brace at the start of a line: correct when the
+  // prose itself contained braces, which would otherwise poison the
+  // slice above.
+  const lineStart = stripped.lastIndexOf("\n{");
+  if (lineStart !== -1 && end > lineStart) {
+    candidates.push(stripped.slice(lineStart + 1, end + 1));
+  }
+
+  return candidates;
 }

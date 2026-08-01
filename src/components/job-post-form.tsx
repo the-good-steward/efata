@@ -38,12 +38,13 @@ export function JobPostForm() {
         disabled={pending}
         className="bg-parchment text-ink font-body hover:bg-gold focus-visible:ring-gold focus-visible:ring-offset-ink self-start rounded-sm px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-60"
       >
-        {pending ? "Building your questions…" : "Build my questions"}
+        {pending ? "Researching and building…" : "Build my questions"}
       </button>
 
       {pending && (
         <p className="text-ash font-body text-xs">
-          This takes about 15 seconds.
+          Efata is looking up what&rsquo;s actually asked for this role.
+          This takes up to a minute.
         </p>
       )}
     </form>
