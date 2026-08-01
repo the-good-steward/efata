@@ -1,7 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generationResult, type GenerationResult } from "./schema";
 
-const MODEL = "claude-sonnet-4-6";
+// Must be a valid Claude API model string. Verify against
+// https://platform.claude.com/docs/en/about-claude/models/overview
+// before changing — an invalid name fails at request time, not build
+// time, so a typo here only surfaces to users in production.
+const MODEL = "claude-sonnet-5";
 
 const SYSTEM_PROMPT = `You write interview and client-call practice questions for Efata, a communication practice app.
 

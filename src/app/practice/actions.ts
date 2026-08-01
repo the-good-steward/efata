@@ -46,10 +46,7 @@ export async function createSession(
     generated = await generateQuestions(jobPost, englishLevel);
   } catch (error) {
     console.error("Question generation failed:", error);
-    return {
-      error:
-        "Couldn't build questions from that job post. Try again, or paste a more detailed one.",
-    };
+    return { error: describeGenerationError(error) };
   }
 
   // Service role: generated questions use source 'generated', which the
@@ -138,4 +135,44 @@ export async function createSession(
 
   revalidatePath("/practice");
   redirect(`/practice/${session.id}`);
+}
+
+/**
+ * Turns a generation failure into something actionable.
+ *
+ * A single catch-all message ("try a more detailed job post") is
+ * actively misleading when the real cause is a missing API key or a
+ * wrong model name: it sends the user editing their input when nothing
+ * about the input is wrong. Configuration problems say so plainly.
+ */
+function describeGenerationError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  const status =
+    typeof error === "object" && error !== null && "status" in error
+      ? (error as { status?: number }).status
+      : undefined;
+
+  if (message.includes("ANTHROPIC_API_KEY is not set")) {
+    return "The AI service isn't configured yet. ANTHROPIC_API_KEY is missing.";
+  }
+  if (status === 401 || status === 403) {
+    return "The AI service rejected our credentials. The API key may be invalid or revoked.";
+  }
+  if (status === 404) {
+    return `The AI model wasn't found. Check the model name. (${message})`;
+  }
+  if (status === 429) {
+    return "The AI service is rate limited right now. Wait a moment and try again.";
+  }
+  if (message.toLowerCase().includes("credit")) {
+    return "The Anthropic account is out of credit. Top it up at console.anthropic.com.";
+  }
+  if (status === 400) {
+    return `The AI service rejected the request. (${message})`;
+  }
+  if (message.includes("failed validation") || message.includes("valid JSON")) {
+    return "The questions that came back were malformed. Try again — this is usually transient.";
+  }
+
+  return "Couldn't build questions from that job post. Try again, or paste a more detailed one.";
 }
