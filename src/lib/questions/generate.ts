@@ -64,7 +64,11 @@ export async function generateQuestions(
 
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 4000,
+    // Generous budget on purpose. This model reasons before answering
+    // and that reasoning is charged against max_tokens, so a tight
+    // budget truncates the JSON mid-structure and surfaces as a parse
+    // error rather than as an obvious limit problem.
+    max_tokens: 16000,
     system: SYSTEM_PROMPT,
     messages: [
       {
@@ -86,21 +90,50 @@ ${jobPost}
     .join("")
     .trim();
 
-  // Strip fences if the model adds them despite instructions.
-  const cleaned = text
+  // Truncation is the most likely parse failure, and it is worth
+  // naming explicitly: the JSON will look valid right up to the point
+  // it stops, so the parser error alone is misleading.
+  if (message.stop_reason === "max_tokens") {
+    throw new Error(
+      "The model ran out of output budget and the response was cut off.",
+    );
+  }
+
+  if (!text) {
+    throw new Error(
+      `The model returned no text. stop_reason=${message.stop_reason}`,
+    );
+  }
+
+  // Strip fences if the model adds them despite instructions, and take
+  // the outermost JSON object if it wraps the result in any prose.
+  let cleaned = text
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```$/, "")
     .trim();
+
+  if (!cleaned.startsWith("{")) {
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start !== -1 && end > start) cleaned = cleaned.slice(start, end + 1);
+  }
 
   let parsed: unknown;
   try {
     parsed = JSON.parse(cleaned);
   } catch {
+    // Log enough to diagnose without dumping the whole response.
+    console.error("Unparseable model output (first 800 chars):", cleaned.slice(0, 800));
+    console.error("stop_reason:", message.stop_reason, "length:", cleaned.length);
     throw new Error("The model did not return valid JSON.");
   }
 
   const result = generationResult.safeParse(parsed);
   if (!result.success) {
+    console.error(
+      "Model output failed validation. Payload:",
+      JSON.stringify(parsed).slice(0, 800),
+    );
     throw new Error(
       `Generated questions failed validation: ${result.error.issues
         .map((i) => `${i.path.join(".")} ${i.message}`)

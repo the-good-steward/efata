@@ -170,8 +170,14 @@ function describeGenerationError(error: unknown): string {
   if (status === 400) {
     return `The AI service rejected the request. (${message})`;
   }
-  if (message.includes("failed validation") || message.includes("valid JSON")) {
-    return "The questions that came back were malformed. Try again — this is usually transient.";
+  if (message.includes("ran out of output budget")) {
+    return "The response was cut off before it finished. Try a shorter job post.";
+  }
+  if (message.includes("failed validation")) {
+    return `The questions came back in the wrong shape. (${message})`;
+  }
+  if (message.includes("valid JSON") || message.includes("returned no text")) {
+    return "The AI returned something unreadable. Try again — this is usually transient.";
   }
 
   return "Couldn't build questions from that job post. Try again, or paste a more detailed one.";
