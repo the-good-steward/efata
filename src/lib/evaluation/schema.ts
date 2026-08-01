@@ -1,6 +1,25 @@
 import { z } from "zod";
 
 /**
+ * A string that is trimmed to a maximum length rather than rejected for
+ * exceeding it.
+ *
+ * Length is a display concern, not a correctness one. Rejecting a whole
+ * evaluation because one gap ran twenty characters long throws away
+ * feedback the person earned by recording an answer, and asks them to
+ * do it again for no reason they can see. Structural problems still
+ * fail loudly; verbosity does not.
+ */
+function capped(max: number) {
+  return z.string().transform((value) => {
+    const trimmed = value.trim();
+    return trimmed.length <= max
+      ? trimmed
+      : trimmed.slice(0, max - 1).trimEnd() + "\u2026";
+  });
+}
+
+/**
  * Evaluation output. Scores are 1 to 5.
  *
  * `delivery` is scored for every answer regardless of question type:
@@ -15,23 +34,21 @@ import { z } from "zod";
 export const evaluation = z.object({
   substance: z.object({
     score: z.number().int().min(1).max(5),
-    // Rubric-specific dimensions, e.g. "acknowledged the other side",
-    // "named a concrete next step".
-    strengths: z.array(z.string().max(200)).max(4),
-    gaps: z.array(z.string().max(200)).max(4),
+    strengths: z.array(capped(400)).max(5).default([]),
+    gaps: z.array(capped(400)).max(5).default([]),
   }),
   delivery: z.object({
     score: z.number().int().min(1).max(5),
-    filler_words: z.number().int().min(0).max(200),
-    hedging: z.array(z.string().max(80)).max(6),
-    pace_note: z.string().max(200),
+    filler_words: z.number().int().min(0).max(500).catch(0),
+    hedging: z.array(capped(120)).max(8).default([]),
+    pace_note: capped(300).default(""),
   }),
-  // Two or three sentences, spoken directly to the person.
-  feedback: z.string().min(40).max(1200),
+  // Spoken directly to the person.
+  feedback: z.string().min(20).transform((v) => v.trim()),
   // The single most valuable change for the retry.
-  one_thing: z.string().min(10).max(300),
+  one_thing: capped(400),
   // Their own answer, restructured. Same facts, same story, tightened.
-  improved_answer: z.string().min(40).max(2000),
+  improved_answer: z.string().min(20).transform((v) => v.trim()),
 });
 
 export type Evaluation = z.infer<typeof evaluation>;

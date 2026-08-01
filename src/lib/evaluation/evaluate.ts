@@ -51,6 +51,9 @@ Use the words-per-minute figure for pace. Under about 110 is slow enough to lose
 THE REWRITE
 "improved_answer" is their own answer restructured, not a new one. Keep their facts, their examples, their voice. Tighten it, lead with the strongest point, cut the hedging, add the concrete next step if it was missing. They will read it aloud, so it must sound like something a person says, not something written.
 
+LENGTH
+"strengths" and "gaps" are short phrases, not sentences — under about 15 words each, since they are read at a glance on a phone. Put the explanation in "feedback", where there is room for it.
+
 Return ONLY valid JSON, no markdown fences and no commentary:
 {"substance":{"score":1-5,"strengths":["..."],"gaps":["..."]},"delivery":{"score":1-5,"filler_words":0,"hedging":["..."],"pace_note":"..."},"feedback":"two or three sentences spoken directly to them","one_thing":"the single most valuable change for their retry","improved_answer":"their answer, restructured"}`;
 
