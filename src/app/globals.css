@@ -1,64 +1,90 @@
 @import "tailwindcss";
 
-/*
- * Efata palette. Roughly 70% dusk, 20% paper, 10% everything else — if
- * two accents are doing work on the same screen, one of them is wrong.
- */
-:root {
-  --dusk: #1c2b33;
-  --paper: #ede6d6;
-  --seaglass: #8fafae;
-  --deep-seaglass: #2e6e70;
-  --lamp: #b8863e;
-  --clay-on-paper: #9e5b48;
-  --clay-on-dusk: #d08e74;
 
-  /* Supporting */
-  --raised: #22343d;
-  --muted-on-dusk: #9dacb4;
-  --secondary-on-paper: #3a4a52;
-  --rule-on-paper: #dbd2be;
+@theme {
+  /* Ground and surfaces */
+  --color-dusk: #1C2B33;         /* app background */
+  --color-dusk-quiet: #16232A;   /* the held-breath state — everything but the question recedes */
+  --color-raised: #22343D;       /* cards, transcript blocks, inputs */
+  --color-hairline: #22303A;     /* dividers on dusk */
+  --color-edge: #33454F;         /* input borders, unselected option borders */
 
-  /* Semantic aliases, so components state intent rather than colour. */
-  --ink: var(--dusk);
-  --parchment: var(--paper);
-  --ash: var(--muted-on-dusk);
-  --rule: var(--raised);
-  --spoken: var(--seaglass);
-  --flag: var(--clay-on-dusk);
+  /* Text on dusk */
+  --color-paper: #EDE6D6;        /* primary text, primary button fill */
+  --color-paper-soft: #B9C4C9;   /* secondary text */
+  --color-muted: #9DACB4;        /* tertiary text, captions */
+  --color-faint: #7E8D95;        /* labels, helper text */
+  --color-disabled: #68787F;     /* placeholder, disabled label */
 
-  --font-display: "Source Serif 4", ui-serif, Georgia, serif;
-  --font-body: "Work Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Accents */
+  --color-seaglass: #8FAFAE;     /* the spoken word: live dot, the better line, the user's own voice. On dusk only. */
+  --color-seaglass-deep: #2E6E70;/* same accent on light backgrounds — AA on paper */
+  --color-lamp: #B8863E;         /* progress only. Never a call to action. */
+  --color-clay: #D08E74;         /* a flagged hedge, on dusk */
+  --color-clay-deep: #9E5B48;    /* a flagged hedge, on paper */
+
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-sans: "Work Sans", system-ui, sans-serif;
+
+  --radius-field: 12px;
+  --radius-card: 16px;
+  --radius-sheet: 18px;
+
+  /* recording starts when the line completes */
+  --animate-breath: breath 5s cubic-bezier(.4, 0, .2, 1) forwards;
+  --animate-listening: listening 2.4s ease-in-out infinite;
 }
 
+@keyframes breath {
+  from { transform: scaleX(.06); opacity: .5; }
+  to   { transform: scaleX(1);   opacity: 1; }
+}
+
+@keyframes listening {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the breath still has to take five seconds — hold the full line instead of growing it */
+  .breath-line { animation: none !important; transform: scaleX(1); opacity: .5; }
+}
+
+/* Type scale — apply as utilities, e.g. class="ef-question"
+   Body and answer text never below 16px. Labels/timers may reach 12px at 4.5:1.
+   Tap targets never below 44px. */
+@layer components {
+  .ef-display  { font-family: var(--font-serif); font-weight: 600; font-size: 40px; line-height: 44px; }
+  .ef-question { font-family: var(--font-serif); font-weight: 400; font-size: 28px; line-height: 36px; text-wrap: pretty; }
+  .ef-label    { font-family: var(--font-sans); font-weight: 600; font-size: 13px; line-height: 16px; letter-spacing: .18em; text-transform: uppercase; }
+  .ef-body     { font-family: var(--font-sans); font-weight: 400; font-size: 17px; line-height: 28px; }
+  .ef-ui       { font-family: var(--font-sans); font-weight: 500; font-size: 15px; line-height: 20px; }
+  .ef-caption  { font-family: var(--font-sans); font-weight: 400; font-size: 13px; line-height: 20px; }
+}
+
+/* Semantic aliases kept so existing components resolve to the theme. */
 @theme inline {
-  --color-ink: var(--ink);
-  --color-parchment: var(--parchment);
-  --color-ash: var(--ash);
-  --color-rule: var(--rule);
-  --color-raised: var(--raised);
-  --color-spoken: var(--spoken);
-  --color-seaglass: var(--seaglass);
-  --color-deep: var(--deep-seaglass);
-  --color-lamp: var(--lamp);
-  --color-flag: var(--flag);
-  --color-clay: var(--clay-on-paper);
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
+  --color-ink: var(--color-dusk);
+  --color-parchment: var(--color-paper);
+  --color-ash: var(--color-muted);
+  --color-rule: var(--color-hairline);
+  --color-spoken: var(--color-seaglass);
+  --color-flag: var(--color-clay);
+  --color-lamp: var(--color-lamp);
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
 }
 
 body {
-  background: var(--ink);
-  color: var(--parchment);
-  font-family: var(--font-body);
+  background: var(--color-dusk);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
   font-size: 17px;
   line-height: 28px;
 }
 
-/* Tap targets never below 44px. */
 button,
 [role="button"],
-a.tap,
 select,
 summary {
   min-height: 44px;
@@ -69,22 +95,8 @@ a.inline {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    animation: reveal 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
   .rise {
     animation: rise 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-}
-
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

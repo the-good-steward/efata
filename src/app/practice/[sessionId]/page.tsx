@@ -50,7 +50,7 @@ export default async function SessionPage({
   const { data: attemptRows } = await supabase
     .from("attempts")
     .select(
-      "id, session_question_id, attempt_number, feedback, improved_answer, scores",
+      "id, session_question_id, attempt_number, transcript, feedback, improved_answer, scores",
     )
     .in(
       "session_question_id",
@@ -82,6 +82,7 @@ export default async function SessionPage({
         .map((a) => ({
           id: a.id as string,
           attempt_number: a.attempt_number as number,
+          transcript: (a.transcript as string | null) ?? null,
           feedback: (a.feedback as string | null) ?? null,
           improved_answer: (a.improved_answer as string | null) ?? null,
           rated: rated.has(a.id as string),

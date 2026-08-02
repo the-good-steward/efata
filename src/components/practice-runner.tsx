@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { RetryPanel } from "@/components/retry-panel";
 import { FeedbackRating } from "@/components/feedback-rating";
+import { MarkedTranscript } from "@/components/marked-transcript";
 
 export type RunnerQuestion = {
   linkId: string;
@@ -13,6 +14,7 @@ export type RunnerQuestion = {
   attempts: {
     id: string;
     attempt_number: number;
+    transcript: string | null;
     feedback: string | null;
     improved_answer: string | null;
     rated: boolean;
@@ -105,11 +107,12 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
             The goal is to train how you think when you&rsquo;re put on the
             spot.
           </p>
-          <p className="text-ash font-body text-sm leading-relaxed">
-            One question at a time. You&rsquo;ll get five seconds after each
-            one appears, then recording starts on its own. Aim for 60 to 90
-            seconds. A messy honest answer teaches you more than a polished
-            rehearsed one.
+          <p className="ef-body text-paper-soft">
+            Nothing here is scored. Nobody else hears these.
+          </p>
+          <p className="ef-body text-muted">
+            One question at a time. Five seconds after each one appears,
+            recording starts on its own. Aim for 60 to 90 seconds.
           </p>
           <p className="text-ash font-body text-sm leading-relaxed">
             You can stop early, listen back, and try again after the feedback.
@@ -118,7 +121,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
 
         <button
           onClick={() => setStarted(true)}
-          className="bg-parchment text-ink font-body hover:bg-parchment/85 mt-10 rounded-sm px-5 py-3 text-sm font-medium transition-colors"
+          className="bg-paper text-dusk mt-10 w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
         >
           Start · {questions.length} questions
         </button>
@@ -180,22 +183,44 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
               )}
             />
 
+            {attempt.transcript && (
+              <div className="bg-raised mt-6 rounded-[16px] p-5">
+                <p className="ef-label text-faint mb-4">What you said</p>
+                <MarkedTranscript
+                  transcript={attempt.transcript}
+                  hedges={attempt.scores?.delivery?.hedging ?? []}
+                />
+              </div>
+            )}
+
             {attempt.feedback && (
-              <p className="text-parchment font-body mt-5 text-sm leading-relaxed">
-                {attempt.feedback}
-              </p>
+              <p className="ef-body text-paper mt-6">{attempt.feedback}</p>
             )}
 
             {attempt.scores?.delivery && (
-              <p className="text-ash font-body mt-4 text-xs leading-relaxed">
-                {attempt.scores.delivery.filler_words ?? 0} filler words
-                {attempt.scores.words_per_minute
-                  ? `, ${attempt.scores.words_per_minute} words per minute`
-                  : ""}
-                {attempt.scores.delivery.hedging?.length
-                  ? `. Hedging: ${attempt.scores.delivery.hedging.join(", ")}`
-                  : ""}
-              </p>
+              <div className="mt-6 flex gap-10">
+                <div>
+                  <p className="font-display text-paper text-[28px] tabular-nums">
+                    {attempt.scores.delivery.filler_words ?? 0}
+                  </p>
+                  <p className="ef-caption text-faint">filler words</p>
+                </div>
+                {attempt.scores.words_per_minute && (
+                  <div>
+                    <p className="font-display text-paper text-[28px] tabular-nums">
+                      {attempt.scores.words_per_minute}
+                    </p>
+                    <p className="ef-caption text-faint">
+                      words per minute ·{" "}
+                      {attempt.scores.words_per_minute > 190
+                        ? "quick"
+                        : attempt.scores.words_per_minute < 110
+                          ? "slow"
+                          : "steady"}
+                    </p>
+                  </div>
+                )}
+              </div>
             )}
 
             <p className="text-ash/70 font-body mt-4 text-xs leading-relaxed">
@@ -234,14 +259,14 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           {isLast ? (
             <Link
               href={`/practice`}
-              className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+              className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
             >
               Finish session
             </Link>
           ) : (
             <button
               onClick={() => setIndex((i) => i + 1)}
-              className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+              className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
             >
               Next question
             </button>

@@ -160,12 +160,12 @@ export function AnswerRecorder({
         <div>
           <button
             onClick={ready}
-            className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-5 py-3 text-sm font-medium transition-colors"
+            className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
           >
-            {attemptNumber > 1 ? `I'm ready — attempt ${attemptNumber}` : "I'm ready"}
+            {attemptNumber > 1 ? "I'm ready" : "I'm ready"}
           </button>
-          <p className="text-ash font-body mt-3 text-xs">
-            Recording starts {PREP_SECONDS} seconds after you tap.
+          <p className="ef-caption text-faint mt-3 text-center">
+            Aim for 60 to 90 seconds
           </p>
         </div>
       )}
@@ -198,9 +198,12 @@ export function AnswerRecorder({
               {prepLeft}
             </span>
           </div>
-          <p className="text-ash font-body text-sm">
-            Take a breath. Don&rsquo;t script it.
-          </p>
+          <div>
+            <p className="ef-body text-paper">Take a breath.</p>
+            <p className="ef-caption text-faint">
+              Recording starts on its own
+            </p>
+          </div>
         </div>
       )}
 
@@ -216,7 +219,7 @@ export function AnswerRecorder({
             <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-spoken" />
             {mmss}
           </span>
-          <span className="text-ash/60 font-body text-xs">
+          <span className="ef-caption text-faint">
             Aim for 60 to 90 seconds
           </span>
         </div>
@@ -234,22 +237,28 @@ export function AnswerRecorder({
               onClick={submit}
               className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
             >
-              Get feedback
+              Send this one
             </button>
             <button
               onClick={discard}
               className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
             >
-              Record again
+              Record it again
             </button>
           </div>
         </div>
       )}
 
       {phase === "submitting" && (
-        <p className="text-ash font-body text-sm">
-          Listening to your answer and writing feedback. About 20 seconds.
-        </p>
+        <div>
+          <p className="ef-label text-seaglass">Listening back</p>
+          <p className="ef-body text-paper mt-3">
+            Going through what you said.
+          </p>
+          <p className="ef-caption text-faint mt-1">
+            About twenty seconds. You can put the phone down.
+          </p>
+        </div>
       )}
 
       {error && (
