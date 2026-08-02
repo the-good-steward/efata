@@ -27,13 +27,9 @@ export const generatedQuestion = z.object({
 });
 
 export const generationResult = z.object({
-  role_slug: z.enum([
-    "admin-va",
-    "social-media",
-    "customer-support",
-    "bookkeeping",
-    "web-dev",
-  ]),
+  // Validated against the roles actually in the database rather than a
+  // hardcoded list, so adding a role is a migration and not a deploy.
+  role_slug: z.string().min(2).max(40),
   title: z.string().min(3).max(120),
   questions: z.array(generatedQuestion).min(4).max(10),
 });

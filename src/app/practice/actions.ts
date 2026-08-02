@@ -8,6 +8,7 @@ import {
   generateQuestions,
   type EnglishLevel,
   type ExperienceLevel,
+  type RoleOption,
 } from "@/lib/questions/generate";
 
 export type SessionState = { error?: string };
@@ -47,9 +48,18 @@ export async function createSession(
   const experienceLevel = (profile?.experience_level ??
     "beginner") as ExperienceLevel;
 
+  const { data: roleRows } = await supabase
+    .from("roles")
+    .select("slug, label, technical_focus");
+
   let generated;
   try {
-    generated = await generateQuestions(jobPost, englishLevel, experienceLevel);
+    generated = await generateQuestions(
+      jobPost,
+      englishLevel,
+      experienceLevel,
+      (roleRows ?? []) as RoleOption[],
+    );
   } catch (error) {
     console.error("Question generation failed:", error);
     return { error: describeGenerationError(error) };

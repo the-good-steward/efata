@@ -27,12 +27,7 @@ Every technical question must do at least one of these:
 
 Never ask for a definition. Never ask "what is X" or "how familiar are you with X". Name real tools, real metrics, and real numbers wherever the job post gives you any.
 
-Territory by role, use the one matching role_slug:
-- social-media: organic reach dropping, what changes first; engagement rate versus follower count and which matters to a client; hooks and the first three seconds; posting cadence and format mix; reading analytics to decide what to make next; why a post that performed well last month flops now
-- admin-va: inbox triage systems and what gets touched first; calendar conflicts across time zones; building an SOP someone else can follow; catching a double booking before the client sees it; deciding what to escalate versus handle
-- customer-support: cutting first response time without dropping quality; when a macro helps and when it makes things worse; triage order when the queue is deep; the refund or exception call the policy does not cover; turning an angry ticket around
-- bookkeeping: reconciliation that will not balance and where to look first; AR chasing that keeps the relationship intact; month-end close order; miscategorised transactions found late; what the client's P&L is actually telling them
-- web-dev: a page that loads slowly and what you measure first; forms silently not sending; a plugin or dependency update that broke the site; staging and backups before a risky change; what you check before telling a client it is fixed
+The roles you may choose from, and the territory to draw technical questions from for each, are listed in the message below. Pick the single role_slug that best matches the job post.
 
 Set difficulty from the person's experience level, given in the message below. Pitch the technical questions at that level: too hard and they learn nothing, too easy and the practice is worthless.
 
@@ -63,6 +58,12 @@ export type EnglishLevel =
   | "fluent";
 
 export type ExperienceLevel = "beginner" | "intermediate" | "expert";
+
+export type RoleOption = {
+  slug: string;
+  label: string;
+  technical_focus: string | null;
+};
 
 /**
  * Experience sets how hard the questions are. English sets how they are
@@ -99,9 +100,21 @@ export async function generateQuestions(
   jobPost: string,
   englishLevel: EnglishLevel,
   experienceLevel: ExperienceLevel = "beginner",
+  roles: RoleOption[] = [],
 ): Promise<GenerationResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set.");
+
+  if (roles.length === 0) throw new Error("No roles are configured.");
+
+  const roleCatalogue = roles
+    .map(
+      (role) =>
+        `- ${role.slug} (${role.label})${
+          role.technical_focus ? `: ${role.technical_focus}` : ""
+        }`,
+    )
+    .join("\n");
 
   const client = new Anthropic({ apiKey });
 
@@ -130,6 +143,9 @@ export async function generateQuestions(
         content: `Experience level of the person practising: ${experienceLevel}. ${EXPERIENCE_GUIDANCE[experienceLevel]}
 
 English level: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
+
+ROLES AND THEIR TECHNICAL TERRITORY
+${roleCatalogue}
 
 First, search the web for what is actually asked in interviews and client calls for this kind of role. Search two or three times with different angles, for example the role title plus "interview questions", the specific tools named in the job post, and what clients ask when hiring for this remotely. Read what you find before writing anything.
 
@@ -191,7 +207,15 @@ ${jobPost}
     if (!found) continue;
 
     const result = generationResult.safeParse(parsed);
-    if (result.success) return result.data;
+    if (result.success) {
+      const known = roles.some((role) => role.slug === result.data.role_slug);
+      if (!known) {
+        throw new Error(
+          `The model chose an unknown role: ${result.data.role_slug}`,
+        );
+      }
+      return result.data;
+    }
 
     console.error(
       "Model output failed validation. Payload:",

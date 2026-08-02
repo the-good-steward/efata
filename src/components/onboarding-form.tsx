@@ -45,29 +45,24 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
         <legend className="text-parchment font-display text-xl">
           What kind of work are you going for?
         </legend>
-        <div className="mt-5 flex flex-col gap-2">
+        <p className="text-ash font-body mt-2 text-sm">
+          Pick the closest match. You can practise for any role later.
+        </p>
+        <select
+          name="primary_role_id"
+          required
+          defaultValue=""
+          className="border-rule text-parchment focus:border-gold mt-5 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
+        >
+          <option value="" disabled className="bg-ink">
+            Choose a role
+          </option>
           {roles.map((role) => (
-            <label key={role.id} className="cursor-pointer">
-              <input
-                type="radio"
-                name="primary_role_id"
-                value={role.id}
-                required
-                className="peer sr-only"
-              />
-              <div className="border-rule peer-checked:border-gold peer-checked:bg-gold/5 rounded-sm border px-4 py-3 transition-colors">
-                <span className="text-parchment font-body text-sm">
-                  {role.label}
-                </span>
-                {role.description && (
-                  <p className="text-ash font-body mt-1 text-xs leading-relaxed">
-                    {role.description}
-                  </p>
-                )}
-              </div>
-            </label>
+            <option key={role.id} value={role.id} className="bg-ink">
+              {role.label}
+            </option>
           ))}
-        </div>
+        </select>
       </fieldset>
 
       <fieldset>
