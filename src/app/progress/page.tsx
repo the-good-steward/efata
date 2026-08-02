@@ -1,58 +1,97 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { AppHeader } from "@/components/app-header";
 import { buildProgress, type AttemptPoint } from "@/lib/progress";
 
 export const metadata = { title: "Progress · Efata" };
 
+/**
+ * A flat series is the common case early on, and drawing it against a
+ * zero range pins the line to the bottom edge where it reads as an
+ * empty box. Padding the range keeps a flat line centred, which is the
+ * honest picture: nothing has changed yet.
+ */
 function Sparkline({ series }: { series: number[] }) {
   if (series.length < 3) return null;
 
   const max = Math.max(...series);
   const min = Math.min(...series);
-  const span = max - min || 1;
-  const width = 260;
-  const height = 44;
+  const pad = Math.max((max - min) * 0.2, 0.5);
+  const top = max + pad;
+  const bottom = min - pad;
+  const span = top - bottom;
+
+  const w = 100;
+  const h = 28;
 
   const points = series
-    .map((value, index) => {
-      const x = (index / (series.length - 1)) * width;
-      const y = height - ((value - min) / span) * height;
+    .map((value, i) => {
+      const x = (i / (series.length - 1)) * w;
+      const y = h - ((value - bottom) / span) * h;
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     })
     .join(" ");
 
   return (
     <svg
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      className="mt-4 w-full max-w-[260px]"
+      viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio="none"
+      className="mt-4 h-8 w-full"
       aria-hidden="true"
     >
       <polyline
         points={points}
         fill="none"
-        stroke="var(--spoken)"
+        stroke="var(--color-seaglass)"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );
 }
 
-/**
- * A number with no reading attached is just a number. Each figure gets
- * a sentence saying what it means for a real client call, because "4.2
- * fillers per 100 words" tells a freelancer nothing on its own.
- */
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="bg-raised flex-1 rounded-[12px] px-4 py-3">
+      <p className="font-serif text-paper text-[26px] leading-none tabular-nums">
+        {value}
+      </p>
+      <p className="ef-caption text-faint mt-1.5 leading-tight">{label}</p>
+    </div>
+  );
+}
+
+function Metric({
+  title,
+  headline,
+  reading,
+  series,
+}: {
+  title: string;
+  headline: string;
+  reading: string;
+  series: number[];
+}) {
+  return (
+    <section className="bg-raised mt-4 rounded-[16px] p-5">
+      <h2 className="ef-label text-faint">{title}</h2>
+      <p className="font-serif text-paper mt-2 text-[22px] leading-snug">
+        {headline}
+      </p>
+      <Sparkline series={series} />
+      <p className="ef-body text-paper-soft mt-3">{reading}</p>
+    </section>
+  );
+}
+
 function readFillers(recent: number | null): string {
   if (recent == null) return "";
   if (recent < 2)
     return "That is clean. A client hears a finished thought, not someone assembling one.";
-  if (recent < 5)
-    return "Normal speech. Nobody would notice this on a call.";
+  if (recent < 5) return "Normal speech. Nobody would notice this on a call.";
   if (recent < 9)
     return "Noticeable. It reads as thinking out loud, which makes a rate sound negotiable.";
   return "Enough that it is doing the talking. One pause instead of one filler is the whole fix.";
@@ -63,43 +102,8 @@ function readPace(recent: number | null): string {
   if (recent < 110)
     return "Slow enough that attention drifts. Usually nerves, not thinking.";
   if (recent > 190)
-    return "Rushed. On a call this reads as wanting to get it over with.";
+    return "Rushed. On a call this reads as wanting it over with.";
   return "A steady pace. Easy to follow, and it sounds like you mean it.";
-}
-
-function Change({
-  early,
-  recent,
-  unit,
-  lowerIsBetter,
-}: {
-  early: number | null;
-  recent: number | null;
-  unit: string;
-  lowerIsBetter: boolean;
-}) {
-  if (early == null || recent == null) {
-    return (
-      <p className="text-ash font-body mt-2 text-[15px]">
-        Record a few more answers and the change shows up here.
-      </p>
-    );
-  }
-
-  const delta = recent - early;
-  const better = lowerIsBetter ? delta < 0 : delta > 0;
-  const flat = Math.abs(delta) < 0.5;
-
-  return (
-    <p
-      className={`font-body mt-2 text-[15px] ${
-        flat ? "text-ash" : better ? "text-spoken" : "text-flag"
-      }`}
-    >
-      {early.toFixed(0)} {unit} at the start, {recent.toFixed(0)} in your last
-      five.
-    </p>
-  );
 }
 
 export default async function ProgressPage() {
@@ -121,9 +125,7 @@ export default async function ProgressPage() {
       delivery?: { score?: number; filler_words?: number; hedging?: string[] };
       words_per_minute?: number | null;
     } | null;
-
     const transcript = (row.transcript as string | null) ?? "";
-
     return {
       createdAt: row.created_at as string,
       fillerWords: scores?.delivery?.filler_words ?? 0,
@@ -138,138 +140,104 @@ export default async function ProgressPage() {
     };
   });
 
-  const progress = buildProgress(points);
+  const p = buildProgress(points);
+
+  const fillerNow = p.fillersPer100.recent ?? p.fillersPer100.series.at(-1) ?? null;
+  const paceNow = p.pace.recent ?? p.pace.series.at(-1) ?? null;
+
+  const fillerHeadline =
+    p.fillersPer100.early != null && p.fillersPer100.recent != null
+      ? `${p.fillersPer100.early.toFixed(0)} per 100 words at first, ${p.fillersPer100.recent.toFixed(0)} now`
+      : fillerNow != null
+        ? `${fillerNow.toFixed(0)} per 100 words`
+        : "Not enough yet";
+
+  const paceHeadline =
+    p.pace.early != null && p.pace.recent != null
+      ? `${p.pace.early.toFixed(0)} words a minute at first, ${p.pace.recent.toFixed(0)} now`
+      : paceNow != null
+        ? `${paceNow.toFixed(0)} words a minute`
+        : "Not enough yet";
 
   return (
-    <main className="flex flex-1 flex-col px-6 py-12">
-      <div className="mx-auto w-full max-w-xl">
-        <Link
-          href="/practice"
-          className="text-ash font-body hover:text-parchment inline text-[15px] underline underline-offset-4 transition-colors"
-        >
-          Back to practice
-        </Link>
+    <main className="flex flex-1 flex-col px-5 py-8">
+      <div className="mx-auto w-full max-w-md">
+        <AppHeader email={user.email} />
 
-        <h1
-          className="text-parchment font-display mt-8 text-[40px] leading-[44px]"
-          style={{ fontWeight: 600 }}
-        >
-          What&rsquo;s changed
-        </h1>
+        <h1 className="ef-display text-paper">What&rsquo;s changed</h1>
 
-        {progress.answers === 0 ? (
-          <p className="text-ash font-body mt-6">
+        {p.answers === 0 ? (
+          <p className="ef-body text-paper-soft mt-4">
             Nothing recorded yet. Answer a few questions out loud and this
             fills in.
           </p>
         ) : (
           <>
-            <div className="border-rule mt-10 flex flex-wrap gap-10 border-t pt-8">
-              <div>
-                <p className="text-parchment font-display text-[32px] tabular-nums">
-                  {progress.answers}
-                </p>
-                <p className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
-                  Answers
-                </p>
-              </div>
-              <div>
-                <p className="text-parchment font-display text-[32px] tabular-nums">
-                  {progress.questionsPractised}
-                </p>
-                <p className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
-                  Questions
-                </p>
-              </div>
-              {progress.retriesTaken > 0 && (
-                <div>
-                  <p className="text-parchment font-display text-[32px] tabular-nums">
-                    {progress.retriesImproved}
-                    <span className="text-ash text-lg">
-                      /{progress.retriesTaken}
-                    </span>
-                  </p>
-                  <p className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
-                    Second runs that landed
-                  </p>
-                </div>
+            <div className="mt-6 flex gap-3">
+              <Stat value={String(p.answers)} label="answers" />
+              <Stat value={String(p.questionsPractised)} label="questions" />
+              {p.retriesTaken > 0 && (
+                <Stat
+                  value={`${p.retriesImproved}/${p.retriesTaken}`}
+                  label="second runs that landed"
+                />
               )}
             </div>
 
-            {progress.retriesTaken > 0 && (
-              <p className="ef-body text-paper-soft mt-6">
-                {progress.retriesImproved === progress.retriesTaken
-                  ? "Every second attempt beat the first. The retry is doing the work it is meant to."
-                  : progress.retriesImproved === 0
-                    ? "None of your second attempts beat the first yet. Try reading the better version aloud once before recording again."
-                    : `${progress.retriesImproved} of your ${progress.retriesTaken} second attempts beat the first. That gap is the habit forming.`}
+            {p.retriesTaken > 0 && (
+              <p className="ef-body text-paper-soft mt-4">
+                {p.retriesImproved === p.retriesTaken
+                  ? "Every second attempt beat the first. The retry is doing its work."
+                  : p.retriesImproved === 0
+                    ? "No second attempt has beaten the first yet. Read the better version aloud once before recording again."
+                    : `${p.retriesImproved} of ${p.retriesTaken} second attempts beat the first. That gap is the habit forming.`}
               </p>
             )}
 
-            <section className="border-rule mt-12 border-t pt-8">
-              <h2 className="text-parchment font-display text-2xl">
-                Filler words
-              </h2>
-              <Change
-                early={progress.fillersPer100.early}
-                recent={progress.fillersPer100.recent}
-                unit="per 100 words"
-                lowerIsBetter
-              />
-              <Sparkline series={progress.fillersPer100.series} />
-              <p className="ef-body text-paper-soft mt-4">
-                {readFillers(
-                  progress.fillersPer100.recent ??
-                    progress.fillersPer100.series.at(-1) ??
-                    null,
-                )}
-              </p>
-            </section>
+            <Metric
+              title="Filler words"
+              headline={fillerHeadline}
+              reading={readFillers(fillerNow)}
+              series={p.fillersPer100.series}
+            />
 
-            <section className="border-rule mt-12 border-t pt-8">
-              <h2 className="text-parchment font-display text-2xl">Pace</h2>
-              <Change
-                early={progress.pace.early}
-                recent={progress.pace.recent}
-                unit="words per minute"
-                lowerIsBetter={false}
-              />
-              <p className="text-ash font-body mt-2 text-[13px]">
-                Under 110 loses people. Over 190 sounds rushed.
-              </p>
-              <Sparkline series={progress.pace.series} />
-              <p className="ef-body text-paper-soft mt-4">
-                {readPace(
-                  progress.pace.recent ?? progress.pace.series.at(-1) ?? null,
-                )}
-              </p>
-            </section>
+            <Metric
+              title="Pace"
+              headline={paceHeadline}
+              reading={readPace(paceNow)}
+              series={p.pace.series}
+            />
 
-            {progress.topHedges.length > 0 && (
-              <section className="border-rule mt-12 border-t pt-8">
-                <h2 className="text-parchment font-display text-2xl">
+            {p.topHedges.length > 0 && (
+              <section className="bg-raised mt-4 rounded-[16px] p-5">
+                <h2 className="ef-label text-faint">
                   What you keep reaching for
                 </h2>
-                <ul className="mt-4 flex flex-col gap-2">
-                  {progress.topHedges.map((hedge) => (
-                    <li
-                      key={hedge.phrase}
-                      className="text-parchment font-body flex justify-between"
-                    >
-                      <span>&ldquo;{hedge.phrase}&rdquo;</span>
-                      <span className="text-ash tabular-nums">
-                        {hedge.count} times
+                <ul className="mt-4 flex flex-col gap-2.5">
+                  {p.topHedges.map((h) => (
+                    <li key={h.phrase} className="flex items-baseline gap-3">
+                      <span className="text-clay font-serif text-[19px]">
+                        &ldquo;{h.phrase}&rdquo;
+                      </span>
+                      <span className="ef-caption text-faint tabular-nums">
+                        {h.count} times
                       </span>
                     </li>
                   ))}
                 </ul>
-                <p className="text-ash font-body mt-4 text-[15px] leading-relaxed">
-                  These are the phrases that make a client hear uncertainty
-                  where you meant politeness. Catching one of them mid-sentence
-                  is the whole skill.
+                <p className="ef-body text-paper-soft mt-4">
+                  Catching one of these mid-sentence is the whole skill. You do
+                  not need to fix all of them.
                 </p>
               </section>
             )}
+
+            <Link
+              href="/practice"
+              className="bg-paper text-dusk mt-8 block w-full rounded-full px-6 py-4 text-center text-[17px] font-semibold transition-opacity hover:opacity-90"
+            >
+              Practise again
+            </Link>
           </>
         )}
       </div>
