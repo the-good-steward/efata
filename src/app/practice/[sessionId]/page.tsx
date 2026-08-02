@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { RetryPanel } from "@/components/retry-panel";
+import { FeedbackRating } from "@/components/feedback-rating";
 
 export const metadata = { title: "Session · Efata" };
 
@@ -90,6 +91,21 @@ export default async function SessionPage({
     .order("attempt_number");
 
   const attempts = (attemptRows ?? []) as AttemptRow[];
+
+  const { data: ratingRows } = await supabase
+    .from("attempt_feedback")
+    .select("attempt_id, useful, issue")
+    .in(
+      "attempt_id",
+      attempts.map((a) => a.id),
+    );
+
+  const ratings = new Map(
+    (ratingRows ?? []).map((r) => [
+      r.attempt_id as string,
+      { useful: r.useful as boolean, issue: (r.issue as string | null) ?? null },
+    ]),
+  );
 
   return (
     <main className="flex flex-1 flex-col px-6 py-16">
@@ -182,6 +198,11 @@ export default async function SessionPage({
                       field. Double-check anything technical before you repeat
                       it to a client.
                     </p>
+
+                    <FeedbackRating
+                      attemptId={attempt.id}
+                      existing={ratings.get(attempt.id) ?? null}
+                    />
 
                   </div>
                 ))}

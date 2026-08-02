@@ -49,6 +49,33 @@ export default async function CalibratePage() {
     ]),
   );
 
+  // What users reported about the feedback itself. This scales in a way
+  // calibration cannot — one person cannot score every answer — but it
+  // measures something different: users can reliably say the feedback
+  // was vague or misheard them, and cannot reliably say a technical
+  // correction was wrong, since not knowing is why they are here.
+  const { data: reportRows } = await supabase
+    .from("attempt_feedback")
+    .select("useful, issue, note, created_at")
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const reports = reportRows ?? [];
+  const usefulCount = reports.filter((r) => r.useful).length;
+  const issueCounts = reports.reduce<Record<string, number>>((acc, r) => {
+    if (r.issue) acc[r.issue as string] = (acc[r.issue as string] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const ISSUE_LABELS: Record<string, string> = {
+    wrong_facts: "Got the work wrong",
+    misunderstood: "Missed the point",
+    transcript_wrong: "Misheard them",
+    too_harsh: "Felt unfair",
+    too_generic: "Too vague to use",
+    other: "Something else",
+  };
+
   // Agreement is only meaningful across scored pairs.
   const pairs = attempts
     .filter((a) => mine.has(a.id) && a.scores?.substance?.score)
@@ -117,6 +144,46 @@ export default async function CalibratePage() {
               A positive mean gap means Efata scores higher than you do, which
               is the direction that would send someone into a real call
               overconfident. Eight or more pairs before reading much into this.
+            </p>
+          </div>
+        )}
+
+        {reports.length > 0 && (
+          <div className="border-rule mt-10 border-t pt-8">
+            <h2 className="text-ash font-body text-xs tracking-[0.3em] uppercase">
+              What people said about the feedback
+            </h2>
+            <p className="text-parchment font-body mt-4 text-sm">
+              <span className="font-display text-2xl tabular-nums">
+                {usefulCount}
+              </span>
+              <span className="text-ash">
+                /{reports.length} found it useful
+              </span>
+            </p>
+
+            {Object.keys(issueCounts).length > 0 && (
+              <ul className="mt-5 flex flex-col gap-2">
+                {Object.entries(issueCounts)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([issue, count]) => (
+                    <li
+                      key={issue}
+                      className="text-parchment font-body flex justify-between text-sm"
+                    >
+                      <span>{ISSUE_LABELS[issue] ?? issue}</span>
+                      <span className="text-ash tabular-nums">{count}</span>
+                    </li>
+                  ))}
+              </ul>
+            )}
+
+            <p className="text-ash font-body mt-5 text-xs leading-relaxed">
+              &ldquo;Misheard them&rdquo; points at transcription, not
+              evaluation. &ldquo;Too vague&rdquo; points at the prompt.
+              &ldquo;Got the work wrong&rdquo; is the one worth reading the
+              notes on, since it is the failure users are least able to catch
+              on their own.
             </p>
           </div>
         )}
