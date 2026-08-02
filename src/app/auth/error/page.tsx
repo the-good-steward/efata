@@ -27,7 +27,7 @@ export default async function AuthErrorPage({
 
       <Link
         href="/signup"
-        className="bg-parchment text-ink font-body hover:bg-gold mt-8 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+        className="bg-parchment text-ink font-body hover:bg-parchment/85 mt-8 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
       >
         Back to sign up
       </Link>

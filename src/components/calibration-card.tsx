@@ -21,7 +21,7 @@ function ScorePicker({ name, label }: { name: string; label: string }) {
   return (
     <fieldset className="flex items-center gap-3">
       <legend className="sr-only">{label}</legend>
-      <span className="text-ash font-body w-24 text-xs tracking-[0.2em] uppercase">
+      <span className="text-ash font-body w-24 text-[13px] font-semibold tracking-[0.18em] uppercase">
         {label}
       </span>
       {[1, 2, 3, 4, 5].map((n) => (
@@ -33,7 +33,7 @@ function ScorePicker({ name, label }: { name: string; label: string }) {
             required
             className="peer sr-only"
           />
-          <span className="border-rule text-ash peer-checked:border-gold peer-checked:text-ink peer-checked:bg-gold font-body flex h-9 w-9 items-center justify-center rounded-sm border text-sm transition-colors">
+          <span className="border-rule text-ash peer-checked:border-spoken peer-checked:text-ink peer-checked:bg-spoken font-body flex h-9 w-9 items-center justify-center rounded-sm border text-sm transition-colors">
             {n}
           </span>
         </label>
@@ -56,7 +56,7 @@ export function CalibrationCard(props: Props) {
 
   return (
     <li className="border-rule border-t pt-8">
-      <span className="text-ash font-body text-xs tracking-[0.2em] uppercase">
+      <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
         {props.rubric}
       </span>
 
@@ -89,11 +89,11 @@ export function CalibrationCard(props: Props) {
             type="text"
             name="note"
             placeholder="Optional: what stood out?"
-            className="border-rule text-parchment placeholder:text-ash/50 focus:border-gold rounded-sm border bg-transparent px-3 py-2 font-body text-sm outline-none"
+            className="border-rule text-parchment placeholder:text-ash/50 focus:border-spoken rounded-sm border bg-transparent px-3 py-2 font-body text-sm outline-none"
           />
 
           {state.error && (
-            <p role="alert" className="font-body text-sm text-red-300">
+            <p role="alert" className="font-body text-sm text-flag">
               {state.error}
             </p>
           )}
@@ -101,7 +101,7 @@ export function CalibrationCard(props: Props) {
           <button
             type="submit"
             disabled={pending}
-            className="bg-parchment text-ink font-body hover:bg-gold self-start rounded-sm px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60"
+            className="bg-parchment text-ink font-body hover:bg-parchment/85 self-start rounded-sm px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60"
           >
             {pending ? "Saving…" : "Save my score and reveal"}
           </button>
@@ -110,7 +110,7 @@ export function CalibrationCard(props: Props) {
         <div className="mt-6">
           <table className="font-body w-full max-w-sm text-sm">
             <thead>
-              <tr className="text-ash text-xs tracking-[0.2em] uppercase">
+              <tr className="text-ash text-[13px] font-semibold tracking-[0.18em] uppercase">
                 <th className="pb-2 text-left font-normal"> </th>
                 <th className="pb-2 text-right font-normal">You</th>
                 <th className="pb-2 text-right font-normal">Efata</th>
@@ -135,8 +135,8 @@ export function CalibrationCard(props: Props) {
                         diff == null || diff === 0
                           ? "text-ash"
                           : Math.abs(diff) === 1
-                            ? "text-gold"
-                            : "text-red-400"
+                            ? "text-lamp"
+                            : "text-flag"
                       }`}
                     >
                       {diff == null ? "—" : diff > 0 ? `+${diff}` : diff}
@@ -174,7 +174,7 @@ export function CalibrationCard(props: Props) {
             </p>
           )}
           {stability.error && (
-            <p className="font-body mt-3 text-xs text-red-300">
+            <p className="font-body mt-3 text-xs text-flag">
               {stability.error}
             </p>
           )}

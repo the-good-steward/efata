@@ -59,7 +59,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
           required
           value={roleId}
           onChange={(event) => setRoleId(event.target.value)}
-          className="border-rule text-parchment focus:border-gold mt-5 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
+          className="border-rule text-parchment focus:border-spoken mt-5 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
         >
           <option value="" disabled className="bg-ink">
             Choose a role
@@ -77,7 +77,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
             name="custom_role"
             required
             placeholder="What do you call your work? e.g. legal transcriptionist"
-            className="border-rule text-parchment placeholder:text-ash/50 focus:border-gold mt-3 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
+            className="border-rule text-parchment placeholder:text-ash/50 focus:border-spoken mt-3 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
           />
         )}
       </fieldset>
@@ -100,7 +100,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
                 required
                 className="peer sr-only"
               />
-              <div className="border-rule peer-checked:border-gold peer-checked:bg-gold/5 rounded-sm border px-4 py-3 transition-colors">
+              <div className="border-rule peer-checked:border-spoken peer-checked:bg-spoken/10 rounded-sm border px-4 py-3 transition-colors">
                 <span className="text-parchment font-body text-sm">
                   {option.label}
                 </span>
@@ -131,7 +131,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
                 required
                 className="peer sr-only"
               />
-              <div className="border-rule peer-checked:border-gold peer-checked:bg-gold/5 rounded-sm border px-4 py-3 transition-colors">
+              <div className="border-rule peer-checked:border-spoken peer-checked:bg-spoken/10 rounded-sm border px-4 py-3 transition-colors">
                 <span className="text-parchment font-body text-sm">
                   {option.label}
                 </span>
@@ -142,7 +142,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
       </fieldset>
 
       {state.error && (
-        <p role="alert" className="font-body text-sm text-red-300">
+        <p role="alert" className="font-body text-sm text-flag">
           {state.error}
         </p>
       )}
@@ -150,7 +150,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
       <button
         type="submit"
         disabled={pending}
-        className="bg-parchment text-ink font-body hover:bg-gold self-start rounded-sm px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-60"
+        className="bg-parchment text-ink font-body hover:bg-parchment/85 self-start rounded-sm px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-60"
       >
         {pending ? "Saving…" : "Start practising"}
       </button>

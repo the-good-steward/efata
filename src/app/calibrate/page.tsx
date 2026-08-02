@@ -117,7 +117,7 @@ export default async function CalibratePage() {
 
         {pairs.length > 0 && (
           <div className="border-rule mt-10 border-t pt-8">
-            <h2 className="text-ash font-body text-xs tracking-[0.3em] uppercase">
+            <h2 className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               Agreement so far, on substance
             </h2>
             <div className="text-parchment font-body mt-4 flex flex-wrap gap-8 text-sm">
@@ -150,7 +150,7 @@ export default async function CalibratePage() {
 
         {reports.length > 0 && (
           <div className="border-rule mt-10 border-t pt-8">
-            <h2 className="text-ash font-body text-xs tracking-[0.3em] uppercase">
+            <h2 className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               What people said about the feedback
             </h2>
             <p className="text-parchment font-body mt-4 text-sm">

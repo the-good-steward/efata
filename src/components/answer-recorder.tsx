@@ -146,8 +146,8 @@ export function AnswerRecorder({
   return (
     <div className="mt-6">
       {attemptNumber > 1 && oneThing && (
-        <div className="border-gold/40 bg-gold/5 mb-6 rounded-sm border px-4 py-3">
-          <p className="text-gold font-body text-xs tracking-[0.2em] uppercase">
+        <div className="border-lamp/40 bg-lamp/5 mb-6 rounded-sm border px-4 py-3">
+          <p className="text-lamp font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
             This time
           </p>
           <p className="text-parchment font-body mt-2 text-sm leading-relaxed">
@@ -160,7 +160,7 @@ export function AnswerRecorder({
         <div>
           <button
             onClick={ready}
-            className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-5 py-3 text-sm font-medium transition-colors"
+            className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-5 py-3 text-sm font-medium transition-colors"
           >
             {attemptNumber > 1 ? `I'm ready — attempt ${attemptNumber}` : "I'm ready"}
           </button>
@@ -187,7 +187,7 @@ export function AnswerRecorder({
                 cy="32"
                 r="28"
                 fill="none"
-                stroke="var(--gold)"
+                stroke="var(--lamp)"
                 strokeWidth="2"
                 strokeDasharray="176"
                 strokeDashoffset={176 * (1 - prepLeft / PREP_SECONDS)}
@@ -208,12 +208,12 @@ export function AnswerRecorder({
         <div className="flex items-center gap-4">
           <button
             onClick={stopRecording}
-            className="font-body rounded-sm bg-red-900/70 px-4 py-2.5 text-sm font-medium text-red-100 transition-colors hover:bg-red-900"
+            className="font-body rounded-sm border border-spoken/60 px-4 py-2.5 text-sm font-medium text-spoken transition-colors hover:bg-spoken/10"
           >
             Stop
           </button>
           <span className="text-ash font-body flex items-center gap-2 text-sm tabular-nums">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-red-500" />
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-spoken" />
             {mmss}
           </span>
           <span className="text-ash/60 font-body text-xs">
@@ -232,7 +232,7 @@ export function AnswerRecorder({
           <div className="flex gap-3">
             <button
               onClick={submit}
-              className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+              className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
             >
               Get feedback
             </button>
@@ -255,7 +255,7 @@ export function AnswerRecorder({
       {error && (
         <p
           role="alert"
-          className="font-body mt-4 rounded-sm border border-red-900/60 bg-red-950/40 px-3 py-2 text-sm text-red-300"
+          className="font-body mt-4 rounded-sm border border-flag/40 bg-flag/10 px-3 py-2 text-sm text-flag"
         >
           {error}
         </p>

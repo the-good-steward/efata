@@ -79,7 +79,7 @@ export default async function RecallSessionPage({
 
         {logged.length > 0 && (
           <div className="border-rule mt-16 border-t pt-10">
-            <h2 className="text-ash font-body text-xs tracking-[0.3em] uppercase">
+            <h2 className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               {logged.length} logged
             </h2>
             <ul className="mt-6 flex flex-col gap-5">
@@ -99,7 +99,7 @@ export default async function RecallSessionPage({
 
             <Link
               href={`/practice/${sessionId}`}
-              className="bg-parchment text-ink font-body hover:bg-gold mt-8 inline-block rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+              className="bg-parchment text-ink font-body hover:bg-parchment/85 mt-8 inline-block rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
             >
               Practise these
             </Link>

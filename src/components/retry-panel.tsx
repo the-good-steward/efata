@@ -49,8 +49,8 @@ export function RetryPanel({
     return (
       <div className="mt-8">
         {readIt && (
-          <div className="mb-6 rounded-sm border border-amber-800/50 bg-amber-950/20 px-4 py-3">
-            <p className="font-body text-sm leading-relaxed text-amber-200">
+          <div className="mb-6 rounded-sm border border-flag/40 bg-flag/10 px-4 py-3">
+            <p className="font-body text-sm leading-relaxed text-flag">
               That last answer was {scriptOverlap}% the same wording as the
               suggested rewrite. Reading it back is easy; saying it your own
               way is the part that survives a real call. Try it again without
@@ -61,7 +61,7 @@ export function RetryPanel({
 
         {improvedAnswer && (
           <details className="mb-6">
-            <summary className="text-gold font-body cursor-pointer text-sm underline underline-offset-4">
+            <summary className="text-spoken font-body cursor-pointer text-sm underline underline-offset-4">
               Hear it said better
             </summary>
             <p className="text-parchment/90 font-body border-rule mt-3 border-l pl-4 text-sm leading-relaxed italic">
@@ -77,7 +77,7 @@ export function RetryPanel({
         <button
           onClick={() => setMode("recording")}
           disabled={!rated}
-          className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-4 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
         >
           Try again
         </button>

@@ -35,7 +35,7 @@ function Score({ label, value }: { label: string; value?: number }) {
   if (!value) return null;
   return (
     <div className="flex items-baseline gap-2">
-      <span className="text-ash font-body text-xs tracking-[0.2em] uppercase">
+      <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
         {label}
       </span>
       <span className="text-parchment font-display text-2xl tabular-nums">
@@ -83,7 +83,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
 
         <button
           onClick={() => setStarted(true)}
-          className="bg-parchment text-ink font-body hover:bg-gold mt-10 rounded-sm px-5 py-3 text-sm font-medium transition-colors"
+          className="bg-parchment text-ink font-body hover:bg-parchment/85 mt-10 rounded-sm px-5 py-3 text-sm font-medium transition-colors"
         >
           Start · {questions.length} questions
         </button>
@@ -102,17 +102,17 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-4">
-        <span className="text-ash font-body text-xs tracking-[0.3em] uppercase">
+        <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
           {index + 1} of {questions.length}
         </span>
-        <span className="text-ash font-body text-xs tracking-[0.2em] uppercase">
+        <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
           {question.type === "technical" ? "Technical" : "Situational"}
         </span>
       </div>
 
       <div className="bg-rule mt-3 h-px w-full">
         <div
-          className="bg-gold h-px transition-all duration-500"
+          className="bg-lamp h-px transition-all duration-500"
           style={{ width: `${((index + 1) / questions.length) * 100}%` }}
         />
       </div>
@@ -124,13 +124,13 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           </p>
         )}
 
-        <p className="text-parchment font-display mt-3 text-2xl leading-relaxed">
+        <p className="text-parchment font-display mt-3 text-[28px] leading-9">
           {question.body}
         </p>
 
         {attempts.map((attempt) => (
           <div key={attempt.id} className="border-rule/60 mt-10 border-l-2 pl-5">
-            <p className="text-ash font-body text-xs tracking-[0.2em] uppercase">
+            <p className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               Attempt {attempt.attempt_number}
             </p>
 
@@ -193,14 +193,14 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           {isLast ? (
             <Link
               href={`/practice`}
-              className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+              className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
             >
               Finish session
             </Link>
           ) : (
             <button
               onClick={() => setIndex((i) => i + 1)}
-              className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+              className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
             >
               Next question
             </button>

@@ -31,7 +31,7 @@ export function FeedbackRating({
   if ((existing || state.ok) && !showIssues) {
     return (
       <p className="text-ash font-body mt-5 text-xs">
-        Thanks — noted.{" "}
+        Noted.{" "}
         <button
           onClick={() => setShowIssues(true)}
           className="hover:text-parchment underline underline-offset-4 transition-colors"
@@ -55,7 +55,7 @@ export function FeedbackRating({
           <button
             type="submit"
             disabled={pending}
-            className="border-rule text-parchment font-body hover:border-gold hover:text-gold rounded-sm border px-3 py-1.5 text-xs transition-colors disabled:opacity-60"
+            className="border-rule text-parchment font-body hover:border-spoken hover:text-spoken rounded-sm border px-3 py-1.5 text-xs transition-colors disabled:opacity-60"
           >
             Yes
           </button>
@@ -63,7 +63,7 @@ export function FeedbackRating({
 
         <button
           onClick={() => setShowIssues(true)}
-          className="border-rule text-parchment font-body hover:border-gold hover:text-gold rounded-sm border px-3 py-1.5 text-xs transition-colors"
+          className="border-rule text-parchment font-body hover:border-spoken hover:text-spoken rounded-sm border px-3 py-1.5 text-xs transition-colors"
         >
           Not really
         </button>
@@ -86,7 +86,7 @@ export function FeedbackRating({
                   required
                   className="peer sr-only"
                 />
-                <span className="border-rule text-ash peer-checked:border-gold peer-checked:text-parchment font-body block rounded-sm border px-3 py-1.5 text-xs transition-colors">
+                <span className="border-rule text-ash peer-checked:border-spoken peer-checked:text-parchment font-body block rounded-sm border px-3 py-1.5 text-xs transition-colors">
                   {issue.label}
                 </span>
               </label>
@@ -97,13 +97,13 @@ export function FeedbackRating({
             type="text"
             name="note"
             placeholder="Optional: what should it have said?"
-            className="border-rule text-parchment placeholder:text-ash/50 focus:border-gold rounded-sm border bg-transparent px-3 py-1.5 font-body text-xs outline-none"
+            className="border-rule text-parchment placeholder:text-ash/50 focus:border-spoken rounded-sm border bg-transparent px-3 py-1.5 font-body text-xs outline-none"
           />
 
           <button
             type="submit"
             disabled={pending}
-            className="bg-parchment text-ink font-body hover:bg-gold self-start rounded-sm px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-60"
+            className="bg-parchment text-ink font-body hover:bg-parchment/85 self-start rounded-sm px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-60"
           >
             {pending ? "Sending…" : "Send"}
           </button>
@@ -111,7 +111,7 @@ export function FeedbackRating({
       )}
 
       {state.error && (
-        <p className="font-body mt-2 text-xs text-red-300">{state.error}</p>
+        <p className="font-body mt-2 text-xs text-flag">{state.error}</p>
       )}
     </div>
   );

@@ -38,7 +38,7 @@ export default async function PracticePage() {
 
         <header className="flex items-baseline justify-between gap-4">
           <div>
-            <p className="text-ash font-body text-xs tracking-[0.3em] uppercase">
+            <p className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               Signed in
             </p>
             <p className="text-parchment font-body mt-1 text-sm">
@@ -93,7 +93,7 @@ export default async function PracticePage() {
 
         {sessions && sessions.length > 0 && (
           <div className="border-rule mt-16 border-t pt-12">
-            <h2 className="text-ash font-body text-xs tracking-[0.3em] uppercase">
+            <h2 className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               Recent sessions
             </h2>
             <ul className="mt-6 flex flex-col gap-3">
@@ -101,7 +101,7 @@ export default async function PracticePage() {
                 <li key={session.id}>
                   <Link
                     href={`/practice/${session.id}`}
-                    className="text-parchment font-body hover:text-gold text-sm underline underline-offset-4 transition-colors"
+                    className="text-parchment font-body hover:text-spoken text-sm underline underline-offset-4 transition-colors"
                   >
                     {session.title ?? "Untitled session"}
                   </Link>

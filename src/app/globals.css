@@ -1,44 +1,48 @@
 @import "tailwindcss";
 
-/* Efata brand palette. */
+/*
+ * Efata palette. Roughly 70% dusk, 20% paper, 10% everything else — if
+ * two accents are doing work on the same screen, one of them is wrong.
+ */
 :root {
   --dusk: #1c2b33;
   --paper: #ede6d6;
   --seaglass: #8fafae;
   --deep-seaglass: #2e6e70;
   --lamp: #b8863e;
-  --clay: #9e5b48;
-  --clay-light: #d08e74;
+  --clay-on-paper: #9e5b48;
+  --clay-on-dusk: #d08e74;
 
-  /* Semantic aliases, so components describe intent not colour. */
+  /* Supporting */
+  --raised: #22343d;
+  --muted-on-dusk: #9dacb4;
+  --secondary-on-paper: #3a4a52;
+  --rule-on-paper: #dbd2be;
+
+  /* Semantic aliases, so components state intent rather than colour. */
   --ink: var(--dusk);
   --parchment: var(--paper);
-  --ash: var(--seaglass);
-  --gold: var(--lamp);
-  --rule: color-mix(in srgb, var(--seaglass) 22%, transparent);
-  --raised: color-mix(in srgb, var(--paper) 4%, var(--dusk));
+  --ash: var(--muted-on-dusk);
+  --rule: var(--raised);
+  --spoken: var(--seaglass);
+  --flag: var(--clay-on-dusk);
 
-  /* Loaded via next/font in layout.tsx, with system fallbacks so text
-     is readable before the webfont lands. */
-  --font-display:
-    "Source Serif 4", ui-serif, "Iowan Old Style", "Palatino Linotype",
-    serif;
-  --font-body:
-    "Source Sans 3", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, sans-serif;
+  --font-display: "Source Serif 4", ui-serif, Georgia, serif;
+  --font-body: "Work Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 @theme inline {
   --color-ink: var(--ink);
   --color-parchment: var(--parchment);
   --color-ash: var(--ash);
-  --color-gold: var(--gold);
   --color-rule: var(--rule);
   --color-raised: var(--raised);
+  --color-spoken: var(--spoken);
   --color-seaglass: var(--seaglass);
   --color-deep: var(--deep-seaglass);
-  --color-clay: var(--clay);
-  --color-clay-light: var(--clay-light);
+  --color-lamp: var(--lamp);
+  --color-flag: var(--flag);
+  --color-clay: var(--clay-on-paper);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 }
@@ -47,6 +51,21 @@ body {
   background: var(--ink);
   color: var(--parchment);
   font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 28px;
+}
+
+/* Tap targets never below 44px. */
+button,
+[role="button"],
+a.tap,
+select,
+summary {
+  min-height: 44px;
+}
+button.inline,
+a.inline {
+  min-height: 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -77,15 +96,5 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* Countdown ring before recording starts. */
-@keyframes drain {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: 283;
   }
 }
