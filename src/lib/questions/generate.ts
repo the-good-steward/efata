@@ -49,6 +49,8 @@ RULES
 - Ground the questions in the specific job post. Use the actual tools, industry, and responsibilities it names.
 - Never ask for personal information, salary history, age, marital status, religion, or anything an employer should not ask.
 - For technical questions only, include "markers". "must_mention" lists the specific levers, metrics, or checks a strong answer names — concrete things like "checks posting time against when the audience is active", not vague ones like "shows good understanding". "red_flags" lists what a bluffer says instead, such as naming a tactic with no way to measure whether it worked.
+
+- The markers are what a person's answer gets scored against, so they must be right. Base them on what you found while searching, not on what sounds plausible. Put the URLs you actually relied on in "sources". Set "confidence" to "researched" only when you found substantive material from people who do this work; set it to "unverified" when you are largely inferring, which is far better than guessing confidently. Be sceptical of agency marketing content: these topics attract a lot of search-optimised material that is confident and wrong. Prefer practitioners describing what they actually do.
 - difficulty is 1 to 5, where 3 is a competent freelancer with a year of relevant experience.
 
 Return ONLY valid JSON, no markdown fences and no commentary, in exactly this shape:

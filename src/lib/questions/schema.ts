@@ -11,10 +11,17 @@ export const generatedQuestion = z.object({
   context: z.string().max(400).optional(),
   difficulty: z.number().int().min(1).max(5),
   // Only present on technical questions: what a strong answer covers.
+  // Only present on technical questions. `sources` records where the
+  // criteria came from, so a wrong answer key can be traced and
+  // corrected rather than quietly mis-scoring people forever.
   markers: z
     .object({
       must_mention: z.array(z.string()).max(6),
       red_flags: z.array(z.string()).max(4),
+      sources: z.array(z.string()).max(6).default([]),
+      // Set by the model when research was thin, so evaluation can say
+      // so instead of scoring confidently off a guess.
+      confidence: z.enum(["researched", "unverified"]).default("unverified"),
     })
     .optional(),
 });

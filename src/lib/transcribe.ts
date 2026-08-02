@@ -58,3 +58,29 @@ export async function transcribeAudio(
 
   return { text: text.trim(), durationSeconds };
 }
+
+
+/**
+ * Counts filler words directly from the transcript.
+ *
+ * This is arithmetic, not judgment, so it should not be asked of a
+ * language model: models approximate counts, and an inconsistent number
+ * undermines trust in the parts of the feedback that are genuinely
+ * measured. Deepgram is configured to preserve fillers precisely so
+ * this can be counted here.
+ */
+const FILLERS = [
+  "um", "uh", "erm", "hmm", "mhm", "ah", "eh",
+  "like", "actually", "basically", "literally", "honestly",
+  "you know", "i mean", "sort of", "kind of", "kinda", "sorta",
+];
+
+export function countFillers(transcript: string): number {
+  const text = ` ${transcript.toLowerCase().replace(/[.,!?;:"']/g, " ").replace(/\s+/g, " ")} `;
+  let total = 0;
+  for (const filler of FILLERS) {
+    const matches = text.match(new RegExp(`\\s${filler}\\s`, "g"));
+    total += matches ? matches.length : 0;
+  }
+  return total;
+}

@@ -30,6 +30,10 @@ Score substance on whether the answer would convince someone who does this job f
 
 Strong answers name specific levers, metrics, tools, or an order of checks. Weak answers restate the question in different words, describe a tactic with no way to measure whether it worked, or stay abstract because they do not actually know.
 
+Judge the content, not the polish. A hesitant answer that names the right lever is better than a fluent one that names nothing measurable, and it must score higher. Confidence is scored under delivery; do not let it leak into the substance score.
+
+If the answer contradicts the reference criteria but is actually correct — practitioners disagree, and the criteria may be wrong — say so in the feedback rather than marking it down. Do not pretend to certainty you do not have about a domain judgment.
+
 Be honest here. Inflated scores on technical answers are worse than useless: the person walks into a real call believing they are ready.`,
 };
 
@@ -62,7 +66,11 @@ export async function evaluateAnswer(params: {
   rubric: Rubric;
   transcript: string;
   durationSeconds: number;
-  answerKey?: { must_mention?: string[]; red_flags?: string[] } | null;
+  answerKey?: {
+    must_mention?: string[];
+    red_flags?: string[];
+    confidence?: "researched" | "unverified";
+  } | null;
   attemptNumber: number;
   previousTranscript?: string | null;
 }): Promise<Evaluation> {
@@ -76,10 +84,14 @@ export async function evaluateAnswer(params: {
       : 0;
 
   const keySection = params.answerKey
-    ? `\nWhat a strong answer covers: ${(params.answerKey.must_mention ?? []).join("; ")}
-Signs of bluffing: ${(params.answerKey.red_flags ?? []).join("; ")}
-Judge the technical content against these.`
-    : "";
+    ? `\nREFERENCE CRITERIA${
+        params.answerKey.confidence === "researched"
+          ? " (researched from practitioner sources)"
+          : " (NOT verified — treat as a rough guide, not ground truth, and do not mark an answer down purely for departing from it)"
+      }
+What a strong answer covers: ${(params.answerKey.must_mention ?? []).join("; ")}
+Signs of bluffing: ${(params.answerKey.red_flags ?? []).join("; ")}`
+    : "\nNo reference criteria are available for this question. Judge on the merits and keep the technical score conservative rather than confident.";
 
   const retrySection =
     params.attemptNumber > 1 && params.previousTranscript

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { transcribeAudio } from "@/lib/transcribe";
+import { transcribeAudio, countFillers } from "@/lib/transcribe";
 import { evaluateAnswer, type Rubric } from "@/lib/evaluation/evaluate";
 
 export type AnswerState = { error?: string; ok?: boolean };
@@ -123,7 +123,13 @@ export async function submitAnswer(
     transcript: transcript.text,
     scores: {
       substance: result.substance,
-      delivery: result.delivery,
+      delivery: {
+        ...result.delivery,
+        // Counted from the transcript rather than taken from the model,
+        // which approximates. A number the person can verify by reading
+        // their own transcript has to be right.
+        filler_words: countFillers(transcript.text),
+      },
       words_per_minute:
         transcript.durationSeconds > 0
           ? Math.round(
