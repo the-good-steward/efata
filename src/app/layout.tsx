@@ -14,6 +14,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
+      <head>
+        {/*
+          Source Serif for display, Source Sans for body, loaded as a
+          stylesheet rather than through next/font. display=swap means
+          text renders immediately in the system fallback and reflows
+          when the webfont lands, which matters when many users are on
+          slow mobile connections.
+        */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font --
+            That rule targets the Pages Router, where a per-page font
+            link only applies to one page. This is the App Router root
+            layout, so it is global. */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+        />
+      </head>
       <body className="bg-ink flex min-h-full flex-col">{children}</body>
     </html>
   );

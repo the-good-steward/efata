@@ -18,11 +18,14 @@
   --rule: color-mix(in srgb, var(--seaglass) 22%, transparent);
   --raised: color-mix(in srgb, var(--paper) 4%, var(--dusk));
 
+  /* Loaded via next/font in layout.tsx, with system fallbacks so text
+     is readable before the webfont lands. */
   --font-display:
-    ui-serif, "Iowan Old Style", "Palatino Linotype", "URW Palladio", "P052",
+    "Source Serif 4", ui-serif, "Iowan Old Style", "Palatino Linotype",
     serif;
   --font-body:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    "Source Sans 3", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
 }
 
 @theme inline {

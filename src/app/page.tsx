@@ -1,22 +1,4 @@
-function Flourish({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      width="120"
-      height="16"
-      viewBox="0 0 120 16"
-      fill="none"
-      className={`text-gold ${className}`}
-      aria-hidden="true"
-    >
-      <path
-        d="M4 14C20 4 100 4 116 14"
-        stroke="currentColor"
-        strokeWidth="1"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+import { Mark } from "@/components/logo";
 
 export default function Home() {
   return (
@@ -26,15 +8,13 @@ export default function Home() {
           In development
         </span>
 
-        <Flourish className="mt-8" />
+        <Mark size={64} className="text-parchment mt-10" />
 
-        <h1 className="text-parchment font-display mt-6 text-6xl sm:text-7xl">
-          Efata
+        <h1 className="text-parchment font-display mt-8 text-6xl tracking-tight sm:text-7xl">
+          efata
         </h1>
 
-        <Flourish className="mt-6 rotate-180" />
-
-        <p className="text-ash font-display mt-6 text-lg italic">
+        <p className="text-ash font-display mt-5 text-lg italic">
           Ephphatha, &ldquo;be opened&rdquo;
         </p>
 

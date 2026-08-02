@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/auth/actions";
 import { JobPostForm } from "@/components/job-post-form";
+import { Wordmark } from "@/components/logo";
 
 export const metadata = { title: "Practice · Efata" };
 
@@ -33,6 +34,8 @@ export default async function PracticePage() {
   return (
     <main className="flex flex-1 flex-col px-6 py-16">
       <div className="mx-auto w-full max-w-xl">
+        <Wordmark className="mb-10" />
+
         <header className="flex items-baseline justify-between gap-4">
           <div>
             <p className="text-ash font-body text-xs tracking-[0.3em] uppercase">

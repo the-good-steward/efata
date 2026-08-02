@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Mark } from "@/components/logo";
 import { useActionState } from "react";
 import type { AuthState } from "@/app/auth/actions";
 
@@ -19,6 +20,7 @@ export function AuthForm({ mode, action }: Props) {
 
   return (
     <div className="w-full max-w-sm">
+      <Mark size={36} className="text-parchment mb-8" />
       <h1 className="text-parchment font-display text-4xl">
         {isSignup ? "Create your account" : "Sign in"}
       </h1>
