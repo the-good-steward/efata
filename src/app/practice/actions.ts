@@ -70,11 +70,14 @@ export async function createSession(
   // client-facing insert policy deliberately rejects.
   const admin = createAdminClient();
 
-  const { data: role } = await admin
-    .from("roles")
-    .select("id")
-    .eq("slug", generated.role_slug)
-    .single();
+  // maybeSingle, not single: an untagged session is fine, a crash is not.
+  const { data: role } = generated.role_slug
+    ? await admin
+        .from("roles")
+        .select("id")
+        .eq("slug", generated.role_slug)
+        .maybeSingle()
+    : { data: null };
 
   const { data: session, error: sessionError } = await admin
     .from("sessions")
@@ -197,7 +200,10 @@ function describeGenerationError(error: unknown): string {
     return "The AI returned something unreadable. Try again — this is usually transient.";
   }
 
-  return "Couldn't build questions from that job post. Try again, or paste a more detailed one.";
+  // Include the underlying message. A bare "try again" on an error we
+  // did not anticipate sends the user editing input that was never the
+  // problem, which is exactly how the last few of these went.
+  return `Couldn't build questions from that job post. ${message.slice(0, 160)}`;
 }
 
 /**

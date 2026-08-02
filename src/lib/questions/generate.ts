@@ -29,9 +29,9 @@ Never ask for a definition. Never ask "what is X" or "how familiar are you with 
 
 The roles you may choose from, and the territory to draw technical questions from for each, are listed in the message below. Pick the single role_slug that best matches the job post.
 
-The catalogue is a hint, not a boundary. If nothing on it genuinely fits — a pharmacy assistant, a legal transcriptionist, a livestock records clerk — use "other" and build the technical territory from the job post itself: the tools it names, the numbers it cares about, the outputs it asks for, and the calls that role makes daily. Do not force a poor match onto a listed role just because it is there; a bookkeeping question asked of a veterinary receptionist is worse than useless.
+The catalogue is a hint, not a boundary. Do not force a poor match onto a listed role just because it is there; a bookkeeping question asked of a veterinary receptionist is worse than useless. Whatever role you pick, the technical questions must come from the job post in front of you — its tools, its numbers, its outputs, and the calls that role makes daily.
 
-When you use "other", the technical questions must be MORE specific, not less. You have the actual job post, so use it. Name their tools and their situations rather than retreating to generic professionalism.
+You may ONLY return a role_slug that appears in the list below. Nothing else is valid.
 
 Set difficulty from the person's experience level, given in the message below. Pitch the technical questions at that level: too hard and they learn nothing, too easy and the practice is worthless.
 
@@ -112,6 +112,8 @@ export async function generateQuestions(
 
   if (roles.length === 0) throw new Error("No roles are configured.");
 
+  const hasEscapeHatch = roles.some((role) => role.slug === "other");
+
   const roleCatalogue = roles
     .map(
       (role) =>
@@ -151,6 +153,10 @@ English level: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
 
 ROLES AND THEIR TECHNICAL TERRITORY
 ${roleCatalogue}${
+          hasEscapeHatch
+            ? `\n\nIf nothing above genuinely fits — a pharmacy assistant, a legal transcriptionist, a livestock records clerk — use "other" and build the technical territory from the job post itself. When you do, the technical questions must get MORE specific, not less: name their tools and their situations rather than retreating to generic professionalism.`
+            : ""
+        }${
           customRole
             ? `\n\nThis person describes their own work as: "${customRole}". Weigh that alongside the job post when choosing the role and writing technical questions.`
             : ""
@@ -219,9 +225,14 @@ ${jobPost}
     if (result.success) {
       const known = roles.some((role) => role.slug === result.data.role_slug);
       if (!known) {
-        throw new Error(
-          `The model chose an unknown role: ${result.data.role_slug}`,
+        // Deliberately not fatal. The questions themselves are fine; only
+        // the tag is unrecognised, usually because the catalogue in the
+        // database is behind what the prompt described. Throwing away a
+        // good set over a label would be a bad trade.
+        console.warn(
+          `Model returned unknown role_slug "${result.data.role_slug}". Storing the session untagged.`,
         );
+        return { ...result.data, role_slug: "" };
       }
       return result.data;
     }
