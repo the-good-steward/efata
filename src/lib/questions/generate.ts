@@ -29,6 +29,10 @@ Never ask for a definition. Never ask "what is X" or "how familiar are you with 
 
 The roles you may choose from, and the territory to draw technical questions from for each, are listed in the message below. Pick the single role_slug that best matches the job post.
 
+The catalogue is a hint, not a boundary. If nothing on it genuinely fits — a pharmacy assistant, a legal transcriptionist, a livestock records clerk — use "other" and build the technical territory from the job post itself: the tools it names, the numbers it cares about, the outputs it asks for, and the calls that role makes daily. Do not force a poor match onto a listed role just because it is there; a bookkeeping question asked of a veterinary receptionist is worse than useless.
+
+When you use "other", the technical questions must be MORE specific, not less. You have the actual job post, so use it. Name their tools and their situations rather than retreating to generic professionalism.
+
 Set difficulty from the person's experience level, given in the message below. Pitch the technical questions at that level: too hard and they learn nothing, too easy and the practice is worthless.
 
 RESEARCH
@@ -101,6 +105,7 @@ export async function generateQuestions(
   englishLevel: EnglishLevel,
   experienceLevel: ExperienceLevel = "beginner",
   roles: RoleOption[] = [],
+  customRole: string | null = null,
 ): Promise<GenerationResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set.");
@@ -145,7 +150,11 @@ export async function generateQuestions(
 English level: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
 
 ROLES AND THEIR TECHNICAL TERRITORY
-${roleCatalogue}
+${roleCatalogue}${
+          customRole
+            ? `\n\nThis person describes their own work as: "${customRole}". Weigh that alongside the job post when choosing the role and writing technical questions.`
+            : ""
+        }
 
 First, search the web for what is actually asked in interviews and client calls for this kind of role. Search two or three times with different angles, for example the role title plus "interview questions", the specific tools named in the job post, and what clients ask when hiring for this remotely. Read what you find before writing anything.
 

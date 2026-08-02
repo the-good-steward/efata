@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   completeOnboarding,
   type OnboardingState,
@@ -38,6 +38,10 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
     completeOnboarding,
     {},
   );
+  const [roleId, setRoleId] = useState("");
+
+  const otherRole = roles.find((role) => role.label === "Something else");
+  const showCustom = otherRole ? roleId === otherRole.id : false;
 
   return (
     <form action={formAction} className="mt-10 flex flex-col gap-12">
@@ -46,12 +50,15 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
           What kind of work are you going for?
         </legend>
         <p className="text-ash font-body mt-2 text-sm">
-          Pick the closest match. You can practise for any role later.
+          Pick the closest match, or choose &ldquo;Something else&rdquo; if
+          your work isn&rsquo;t listed. Either way you can paste any job post
+          and get questions for it.
         </p>
         <select
           name="primary_role_id"
           required
-          defaultValue=""
+          value={roleId}
+          onChange={(event) => setRoleId(event.target.value)}
           className="border-rule text-parchment focus:border-gold mt-5 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
         >
           <option value="" disabled className="bg-ink">
@@ -63,6 +70,16 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
             </option>
           ))}
         </select>
+
+        {showCustom && (
+          <input
+            type="text"
+            name="custom_role"
+            required
+            placeholder="What do you call your work? e.g. legal transcriptionist"
+            className="border-rule text-parchment placeholder:text-ash/50 focus:border-gold mt-3 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
+          />
+        )}
       </fieldset>
 
       <fieldset>

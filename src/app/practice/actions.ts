@@ -40,7 +40,7 @@ export async function createSession(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("english_level, experience_level")
+    .select("english_level, experience_level, custom_role")
     .eq("id", user.id)
     .single();
 
@@ -59,6 +59,7 @@ export async function createSession(
       englishLevel,
       experienceLevel,
       (roleRows ?? []) as RoleOption[],
+      (profile?.custom_role as string | null) ?? null,
     );
   } catch (error) {
     console.error("Question generation failed:", error);

@@ -16,6 +16,7 @@ export async function completeOnboarding(
   const experience = String(formData.get("experience_level") ?? "");
   const english = String(formData.get("english_level") ?? "");
   const roleId = String(formData.get("primary_role_id") ?? "");
+  const customRole = String(formData.get("custom_role") ?? "").trim() || null;
 
   if (!EXPERIENCE.includes(experience as (typeof EXPERIENCE)[number])) {
     return { error: "Choose how much experience you have." };
@@ -37,6 +38,7 @@ export async function completeOnboarding(
       experience_level: experience,
       english_level: english,
       primary_role_id: roleId,
+      custom_role: customRole,
       onboarded_at: new Date().toISOString(),
     })
     .eq("id", user.id);

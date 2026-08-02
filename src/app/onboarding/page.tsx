@@ -19,10 +19,15 @@ export default async function OnboardingPage() {
 
   if (profile?.onboarded_at) redirect("/practice");
 
-  const { data: roles } = await supabase
+  const { data: roleRows } = await supabase
     .from("roles")
-    .select("id, label, description")
+    .select("id, label, description, slug")
     .order("label");
+
+  // "Something else" belongs at the bottom, not sorted into the S's.
+  const roles = (roleRows ?? []).sort((a, b) =>
+    a.slug === "other" ? 1 : b.slug === "other" ? -1 : 0,
+  );
 
   return (
     <main className="flex flex-1 flex-col px-6 py-16">
@@ -35,7 +40,7 @@ export default async function OnboardingPage() {
           candidate.
         </p>
 
-        <OnboardingForm roles={roles ?? []} />
+        <OnboardingForm roles={roles} />
       </div>
     </main>
   );

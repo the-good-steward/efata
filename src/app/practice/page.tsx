@@ -82,9 +82,9 @@ export default async function PracticePage() {
           </div>
 
           <p className="text-ash/70 font-body mt-6 text-xs leading-relaxed">
-            Questions are researched from what employers actually ask, then
-            written for your role and level. They are a rehearsal, not a
-            prediction of the real interview.
+            Any job post works, whatever the role. Questions are researched
+            from what employers actually ask, then written for your level.
+            They are a rehearsal, not a prediction of the real interview.
           </p>
         </div>
 
