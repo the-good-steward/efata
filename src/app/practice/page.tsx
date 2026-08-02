@@ -33,14 +33,22 @@ export default async function PracticePage() {
             </p>
           </div>
 
-          <form action={logout}>
+          <div className="flex items-baseline gap-5">
+            <Link
+              href="/calibrate"
+              className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
+            >
+              Calibration
+            </Link>
+            <form action={logout}>
             <button
               type="submit"
               className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
             >
               Sign out
             </button>
-          </form>
+            </form>
+          </div>
         </header>
 
         <div className="border-rule mt-12 border-t pt-12">
