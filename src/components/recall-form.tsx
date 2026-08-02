@@ -3,15 +3,7 @@
 import { useActionState, useRef, useEffect } from "react";
 import { logRealQuestion, type RecallState } from "@/app/recall/actions";
 
-type Role = { id: string; label: string };
-
-export function RecallForm({
-  roles,
-  defaultRoleId,
-}: {
-  roles: Role[];
-  defaultRoleId: string | null;
-}) {
+export function RecallForm({ sessionId }: { sessionId: string }) {
   const [state, formAction, pending] = useActionState<RecallState, FormData>(
     logRealQuestion,
     {},
@@ -27,6 +19,7 @@ export function RecallForm({
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-6">
+      <input type="hidden" name="session_id" value={sessionId} />
       <label className="flex flex-col gap-2">
         <span className="text-ash font-body text-xs tracking-[0.2em] uppercase">
           The question
@@ -64,53 +57,6 @@ export function RecallForm({
           ))}
         </div>
       </fieldset>
-
-      <label className="flex flex-col gap-2">
-        <span className="text-ash font-body text-xs tracking-[0.2em] uppercase">
-          Role it was for
-        </span>
-        <select
-          name="role_id"
-          defaultValue={defaultRoleId ?? ""}
-          className="border-rule text-parchment focus:border-gold rounded-sm border bg-transparent px-3 py-2 font-body text-sm outline-none"
-        >
-          <option value="" className="bg-ink">
-            Not sure
-          </option>
-          {roles.map((role) => (
-            <option key={role.id} value={role.id} className="bg-ink">
-              {role.label}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="flex items-start gap-3">
-        <input
-          type="checkbox"
-          name="caught_out"
-          value="yes"
-          className="border-rule accent-gold mt-1 h-4 w-4"
-        />
-        <span className="text-parchment font-body text-sm leading-relaxed">
-          This one caught me out
-          <span className="text-ash block text-xs">
-            The ones you fumbled are the most useful to everyone else.
-          </span>
-        </span>
-      </label>
-
-      <label className="flex flex-col gap-2">
-        <span className="text-ash font-body text-xs tracking-[0.2em] uppercase">
-          Anything else (optional)
-        </span>
-        <input
-          type="text"
-          name="context"
-          placeholder="Where it was, what kind of client, how it went."
-          className="border-rule text-parchment placeholder:text-ash/50 focus:border-gold rounded-sm border bg-transparent px-3 py-2 font-body text-sm outline-none"
-        />
-      </label>
 
       {state.error && (
         <p role="alert" className="font-body text-sm text-red-300">

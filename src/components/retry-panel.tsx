@@ -11,6 +11,8 @@ type Props = {
   /** null on a first attempt, otherwise 0-100. */
   scriptOverlap: number | null;
   hasAttempted: boolean;
+  /** Retrying is blocked until the last attempt has been rated. */
+  rated: boolean;
 };
 
 const READING_THRESHOLD = 60;
@@ -22,6 +24,7 @@ export function RetryPanel({
   improvedAnswer,
   scriptOverlap,
   hasAttempted,
+  rated,
 }: Props) {
   // "reviewing" shows the rewrite. "recording" deliberately hides it:
   // having the better wording on screen while speaking turns the retry
@@ -73,12 +76,15 @@ export function RetryPanel({
 
         <button
           onClick={() => setMode("recording")}
-          className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+          disabled={!rated}
+          className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-4 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
         >
           Try again
         </button>
         <p className="text-ash font-body mt-3 text-xs">
-          The rewrite gets hidden while you record, on purpose.
+          {rated
+            ? "The rewrite gets hidden while you record, on purpose."
+            : "Tell us whether that feedback was useful first — it takes one tap, and it's how the feedback gets better."}
         </p>
       </div>
     );

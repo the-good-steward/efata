@@ -211,6 +211,7 @@ export default async function SessionPage({
                   sessionQuestionId={link.id}
                   attemptNumber={mine.length + 1}
                   hasAttempted={mine.length > 0}
+                  rated={latest ? ratings.has(latest.id) : true}
                   improvedAnswer={latest?.improved_answer ?? null}
                   scriptOverlap={latest?.scores?.script_overlap ?? null}
                   oneThing={
