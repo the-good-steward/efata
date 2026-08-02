@@ -1,11 +1,22 @@
 @import "tailwindcss";
 
+/* Efata brand palette. */
 :root {
-  --ink: #14120f;
-  --parchment: #f1ece1;
-  --ash: #a79c8a;
-  --gold: #c79a4b;
-  --rule: #2a251e;
+  --dusk: #1c2b33;
+  --paper: #ede6d6;
+  --seaglass: #8fafae;
+  --deep-seaglass: #2e6e70;
+  --lamp: #b8863e;
+  --clay: #9e5b48;
+  --clay-light: #d08e74;
+
+  /* Semantic aliases, so components describe intent not colour. */
+  --ink: var(--dusk);
+  --parchment: var(--paper);
+  --ash: var(--seaglass);
+  --gold: var(--lamp);
+  --rule: color-mix(in srgb, var(--seaglass) 22%, transparent);
+  --raised: color-mix(in srgb, var(--paper) 4%, var(--dusk));
 
   --font-display:
     ui-serif, "Iowan Old Style", "Palatino Linotype", "URW Palladio", "P052",
@@ -20,6 +31,11 @@
   --color-ash: var(--ash);
   --color-gold: var(--gold);
   --color-rule: var(--rule);
+  --color-raised: var(--raised);
+  --color-seaglass: var(--seaglass);
+  --color-deep: var(--deep-seaglass);
+  --color-clay: var(--clay);
+  --color-clay-light: var(--clay-light);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 }
@@ -34,6 +50,9 @@ body {
   .reveal {
     animation: reveal 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+  .rise {
+    animation: rise 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 @keyframes reveal {
@@ -44,5 +63,26 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Countdown ring before recording starts. */
+@keyframes drain {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 283;
   }
 }

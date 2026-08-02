@@ -11,9 +11,18 @@ type Props = {
   oneThing?: string | null;
 };
 
-type Phase = "idle" | "recording" | "review" | "submitting";
+type Phase = "idle" | "prep" | "recording" | "review" | "submitting";
 
 const MAX_SECONDS = 150;
+/**
+ * Beat between seeing the question and recording starting.
+ *
+ * Short on purpose. The skill being trained is thinking on your feet,
+ * and a long pause turns practice into rehearsal — which is exactly
+ * what does not transfer to a live call. Five seconds is enough to take
+ * a breath and pick an angle, not enough to draft an answer.
+ */
+const PREP_SECONDS = 5;
 
 export function AnswerRecorder({
   sessionQuestionId,
@@ -35,36 +44,34 @@ export function AnswerRecorder({
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (prepRef.current) clearInterval(prepRef.current);
       streamRef.current?.getTracks().forEach((t) => t.stop());
     };
   }, []);
 
-  async function startRecording() {
+  const [prepLeft, setPrepLeft] = useState(PREP_SECONDS);
+  const prepRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  /**
+   * Microphone access has to be requested from a user gesture, so the
+   * permission prompt happens here rather than after the countdown.
+   */
+  async function ready() {
     setError(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-      chunksRef.current = [];
+      setPhase("prep");
+      setPrepLeft(PREP_SECONDS);
 
-      const recorder = new MediaRecorder(stream);
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) chunksRef.current.push(event.data);
-      };
-      recorder.onstop = () => {
-        setBlob(new Blob(chunksRef.current, { type: recorder.mimeType }));
-        streamRef.current?.getTracks().forEach((t) => t.stop());
-        setPhase("review");
-      };
-
-      recorder.start();
-      recorderRef.current = recorder;
-      setSeconds(0);
-      setPhase("recording");
-
-      timerRef.current = setInterval(() => {
-        setSeconds((s) => {
-          if (s + 1 >= MAX_SECONDS) stopRecording();
-          return s + 1;
+      prepRef.current = setInterval(() => {
+        setPrepLeft((left) => {
+          if (left <= 1) {
+            if (prepRef.current) clearInterval(prepRef.current);
+            beginRecording();
+            return 0;
+          }
+          return left - 1;
         });
       }, 1000);
     } catch {
@@ -74,12 +81,41 @@ export function AnswerRecorder({
     }
   }
 
+  function beginRecording() {
+    const stream = streamRef.current;
+    if (!stream) return;
+
+    chunksRef.current = [];
+    const recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) chunksRef.current.push(event.data);
+    };
+    recorder.onstop = () => {
+      setBlob(new Blob(chunksRef.current, { type: recorder.mimeType }));
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      setPhase("review");
+    };
+
+    recorder.start();
+    recorderRef.current = recorder;
+    setSeconds(0);
+    setPhase("recording");
+
+    timerRef.current = setInterval(() => {
+      setSeconds((s) => {
+        if (s + 1 >= MAX_SECONDS) stopRecording();
+        return s + 1;
+      });
+    }, 1000);
+  }
+
   function stopRecording() {
     if (timerRef.current) clearInterval(timerRef.current);
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
   }
 
   function discard() {
+    if (prepRef.current) clearInterval(prepRef.current);
     setBlob(null);
     setSeconds(0);
     setPhase("idle");
@@ -121,12 +157,51 @@ export function AnswerRecorder({
       )}
 
       {phase === "idle" && (
-        <button
-          onClick={startRecording}
-          className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
-        >
-          {attemptNumber > 1 ? "Record attempt " + attemptNumber : "Record your answer"}
-        </button>
+        <div>
+          <button
+            onClick={ready}
+            className="bg-parchment text-ink font-body hover:bg-gold rounded-sm px-5 py-3 text-sm font-medium transition-colors"
+          >
+            {attemptNumber > 1 ? `I'm ready — attempt ${attemptNumber}` : "I'm ready"}
+          </button>
+          <p className="text-ash font-body mt-3 text-xs">
+            Recording starts {PREP_SECONDS} seconds after you tap.
+          </p>
+        </div>
+      )}
+
+      {phase === "prep" && (
+        <div className="flex items-center gap-4">
+          <div className="relative flex h-16 w-16 items-center justify-center">
+            <svg className="absolute -rotate-90" width="64" height="64" aria-hidden="true">
+              <circle
+                cx="32"
+                cy="32"
+                r="28"
+                fill="none"
+                stroke="var(--rule)"
+                strokeWidth="2"
+              />
+              <circle
+                cx="32"
+                cy="32"
+                r="28"
+                fill="none"
+                stroke="var(--gold)"
+                strokeWidth="2"
+                strokeDasharray="176"
+                strokeDashoffset={176 * (1 - prepLeft / PREP_SECONDS)}
+                style={{ transition: "stroke-dashoffset 1s linear" }}
+              />
+            </svg>
+            <span className="text-parchment font-display text-2xl tabular-nums">
+              {prepLeft}
+            </span>
+          </div>
+          <p className="text-ash font-body text-sm">
+            Take a breath. Don&rsquo;t script it.
+          </p>
+        </div>
       )}
 
       {phase === "recording" && (
