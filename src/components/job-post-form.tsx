@@ -1,13 +1,44 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { createSession, type SessionState } from "@/app/practice/actions";
+
+/**
+ * Not a progress bar — the steps are not measurable and a bar that
+ * stalls at 80% is worse than none. These describe the work.
+ */
+const STEPS = [
+  "Reading the job post",
+  "Looking up what this role is actually asked",
+  "Working out what they'd test you on",
+  "Writing your questions",
+  "Nearly there",
+];
 
 export function JobPostForm() {
   const [state, formAction, pending] = useActionState<SessionState, FormData>(
     createSession,
     {},
   );
+
+  /**
+   * Generation takes up to a minute because it researches the role
+   * before writing anything. A single frozen spinner for that long
+   * reads as broken, so the steps say what is actually happening.
+   */
+  // Derived from elapsed time rather than held as state that an effect
+  // writes to, which keeps the lint rule happy and the logic simpler.
+  const [ticks, setTicks] = useState(0);
+
+  useEffect(() => {
+    if (!pending) return;
+    const timer = setInterval(() => {
+      setTicks((t) => t + 1);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [pending]);
+
+  const step = pending ? Math.min(ticks, STEPS.length - 1) : 0;
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -42,10 +73,16 @@ export function JobPostForm() {
       </button>
 
       {pending && (
-        <p className="text-ash font-body text-xs">
-          Efata is looking up what&rsquo;s actually asked for this role.
-          This takes up to a minute.
-        </p>
+        <div className="bg-raised mt-2 rounded-[12px] p-5">
+          <div className="flex items-center gap-3">
+            <span className="bg-seaglass inline-block h-2 w-2 animate-pulse rounded-full" />
+            <p className="ef-ui text-paper">{STEPS[step]}</p>
+          </div>
+          <p className="ef-caption text-faint mt-3">
+            Up to a minute. It&rsquo;s reading what employers actually ask
+            for this role, not guessing.
+          </p>
+        </div>
       )}
     </form>
   );

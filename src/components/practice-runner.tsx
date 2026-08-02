@@ -90,6 +90,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   const [index, setIndex] = useState(
     firstUnanswered === -1 ? 0 : firstUnanswered,
   );
+  const [finished, setFinished] = useState(false);
   const [started, setStarted] = useState(
     questions.some((q) => q.attempts.length > 0),
   );
@@ -125,6 +126,99 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         >
           Start · {questions.length} questions
         </button>
+      </div>
+    );
+  }
+
+  if (finished) {
+    const answeredCount = questions.filter((q) => q.attempts.length > 0).length;
+    const retried = questions.filter((q) => q.attempts.length > 1).length;
+    const fillers = questions
+      .flatMap((q) => q.attempts)
+      .map((a) => a.scores?.delivery?.filler_words ?? 0);
+    const firstFillers = fillers[0];
+    const lastFillers = fillers[fillers.length - 1];
+
+    const hedges = new Map<string, number>();
+    for (const q of questions) {
+      for (const a of q.attempts) {
+        for (const h of a.scores?.delivery?.hedging ?? []) {
+          const key = h.trim().toLowerCase();
+          if (key) hedges.set(key, (hedges.get(key) ?? 0) + 1);
+        }
+      }
+    }
+    const topHedges = [...hedges.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+
+    return (
+      <div className="rise">
+        <p className="ef-label text-faint">Session finished</p>
+        <h1 className="ef-display text-paper mt-3">
+          {answeredCount} of {questions.length} answered
+        </h1>
+
+        <div className="border-hairline mt-8 flex flex-col gap-5 border-t pt-8">
+          {retried > 0 && (
+            <p className="ef-body text-paper-soft">
+              You went back and did {retried}{" "}
+              {retried === 1 ? "question" : "questions"} a second time. That
+              second run is where the change actually happens.
+            </p>
+          )}
+
+          {topHedges.length > 0 && (
+            <div>
+              <p className="ef-label text-faint">What you reached for</p>
+              <ul className="mt-3 flex flex-col gap-1">
+                {topHedges.map(([phrase, count]) => (
+                  <li key={phrase} className="ef-body text-paper">
+                    &ldquo;{phrase}&rdquo;{" "}
+                    <span className="text-faint">
+                      · {count} {count === 1 ? "time" : "times"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="ef-caption text-faint mt-3">
+                Catching one of these mid-sentence on a real call is the whole
+                skill. You do not need to fix all of them.
+              </p>
+            </div>
+          )}
+
+          {firstFillers != null && lastFillers != null && fillers.length > 2 && (
+            <p className="ef-body text-paper-soft">
+              You started at {firstFillers} filler words and finished at{" "}
+              {lastFillers}.
+            </p>
+          )}
+        </div>
+
+        <div className="mt-10 flex flex-col gap-3">
+          <Link
+            href="/progress"
+            className="bg-paper text-dusk block w-full rounded-full px-6 py-4 text-center text-[17px] font-semibold transition-opacity hover:opacity-90"
+          >
+            See how this compares
+          </Link>
+          <button
+            onClick={() => {
+              setFinished(false);
+              setIndex(0);
+            }}
+            className="ef-ui text-muted hover:text-paper transition-colors"
+          >
+            Back to the questions
+          </button>
+          <Link
+            href="/practice"
+            className="ef-ui text-faint hover:text-paper text-center transition-colors"
+          >
+            Start a different session
+          </Link>
+        </div>
       </div>
     );
   }
@@ -246,33 +340,31 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         />
       </div>
 
-      {answered && (
-        <div className="border-rule mt-14 flex items-center justify-between gap-4 border-t pt-6">
-          <button
-            onClick={() => setIndex((i) => Math.max(0, i - 1))}
-            disabled={index === 0}
-            className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors disabled:opacity-30"
-          >
-            Previous
-          </button>
+      <div className="border-hairline mt-14 flex items-center justify-between gap-4 border-t pt-6">
+        <button
+          onClick={() => setIndex((i) => Math.max(0, i - 1))}
+          disabled={index === 0}
+          className="ef-ui text-muted hover:text-paper inline transition-colors disabled:opacity-30"
+        >
+          Back
+        </button>
 
-          {isLast ? (
-            <Link
-              href={`/practice`}
-              className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
-            >
-              Finish session
-            </Link>
-          ) : (
-            <button
-              onClick={() => setIndex((i) => i + 1)}
-              className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
-            >
-              Next question
-            </button>
-          )}
-        </div>
-      )}
+        {isLast ? (
+          <button
+            onClick={() => setFinished(true)}
+            className="ef-ui text-muted hover:text-paper inline transition-colors"
+          >
+            Finish session
+          </button>
+        ) : (
+          <button
+            onClick={() => setIndex((i) => i + 1)}
+            className="ef-ui text-muted hover:text-paper inline transition-colors"
+          >
+            {answered ? "Next question" : "Skip for now"}
+          </button>
+        )}
+      </div>
 
       <p className="text-ash/60 font-body mt-10 text-xs">
         <Link

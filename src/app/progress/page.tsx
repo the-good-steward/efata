@@ -42,6 +42,31 @@ function Sparkline({ series }: { series: number[] }) {
   );
 }
 
+/**
+ * A number with no reading attached is just a number. Each figure gets
+ * a sentence saying what it means for a real client call, because "4.2
+ * fillers per 100 words" tells a freelancer nothing on its own.
+ */
+function readFillers(recent: number | null): string {
+  if (recent == null) return "";
+  if (recent < 2)
+    return "That is clean. A client hears a finished thought, not someone assembling one.";
+  if (recent < 5)
+    return "Normal speech. Nobody would notice this on a call.";
+  if (recent < 9)
+    return "Noticeable. It reads as thinking out loud, which makes a rate sound negotiable.";
+  return "Enough that it is doing the talking. One pause instead of one filler is the whole fix.";
+}
+
+function readPace(recent: number | null): string {
+  if (recent == null) return "";
+  if (recent < 110)
+    return "Slow enough that attention drifts. Usually nerves, not thinking.";
+  if (recent > 190)
+    return "Rushed. On a call this reads as wanting to get it over with.";
+  return "A steady pace. Easy to follow, and it sounds like you mean it.";
+}
+
 function Change({
   early,
   recent,
@@ -165,11 +190,21 @@ export default async function ProgressPage() {
                     </span>
                   </p>
                   <p className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
-                    Retries that improved
+                    Second runs that landed
                   </p>
                 </div>
               )}
             </div>
+
+            {progress.retriesTaken > 0 && (
+              <p className="ef-body text-paper-soft mt-6">
+                {progress.retriesImproved === progress.retriesTaken
+                  ? "Every second attempt beat the first. The retry is doing the work it is meant to."
+                  : progress.retriesImproved === 0
+                    ? "None of your second attempts beat the first yet. Try reading the better version aloud once before recording again."
+                    : `${progress.retriesImproved} of your ${progress.retriesTaken} second attempts beat the first. That gap is the habit forming.`}
+              </p>
+            )}
 
             <section className="border-rule mt-12 border-t pt-8">
               <h2 className="text-parchment font-display text-2xl">
@@ -182,6 +217,13 @@ export default async function ProgressPage() {
                 lowerIsBetter
               />
               <Sparkline series={progress.fillersPer100.series} />
+              <p className="ef-body text-paper-soft mt-4">
+                {readFillers(
+                  progress.fillersPer100.recent ??
+                    progress.fillersPer100.series.at(-1) ??
+                    null,
+                )}
+              </p>
             </section>
 
             <section className="border-rule mt-12 border-t pt-8">
@@ -196,6 +238,11 @@ export default async function ProgressPage() {
                 Under 110 loses people. Over 190 sounds rushed.
               </p>
               <Sparkline series={progress.pace.series} />
+              <p className="ef-body text-paper-soft mt-4">
+                {readPace(
+                  progress.pace.recent ?? progress.pace.series.at(-1) ?? null,
+                )}
+              </p>
             </section>
 
             {progress.topHedges.length > 0 && (

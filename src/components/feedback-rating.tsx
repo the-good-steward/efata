@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useOptimistic, useState, startTransition } from "react";
 import {
   rateFeedback,
   type FeedbackState,
@@ -27,8 +27,12 @@ export function FeedbackRating({
     {},
   );
   const [showIssues, setShowIssues] = useState(false);
+  const [answered, setAnswered] = useOptimistic(
+    Boolean(existing),
+    (_current, next: boolean) => next,
+  );
 
-  if ((existing || state.ok) && !showIssues) {
+  if ((answered || existing || state.ok) && !showIssues) {
     return (
       <p className="text-ash font-body mt-5 text-xs">
         Noted.{" "}
@@ -49,7 +53,12 @@ export function FeedbackRating({
       </p>
 
       <div className="mt-3 flex gap-2">
-        <form action={formAction}>
+        <form
+          action={(formData) => {
+            startTransition(() => setAnswered(true));
+            formAction(formData);
+          }}
+        >
           <input type="hidden" name="attempt_id" value={attemptId} />
           <input type="hidden" name="useful" value="yes" />
           <button

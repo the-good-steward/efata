@@ -213,7 +213,7 @@ export function AnswerRecorder({
             onClick={stopRecording}
             className="font-body rounded-sm border border-spoken/60 px-4 py-2.5 text-sm font-medium text-spoken transition-colors hover:bg-spoken/10"
           >
-            Stop
+            Done
           </button>
           <span className="text-ash font-body flex items-center gap-2 text-sm tabular-nums">
             <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-spoken" />

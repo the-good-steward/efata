@@ -8,13 +8,21 @@ type Props = {
   attemptNumber: number;
   oneThing: string | null;
   improvedAnswer: string | null;
-  /** null on a first attempt, otherwise 0-100. */
   scriptOverlap: number | null;
   hasAttempted: boolean;
-  /** Retrying is blocked until the last attempt has been rated. */
   rated: boolean;
+  onDone?: () => void;
 };
 
+/**
+ * Two attempts, then move on.
+ *
+ * A third run on the same question is diminishing: by then the answer
+ * is memorised rather than thought through, which is the opposite of
+ * the skill. After the second attempt the better version is handed over
+ * openly and the session moves forward.
+ */
+const MAX_ATTEMPTS = 2;
 const READING_THRESHOLD = 60;
 
 export function RetryPanel({
@@ -26,14 +34,7 @@ export function RetryPanel({
   hasAttempted,
   rated,
 }: Props) {
-  // "reviewing" shows the rewrite. "recording" deliberately hides it:
-  // having the better wording on screen while speaking turns the retry
-  // into a reading exercise, which is not the skill being practised.
-  const [mode, setMode] = useState<"reviewing" | "recording">(
-    hasAttempted ? "reviewing" : "recording",
-  );
-
-  const readIt = scriptOverlap != null && scriptOverlap >= READING_THRESHOLD;
+  const [recording, setRecording] = useState(false);
 
   if (!hasAttempted) {
     return (
@@ -45,64 +46,90 @@ export function RetryPanel({
     );
   }
 
-  if (mode === "reviewing") {
+  const attemptsUsed = attemptNumber - 1;
+  const canRetry = attemptsUsed < MAX_ATTEMPTS;
+  const readIt = scriptOverlap != null && scriptOverlap >= READING_THRESHOLD;
+
+  if (recording) {
     return (
       <div className="mt-8">
-        {readIt && (
-          <div className="mb-6 rounded-sm border border-flag/40 bg-flag/10 px-4 py-3">
-            <p className="font-body text-sm leading-relaxed text-flag">
-              That last answer was {scriptOverlap}% the same wording as the
-              suggested rewrite. Reading it back is easy; saying it your own
-              way is the part that survives a real call. Try it again without
-              looking.
-            </p>
-          </div>
-        )}
-
-        {improvedAnswer && (
-          <details className="mb-6">
-            <summary className="text-spoken font-body cursor-pointer text-sm underline underline-offset-4">
-              Hear it said better
-            </summary>
-            <p className="text-parchment/90 font-body border-rule mt-3 border-l pl-4 text-sm leading-relaxed italic">
-              {improvedAnswer}
-            </p>
-            <p className="text-ash font-body mt-3 text-xs">
-              Read it once, out loud. Then close it and say it in your own
-              words.
-            </p>
-          </details>
-        )}
-
+        <AnswerRecorder
+          sessionQuestionId={sessionQuestionId}
+          attemptNumber={attemptNumber}
+          oneThing={oneThing}
+        />
         <button
-          onClick={() => setMode("recording")}
-          disabled={!rated}
-          className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          onClick={() => setRecording(false)}
+          className="text-faint hover:text-paper ef-caption mt-4 inline underline underline-offset-4 transition-colors"
         >
-          Try again
+          Back to the feedback
         </button>
-        <p className="text-ash font-body mt-3 text-xs">
-          {rated
-            ? "The rewrite gets hidden while you record, on purpose."
-            : "Tell us whether that feedback was useful first — it takes one tap, and it's how the feedback gets better."}
-        </p>
       </div>
     );
   }
 
   return (
     <div className="mt-8">
-      <AnswerRecorder
-        sessionQuestionId={sessionQuestionId}
-        attemptNumber={attemptNumber}
-        oneThing={oneThing}
-      />
-      <button
-        onClick={() => setMode("reviewing")}
-        className="text-ash font-body hover:text-parchment mt-4 text-xs underline underline-offset-4 transition-colors"
-      >
-        Show the feedback again
-      </button>
+      {readIt && (
+        <div className="border-clay/40 bg-clay/10 mb-6 rounded-[12px] px-4 py-3">
+          <p className="ef-body text-clay">
+            That was {scriptOverlap}% the same wording as the version below.
+            Reading it back is easy. Saying it your own way is the part that
+            survives a real call.
+          </p>
+        </div>
+      )}
+
+      {/*
+        The better version is the payoff for having spoken, so it leads
+        rather than hiding behind a disclosure triangle. After the last
+        attempt it is open by default: there is nothing left to protect.
+      */}
+      {improvedAnswer && (
+        <details
+          open={!canRetry}
+          className="border-seaglass/30 bg-raised rounded-[16px] border p-5"
+        >
+          <summary className="ef-ui text-seaglass flex cursor-pointer items-center justify-between">
+            <span>Hear it said better</span>
+            <span className="ef-caption text-faint">Open</span>
+          </summary>
+
+          <p className="ef-caption text-faint mt-4">
+            Same answer, same facts, yours — softeners out.
+          </p>
+          <p className="ef-body text-paper border-seaglass/40 mt-3 border-l-2 pl-4 italic">
+            &ldquo;{improvedAnswer}&rdquo;
+          </p>
+          <p className="ef-caption text-faint mt-4">
+            Read it aloud once. Then close this and say it your own way.
+          </p>
+        </details>
+      )}
+
+      <div className="mt-6 flex flex-col gap-3">
+        {canRetry ? (
+          <>
+            <button
+              onClick={() => setRecording(true)}
+              disabled={!rated}
+              className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Try that one again
+            </button>
+            {!rated && (
+              <p className="ef-caption text-faint text-center">
+                Tell us whether the feedback was useful first
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="ef-caption text-faint text-center">
+            Two attempts is enough on one question. Take the better version
+            with you and keep going.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
