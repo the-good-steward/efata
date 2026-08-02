@@ -8,13 +8,18 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * not. Without a ceiling, a single enthusiastic user — or someone
  * hammering the button — lands on the invoice with no warning.
  *
- * The limits are set to be invisible to a person practising seriously.
- * Three sessions is more than anyone can usefully do in a day, and
- * forty answers covers several sessions with retries on every question.
+ * The limits exist to stop one person running up the bill unnoticed,
+ * not to ration practice. They should be invisible to anyone using the
+ * app as intended — someone comparing three job posts in an evening is
+ * a good user, not an abuser, and hitting a wall would teach them the
+ * app is stingy.
+ *
+ * Cached generations are not counted at all: a cache hit costs nothing,
+ * so charging it against a quota punishes the case we most want.
  */
 export const LIMITS = {
-  free: { sessionsPerDay: 3, answersPerDay: 40 },
-  paid: { sessionsPerDay: 12, answersPerDay: 150 },
+  free: { sessionsPerDay: 8, answersPerDay: 60 },
+  paid: { sessionsPerDay: 25, answersPerDay: 200 },
 } as const;
 
 export type Tier = keyof typeof LIMITS;
@@ -52,7 +57,7 @@ export async function checkSessionLimit(
       allowed: false,
       message:
         tier === "free"
-          ? `That's ${cap} sets of questions today. Practise the ones you have — answering the same question twice teaches more than a new set does.`
+          ? `That's ${cap} new sets today. Practise the ones you already have — a second run at the same question does more than a fresh set.`
           : `That's ${cap} sets today. Come back tomorrow.`,
     };
   }

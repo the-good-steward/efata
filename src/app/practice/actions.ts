@@ -50,13 +50,6 @@ export async function createSession(
   const experienceLevel = (profile?.experience_level ??
     "beginner") as ExperienceLevel;
 
-  const limit = await checkSessionLimit(
-    supabase,
-    user.id,
-    (profile?.tier ?? "free") as Tier,
-  );
-  if (!limit.allowed) return { error: limit.message };
-
   const { data: roleRows } = await supabase
     .from("roles")
     .select("slug, label, technical_focus");
@@ -69,7 +62,19 @@ export async function createSession(
   const key = cacheKey(jobPost, experienceLevel, englishLevel);
 
   let generated = await readCache(admin, key);
-  let cacheHit = false;
+  const cacheHit = Boolean(generated);
+
+  // Only a real generation costs money, so only a real generation is
+  // rationed. Someone re-practising a job post a friend already used
+  // should never hit a wall for it.
+  if (!generated) {
+    const limit = await checkSessionLimit(
+      supabase,
+      user.id,
+      (profile?.tier ?? "free") as Tier,
+    );
+    if (!limit.allowed) return { error: limit.message };
+  }
 
   try {
     if (!generated) generated = await generateQuestions(
@@ -79,7 +84,6 @@ export async function createSession(
       (roleRows ?? []) as RoleOption[],
       (profile?.custom_role as string | null) ?? null,
     );
-    else cacheHit = true;
   } catch (error) {
     console.error("Question generation failed:", error);
     return { error: describeGenerationError(error) };
