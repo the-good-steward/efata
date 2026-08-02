@@ -33,11 +33,29 @@ function startOfDayUtc(): string {
 
 export type LimitCheck = { allowed: boolean; message?: string };
 
+/**
+ * Kill switch for testing.
+ *
+ * Set EFATA_UNLIMITED=true to remove every cap. Deliberately an
+ * environment variable rather than deleted code: turning limits back on
+ * is then one setting, not a revert, and the value is visible in the
+ * dashboard rather than buried in a commit.
+ *
+ * There is no ceiling on spend while this is on. It is safe with a
+ * handful of known testers and unsafe the moment the app is open to
+ * people you do not know.
+ */
+function limitsDisabled(): boolean {
+  return process.env.EFATA_UNLIMITED === "true";
+}
+
 export async function checkSessionLimit(
   supabase: SupabaseClient,
   userId: string,
   tier: Tier,
 ): Promise<LimitCheck> {
+  if (limitsDisabled()) return { allowed: true };
+
   const { count, error } = await supabase
     .from("sessions")
     .select("id", { count: "exact", head: true })
@@ -69,6 +87,8 @@ export async function checkAnswerLimit(
   userId: string,
   tier: Tier,
 ): Promise<LimitCheck> {
+  if (limitsDisabled()) return { allowed: true };
+
   const { count, error } = await supabase
     .from("attempts")
     .select("id", { count: "exact", head: true })
