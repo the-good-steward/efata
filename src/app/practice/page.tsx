@@ -74,6 +74,12 @@ export default async function PracticePage() {
           <div className="mt-8">
             <JobPostForm />
           </div>
+
+          <p className="text-ash/70 font-body mt-6 text-xs leading-relaxed">
+            Questions are researched from what employers actually ask, then
+            written for your role and level. They are a rehearsal, not a
+            prediction of the real interview.
+          </p>
         </div>
 
         {sessions && sessions.length > 0 && (

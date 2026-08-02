@@ -106,6 +106,11 @@ export default async function SessionPage({
           {links.length} questions. Answer out loud, then read the feedback and
           try the same one again.
         </p>
+        <p className="text-ash/70 font-body mt-4 text-xs leading-relaxed">
+          Efata is here to sharpen how you communicate. It checks technical
+          claims against sources, but it can still be wrong about your field,
+          so treat the feedback as a second opinion rather than the last word.
+        </p>
 
         <ol className="mt-12 flex flex-col gap-12">
           {links.map((link, index) => {
@@ -169,6 +174,12 @@ export default async function SessionPage({
                           : ""}
                       </p>
                     )}
+
+                    <p className="text-ash/70 font-body mt-4 text-xs leading-relaxed">
+                      Efata can get things wrong, including facts about your
+                      field. Double-check anything technical before you repeat
+                      it to a client.
+                    </p>
 
                     {attempt.improved_answer && (
                       <details className="mt-5">

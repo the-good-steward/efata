@@ -34,6 +34,13 @@ Judge the content, not the polish. A hesitant answer that names the right lever 
 
 If the answer contradicts the reference criteria but is actually correct — practitioners disagree, and the criteria may be wrong — say so in the feedback rather than marking it down. Do not pretend to certainty you do not have about a domain judgment.
 
+VERIFY BEFORE CORRECTING
+You have web search. Before telling someone a factual claim is wrong, check it. Telling a person they made a mistake they did not make is the worst thing this app can do: it damages their confidence and teaches them something false, and they have no way to know you were the one who got it wrong.
+
+So: if you are about to call something incorrect and you are not certain, search first. If it turns out practitioners disagree, say that instead of picking a side. If search does not settle it, say you are not certain rather than asserting.
+
+You do not need to search to confirm things you are confident about, and you do not need to search when the answer contains no factual claim at all.
+
 Be honest here. Inflated scores on technical answers are worse than useless: the person walks into a real call believing they are ready.`,
 };
 
@@ -115,7 +122,23 @@ Say explicitly what improved and what did not. If they fixed the main problem, l
 
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 4000,
+    max_tokens: 8000,
+    // Search only on technical answers. Telling someone they are wrong
+    // is the highest-stakes thing this app does, so that judgment
+    // should be checked against sources rather than recalled. Adding it
+    // to every evaluation would cost latency on answers where there is
+    // no factual claim to verify.
+    ...(params.rubric === "technical"
+      ? {
+          tools: [
+            {
+              type: "web_search_20250305" as const,
+              name: "web_search" as const,
+              max_uses: 3,
+            },
+          ],
+        }
+      : {}),
     system: SYSTEM_PROMPT,
     messages: [
       {
@@ -134,33 +157,39 @@ Spoke for ${Math.round(params.durationSeconds)} seconds, ${words} words, about $
     ],
   });
 
-  const text = message.content
+  // With search enabled the model narrates between searches and the
+  // JSON arrives last, so joining every block and grabbing the
+  // outermost braces would swallow any brace in that narration.
+  const textBlocks = message.content
     .filter((block): block is Anthropic.TextBlock => block.type === "text")
-    .map((block) => block.text)
-    .join("")
-    .trim();
+    .map((block) => block.text.trim())
+    .filter(Boolean);
+
+  const text = textBlocks.length > 0 ? textBlocks[textBlocks.length - 1] : "";
 
   if (message.stop_reason === "max_tokens") {
     throw new Error("The evaluation was cut off before it finished.");
   }
 
-  let cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-  if (!cleaned.startsWith("{")) {
-    const start = cleaned.indexOf("{");
-    const end = cleaned.lastIndexOf("}");
-    if (start !== -1 && end > start) cleaned = cleaned.slice(start, end + 1);
-  }
+  // Try the last block first, then work backwards through the rest.
+  for (const block of [text, ...textBlocks.slice().reverse()]) {
+    let parsed: unknown;
+    let found = false;
 
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(cleaned);
-  } catch {
-    console.error("Unparseable evaluation (first 800):", cleaned.slice(0, 800));
-    throw new Error("The evaluation came back unreadable.");
-  }
+    for (const candidate of extractJson(block)) {
+      try {
+        parsed = JSON.parse(candidate);
+        found = true;
+        break;
+      } catch {
+        continue;
+      }
+    }
+    if (!found) continue;
 
-  const result = evaluation.safeParse(parsed);
-  if (!result.success) {
+    const result = evaluation.safeParse(parsed);
+    if (result.success) return result.data;
+
     console.error(
       "Evaluation failed validation:",
       JSON.stringify(parsed).slice(0, 800),
@@ -172,5 +201,36 @@ Spoke for ${Math.round(params.durationSeconds)} seconds, ${words} words, about $
     );
   }
 
-  return result.data;
+  console.error("Unparseable evaluation (first 800):", text.slice(0, 800));
+  throw new Error("The evaluation came back unreadable.");
+}
+
+
+/**
+ * Pulls a JSON object out of a block of model text, tolerating code
+ * fences and surrounding prose. Returns the candidates worth trying, in
+ * order, or nothing when the block holds no object at all — which is
+ * the normal case for narration between web searches.
+ */
+function extractJson(raw: string): string[] {
+  const stripped = raw
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  const end = stripped.lastIndexOf("}");
+  if (end === -1) return [];
+
+  const candidates: string[] = [];
+  if (stripped.startsWith("{")) candidates.push(stripped);
+
+  const first = stripped.indexOf("{");
+  if (first !== -1 && end > first) candidates.push(stripped.slice(first, end + 1));
+
+  const lineStart = stripped.lastIndexOf("\n{");
+  if (lineStart !== -1 && end > lineStart) {
+    candidates.push(stripped.slice(lineStart + 1, end + 1));
+  }
+
+  return candidates;
 }
