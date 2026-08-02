@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { transcribeAudio, countFillers } from "@/lib/transcribe";
+import {
+  transcribeAudio,
+  countFillers,
+  scriptOverlap,
+} from "@/lib/transcribe";
 import { evaluateAnswer, type Rubric } from "@/lib/evaluation/evaluate";
 
 export type AnswerState = { error?: string; ok?: boolean };
@@ -53,13 +57,14 @@ export async function submitAnswer(
   // attempt 1 so the person can hear what changed.
   const { data: previous } = await supabase
     .from("attempts")
-    .select("attempt_number, transcript")
+    .select("attempt_number, transcript, improved_answer")
     .eq("session_question_id", sessionQuestionId)
     .order("attempt_number", { ascending: false })
     .limit(1);
 
   const attemptNumber = (previous?.[0]?.attempt_number ?? 0) + 1;
   const previousTranscript = previous?.[0]?.transcript ?? null;
+  const previousRewrite = previous?.[0]?.improved_answer ?? null;
 
   let transcript;
   try {
@@ -100,6 +105,9 @@ export async function submitAnswer(
       answerKey,
       attemptNumber,
       previousTranscript,
+      scriptOverlap: previousRewrite
+        ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
+        : null,
     });
   } catch (error) {
     console.error("Evaluation failed:", error);
@@ -122,6 +130,13 @@ export async function submitAnswer(
     audio_path: uploadError ? null : path,
     transcript: transcript.text,
     scores: {
+      // How much of this retry was lifted from the rewrite we showed
+      // them. Reading it back measures reading, not communicating, and
+      // leaves them with nothing they can reproduce in a live call.
+      script_overlap: previousRewrite
+        ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
+        : null,
+      one_thing: result.one_thing,
       substance: result.substance,
       delivery: {
         ...result.delivery,

@@ -91,6 +91,8 @@ export async function evaluateAnswer(params: {
   } | null;
   attemptNumber: number;
   previousTranscript?: string | null;
+  /** 0-100: how much of this retry matched the rewrite we showed them. */
+  scriptOverlap?: number | null;
 }): Promise<Evaluation> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set.");
@@ -115,7 +117,17 @@ Signs of bluffing: ${(params.answerKey.red_flags ?? []).join("; ")}`
     params.attemptNumber > 1 && params.previousTranscript
       ? `\nThis is attempt ${params.attemptNumber}. Their first attempt was:
 """${params.previousTranscript.slice(0, 2000)}"""
-Say explicitly what improved and what did not. If they fixed the main problem, lead with that — hearing themselves get better is the point of the retry.`
+Say explicitly what improved and what did not. If they fixed the main problem, lead with that — hearing themselves get better is the point of the retry.${
+          params.scriptOverlap != null && params.scriptOverlap >= 60
+            ? `
+
+They reused about ${params.scriptOverlap}% of the exact wording from the rewrite we suggested. Do not score this as improvement: reciting a script is not the skill, and it will not survive a live call where no script exists. Say so warmly but plainly, and ask them to say it again in their own words.`
+            : params.scriptOverlap != null && params.scriptOverlap < 30
+              ? `
+
+They rebuilt the answer in their own words rather than repeating our rewrite. If it improved, say that explicitly — it is the harder and more valuable thing to have done.`
+              : ""
+        }`
       : "";
 
   const client = new Anthropic({ apiKey });

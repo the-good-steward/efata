@@ -84,3 +84,39 @@ export function countFillers(transcript: string): number {
   }
   return total;
 }
+
+/**
+ * How much of a retry is lifted from the suggested rewrite.
+ *
+ * The rewrite exists so someone can hear a better version of their own
+ * answer. The risk is that they read it back verbatim, which measures
+ * reading rather than communicating, and leaves them with nothing they
+ * can actually reproduce in a live call where no script exists.
+ *
+ * Returns the share of the retry's word sequences that also appear in
+ * the rewrite. Bigrams rather than single words, since word overlap
+ * alone is high for any two answers to the same question.
+ */
+export function scriptOverlap(retry: string, rewrite: string): number {
+  const bigrams = (text: string) => {
+    const words = text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter(Boolean);
+    const set = new Set<string>();
+    for (let i = 0; i < words.length - 1; i++) {
+      set.add(`${words[i]} ${words[i + 1]}`);
+    }
+    return set;
+  };
+
+  const retryGrams = bigrams(retry);
+  const rewriteGrams = bigrams(rewrite);
+  if (retryGrams.size === 0 || rewriteGrams.size === 0) return 0;
+
+  let shared = 0;
+  for (const gram of retryGrams) if (rewriteGrams.has(gram)) shared++;
+
+  return shared / retryGrams.size;
+}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { AnswerRecorder } from "@/components/answer-recorder";
+import { RetryPanel } from "@/components/retry-panel";
 
 export const metadata = { title: "Session · Efata" };
 
@@ -21,6 +21,8 @@ type AttemptRow = {
   feedback: string | null;
   improved_answer: string | null;
   scores: {
+    script_overlap?: number | null;
+    one_thing?: string | null;
     substance?: { score?: number; strengths?: string[]; gaps?: string[] };
     delivery?: {
       score?: number;
@@ -181,29 +183,18 @@ export default async function SessionPage({
                       it to a client.
                     </p>
 
-                    {attempt.improved_answer && (
-                      <details className="mt-5">
-                        <summary className="text-gold font-body cursor-pointer text-sm underline underline-offset-4">
-                          Hear it said better
-                        </summary>
-                        <p className="text-parchment/90 font-body border-rule mt-3 border-l pl-4 text-sm leading-relaxed italic">
-                          {attempt.improved_answer}
-                        </p>
-                        <p className="text-ash font-body mt-3 text-xs">
-                          Your answer, restructured. Read it aloud, then record
-                          again.
-                        </p>
-                      </details>
-                    )}
                   </div>
                 ))}
 
-                <AnswerRecorder
+                <RetryPanel
                   sessionQuestionId={link.id}
                   attemptNumber={mine.length + 1}
+                  hasAttempted={mine.length > 0}
+                  improvedAnswer={latest?.improved_answer ?? null}
+                  scriptOverlap={latest?.scores?.script_overlap ?? null}
                   oneThing={
+                    latest?.scores?.one_thing ??
                     latest?.scores?.substance?.gaps?.[0] ??
-                    latest?.scores?.delivery?.pace_note ??
                     null
                   }
                 />
