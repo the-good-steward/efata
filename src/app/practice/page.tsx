@@ -48,6 +48,12 @@ export default async function PracticePage() {
 
           <div className="flex items-baseline gap-5">
             <Link
+              href="/progress"
+              className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
+            >
+              Progress
+            </Link>
+            <Link
               href="/recall"
               className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
             >
