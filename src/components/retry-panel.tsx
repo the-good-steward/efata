@@ -81,30 +81,25 @@ export function RetryPanel({
       )}
 
       {/*
-        The better version is the payoff for having spoken, so it leads
-        rather than hiding behind a disclosure triangle. After the last
-        attempt it is open by default: there is nothing left to protect.
+        The better version is withheld until the retry is spent.
+        Offering it after the first attempt would turn the second into
+        recitation — they would read our wording rather than rebuild the
+        answer, which is the skill that transfers to a live call.
       */}
-      {improvedAnswer && (
-        <details
-          open={!canRetry}
-          className="border-seaglass/30 bg-raised rounded-[16px] border p-5"
-        >
-          <summary className="ef-ui text-seaglass flex cursor-pointer items-center justify-between">
-            <span>Hear it said better</span>
-            <span className="ef-caption text-faint">Open</span>
-          </summary>
-
-          <p className="ef-caption text-faint mt-4">
+      {!canRetry && improvedAnswer && (
+        <div className="border-seaglass/30 bg-raised rounded-[16px] border p-5">
+          <p className="ef-ui text-seaglass">Here it is said better</p>
+          <p className="ef-caption text-faint mt-3">
             Same answer, same facts, yours — softeners out.
           </p>
           <p className="ef-body text-paper border-seaglass/40 mt-3 border-l-2 pl-4 italic">
             &ldquo;{improvedAnswer}&rdquo;
           </p>
           <p className="ef-caption text-faint mt-4">
-            Read it aloud once. Then close this and say it your own way.
+            Say it aloud once before you move on. Hearing your own words come
+            out cleanly is what makes them stick.
           </p>
-        </details>
+        </div>
       )}
 
       <div className="mt-6 flex flex-col gap-3">
@@ -117,16 +112,16 @@ export function RetryPanel({
             >
               Try that one again
             </button>
-            {!rated && (
-              <p className="ef-caption text-faint text-center">
-                Tell us whether the feedback was useful first
-              </p>
-            )}
+            <p className="ef-caption text-faint text-center">
+              {rated
+                ? "After this one, I'll show you how it could be said better."
+                : "Tell us whether the feedback was useful first"}
+            </p>
           </>
         ) : (
           <p className="ef-caption text-faint text-center">
-            Two attempts is enough on one question. Take the better version
-            with you and keep going.
+            Two attempts is enough on one question. Take that version with you
+            and keep going.
           </p>
         )}
       </div>

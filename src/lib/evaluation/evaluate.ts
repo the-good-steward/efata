@@ -80,7 +80,7 @@ Use the words-per-minute figure for pace. Under about 110 is slow enough to lose
 THE REWRITE
 "feedback" leads with communication. If there is also a technical error, name it in one sentence, then move on.
 
-"improved_answer" is their own answer restructured, not a new one. If they said something factually wrong, correct it in the rewrite rather than reproducing the mistake in better words. Keep their facts, their examples, their voice. Tighten it, lead with the strongest point, cut the hedging, add the concrete next step if it was missing. They will read it aloud, so it must sound like something a person says, not something written.
+"improved_answer" is their own answer restructured, not a new one. It is NOT shown to them after a first attempt — only after their second — so never refer to it in "feedback" as though they can read it. Say what to change in your own words instead. If they said something factually wrong, correct it in the rewrite rather than reproducing the mistake in better words. Keep their facts, their examples, their voice. Tighten it, lead with the strongest point, cut the hedging, add the concrete next step if it was missing. They will read it aloud, so it must sound like something a person says, not something written.
 
 LENGTH
 "strengths" and "gaps" are short phrases, not sentences — under about 15 words each, since they are read at a glance on a phone. Put the explanation in "feedback", where there is room for it.
