@@ -14,6 +14,16 @@ export default async function PracticePage() {
 
   if (!user) redirect("/login");
 
+  // New accounts go through onboarding first: without a level, question
+  // difficulty would default to beginner for everyone.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("onboarded_at")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profile && !profile.onboarded_at) redirect("/onboarding");
+
   const { data: sessions } = await supabase
     .from("sessions")
     .select("id, title, created_at")

@@ -1,0 +1,42 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { OnboardingForm } from "@/components/onboarding-form";
+
+export const metadata = { title: "Set up · Efata" };
+
+export default async function OnboardingPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("onboarded_at")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profile?.onboarded_at) redirect("/practice");
+
+  const { data: roles } = await supabase
+    .from("roles")
+    .select("id, label, description")
+    .order("label");
+
+  return (
+    <main className="flex flex-1 flex-col px-6 py-16">
+      <div className="mx-auto w-full max-w-lg">
+        <h1 className="text-parchment font-display text-4xl">
+          Before we start
+        </h1>
+        <p className="text-ash font-body mt-4 text-sm leading-relaxed">
+          Three questions, so the practice fits you rather than a generic
+          candidate.
+        </p>
+
+        <OnboardingForm roles={roles ?? []} />
+      </div>
+    </main>
+  );
+}

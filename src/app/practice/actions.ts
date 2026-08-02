@@ -4,7 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { generateQuestions, type EnglishLevel } from "@/lib/questions/generate";
+import {
+  generateQuestions,
+  type EnglishLevel,
+  type ExperienceLevel,
+} from "@/lib/questions/generate";
 
 export type SessionState = { error?: string };
 
@@ -35,15 +39,17 @@ export async function createSession(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("english_level")
+    .select("english_level, experience_level")
     .eq("id", user.id)
     .single();
 
   const englishLevel = (profile?.english_level ?? "conversational") as EnglishLevel;
+  const experienceLevel = (profile?.experience_level ??
+    "beginner") as ExperienceLevel;
 
   let generated;
   try {
-    generated = await generateQuestions(jobPost, englishLevel);
+    generated = await generateQuestions(jobPost, englishLevel, experienceLevel);
   } catch (error) {
     console.error("Question generation failed:", error);
     return { error: describeGenerationError(error) };

@@ -34,7 +34,7 @@ Territory by role, use the one matching role_slug:
 - bookkeeping: reconciliation that will not balance and where to look first; AR chasing that keeps the relationship intact; month-end close order; miscategorised transactions found late; what the client's P&L is actually telling them
 - web-dev: a page that loads slowly and what you measure first; forms silently not sending; a plugin or dependency update that broke the site; staging and backups before a risky change; what you check before telling a client it is fixed
 
-Difficulty for technical questions should be 4 or 5. These are meant to be demanding.
+Set difficulty from the person's experience level, given in the message below. Pitch the technical questions at that level: too hard and they learn nothing, too easy and the practice is worthless.
 
 RESEARCH
 You have web search. Use it before writing technical questions. Look up what is genuinely asked for this role and what practitioners say separates a competent hire from a weak one. Prefer what real hiring managers and freelancers describe over generic career-advice listicles.
@@ -62,6 +62,23 @@ export type EnglishLevel =
   | "professional"
   | "fluent";
 
+export type ExperienceLevel = "beginner" | "intermediate" | "expert";
+
+/**
+ * Experience sets how hard the questions are. English sets how they are
+ * worded. Keeping them separate matters: someone can be highly skilled
+ * and still careful in English, and collapsing the two would hand a
+ * capable specialist beginner questions.
+ */
+const EXPERIENCE_GUIDANCE: Record<ExperienceLevel, string> = {
+  beginner:
+    "New to this work, under about six months. Technical questions should be difficulty 2 or 3 and cover the fundamentals a client would expect on day one. Do not ask about managing others, setting strategy, or owning a budget. They should finish feeling stretched, not defeated.",
+  intermediate:
+    "Has done this for real clients and can hold their own. Technical questions should be difficulty 3 or 4, about judgment calls and situations with no clean answer, not definitions.",
+  expert:
+    "Years of experience, could train someone else. Technical questions should be difficulty 4 or 5: tradeoffs between defensible options, diagnosing a situation from thin information, and decisions they would have to defend to a sceptical client.",
+};
+
 const LEVEL_GUIDANCE: Record<EnglishLevel, string> = {
   basic:
     "Keep wording very simple and short. One idea per sentence. Avoid multi-part questions.",
@@ -81,6 +98,7 @@ const LEVEL_GUIDANCE: Record<EnglishLevel, string> = {
 export async function generateQuestions(
   jobPost: string,
   englishLevel: EnglishLevel,
+  experienceLevel: ExperienceLevel = "beginner",
 ): Promise<GenerationResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set.");
@@ -109,7 +127,9 @@ export async function generateQuestions(
     messages: [
       {
         role: "user",
-        content: `English level of the person practicing: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
+        content: `Experience level of the person practising: ${experienceLevel}. ${EXPERIENCE_GUIDANCE[experienceLevel]}
+
+English level: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
 
 First, search the web for what is actually asked in interviews and client calls for this kind of role. Search two or three times with different angles, for example the role title plus "interview questions", the specific tools named in the job post, and what clients ask when hiring for this remotely. Read what you find before writing anything.
 
