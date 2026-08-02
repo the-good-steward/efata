@@ -9,6 +9,7 @@ import {
   scriptOverlap,
 } from "@/lib/transcribe";
 import { evaluateAnswer, type Rubric } from "@/lib/evaluation/evaluate";
+import { checkAnswerLimit, type Tier } from "@/lib/limits";
 
 export type AnswerState = { error?: string; ok?: boolean };
 
@@ -34,6 +35,19 @@ export async function submitAnswer(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "Your session expired. Sign in again." };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("tier")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const limit = await checkAnswerLimit(
+    supabase,
+    user.id,
+    (profile?.tier ?? "free") as Tier,
+  );
+  if (!limit.allowed) return { error: limit.message };
 
   // Ownership is enforced by RLS on sessions, so a row only comes back
   // if this session_question belongs to the caller.

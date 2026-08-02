@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { checkSessionLimit, type Tier } from "@/lib/limits";
+import { cacheKey, readCache, writeCache } from "@/lib/questions/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   generateQuestions,
@@ -40,7 +42,7 @@ export async function createSession(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("english_level, experience_level, custom_role")
+    .select("english_level, experience_level, custom_role, tier")
     .eq("id", user.id)
     .single();
 
@@ -48,27 +50,42 @@ export async function createSession(
   const experienceLevel = (profile?.experience_level ??
     "beginner") as ExperienceLevel;
 
+  const limit = await checkSessionLimit(
+    supabase,
+    user.id,
+    (profile?.tier ?? "free") as Tier,
+  );
+  if (!limit.allowed) return { error: limit.message };
+
   const { data: roleRows } = await supabase
     .from("roles")
     .select("slug, label, technical_focus");
 
-  let generated;
+  // The generation call runs several web searches and is by far the most
+  // expensive thing the app does, so check the cache before paying for
+  // it. Job posts repeat: cross-posted listings, agency templates, and
+  // a cohort practising the same role.
+  const admin = createAdminClient();
+  const key = cacheKey(jobPost, experienceLevel, englishLevel);
+
+  let generated = await readCache(admin, key);
+  let cacheHit = false;
+
   try {
-    generated = await generateQuestions(
+    if (!generated) generated = await generateQuestions(
       jobPost,
       englishLevel,
       experienceLevel,
       (roleRows ?? []) as RoleOption[],
       (profile?.custom_role as string | null) ?? null,
     );
+    else cacheHit = true;
   } catch (error) {
     console.error("Question generation failed:", error);
     return { error: describeGenerationError(error) };
   }
 
-  // Service role: generated questions use source 'generated', which the
-  // client-facing insert policy deliberately rejects.
-  const admin = createAdminClient();
+  if (!cacheHit) await writeCache(admin, key, generated);
 
   // maybeSingle, not single: an untagged session is fine, a crash is not.
   const { data: role } = generated.role_slug
