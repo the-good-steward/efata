@@ -211,6 +211,23 @@ export default async function SessionPage({
             );
           })}
         </ol>
+
+        <div className="border-rule mt-16 border-t pt-10">
+          <h2 className="text-parchment font-display text-xl">
+            Had a real interview lately?
+          </h2>
+          <p className="text-ash font-body mt-3 text-sm leading-relaxed">
+            Write down what they actually asked you, while you still remember
+            the wording. Every question logged makes these sets less of a
+            guess, for you and for everyone practising the same role.
+          </p>
+          <Link
+            href="/recall"
+            className="bg-parchment text-ink font-body hover:bg-gold mt-6 inline-block rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+          >
+            Log what you were asked
+          </Link>
+        </div>
       </div>
     </main>
   );

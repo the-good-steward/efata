@@ -45,6 +45,12 @@ export default async function PracticePage() {
 
           <div className="flex items-baseline gap-5">
             <Link
+              href="/recall"
+              className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
+            >
+              Log a real question
+            </Link>
+            <Link
               href="/calibrate"
               className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
             >

@@ -12,10 +12,6 @@ const PUBLIC_ROUTES = [
   "/signup",
   "/auth/confirm",
   "/auth/error",
-  // Diagnostic. Must stay reachable when auth is broken, since that is
-  // exactly when it is needed. It returns presence booleans only to
-  // signed-out callers. Remove alongside the route.
-  "/api/debug/env",
 ];
 
 export async function updateSession(request: NextRequest) {
