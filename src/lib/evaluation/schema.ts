@@ -31,17 +31,32 @@ function capped(max: number) {
  * recalled, so it would penalise a missing Result for a situation that
  * never happened.
  */
+/** Optional list tolerating null, absence, and empty alike. */
+function list(max: number, itemMax: number) {
+  return z
+    .union([z.array(z.string()), z.null()])
+    .optional()
+    .transform((value) =>
+      (value ?? [])
+        .filter(Boolean)
+        .slice(0, max)
+        .map((item) =>
+          item.length <= itemMax ? item.trim() : item.slice(0, itemMax).trim(),
+        ),
+    );
+}
+
 export const evaluation = z.object({
   substance: z.object({
-    score: z.number().int().min(1).max(5),
-    strengths: z.array(capped(400)).max(5).default([]),
-    gaps: z.array(capped(400)).max(5).default([]),
+    score: z.coerce.number().int().min(1).max(5),
+    strengths: list(5, 400),
+    gaps: list(5, 400),
   }),
   delivery: z.object({
-    score: z.number().int().min(1).max(5),
-    filler_words: z.number().int().min(0).max(500).catch(0),
-    hedging: z.array(capped(120)).max(8).default([]),
-    pace_note: capped(300).default(""),
+    score: z.coerce.number().int().min(1).max(5),
+    filler_words: z.coerce.number().int().min(0).max(500).catch(0),
+    hedging: list(8, 120),
+    pace_note: z.union([z.string(), z.null()]).optional().transform((v) => (v ?? "").trim().slice(0, 300)),
   }),
   // Spoken directly to the person.
   feedback: z.string().min(20).transform((v) => v.trim()),
