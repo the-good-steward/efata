@@ -31,17 +31,52 @@ export type RunnerQuestion = {
   }[];
 };
 
-function Score({ label, value }: { label: string; value?: number }) {
-  if (!value) return null;
+/**
+ * Change since the previous attempt, in words rather than a number.
+ *
+ * Scores are still recorded — calibration depends on them — but they
+ * are not shown. A 3/5 tells someone they have been graded; "clearer
+ * than last time" tells them the thing that actually matters, which is
+ * whether the second run was better than the first. Nothing here is a
+ * pass or a fail.
+ */
+function movement(
+  current?: number,
+  previous?: number,
+): { label: string; tone: "up" | "flat" | "down" } | null {
+  if (!current || !previous) return null;
+  const delta = current - previous;
+  if (delta >= 2) return { label: "Much stronger than last time", tone: "up" };
+  if (delta === 1) return { label: "Stronger than last time", tone: "up" };
+  if (delta === 0) return { label: "About the same as last time", tone: "flat" };
+  if (delta === -1) return { label: "Not as strong as last time", tone: "down" };
+  return { label: "Weaker than last time", tone: "down" };
+}
+
+function Movement({
+  substance,
+  delivery,
+}: {
+  substance: ReturnType<typeof movement>;
+  delivery: ReturnType<typeof movement>;
+}) {
+  if (!substance && !delivery) return null;
+
+  const tone = (t: "up" | "flat" | "down") =>
+    t === "up" ? "text-spoken" : t === "down" ? "text-flag" : "text-ash";
+
   return (
-    <div className="flex items-baseline gap-2">
-      <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
-        {label}
-      </span>
-      <span className="text-parchment font-display text-2xl tabular-nums">
-        {value}
-        <span className="text-ash text-sm">/5</span>
-      </span>
+    <div className="mt-4 flex flex-col gap-1">
+      {substance && (
+        <p className={`font-body text-[15px] ${tone(substance.tone)}`}>
+          What you said: {substance.label.toLowerCase()}
+        </p>
+      )}
+      {delivery && (
+        <p className={`font-body text-[15px] ${tone(delivery.tone)}`}>
+          How you said it: {delivery.label.toLowerCase()}
+        </p>
+      )}
     </div>
   );
 }
@@ -128,16 +163,22 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           {question.body}
         </p>
 
-        {attempts.map((attempt) => (
+        {attempts.map((attempt, i) => (
           <div key={attempt.id} className="border-rule/60 mt-10 border-l-2 pl-5">
             <p className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               Attempt {attempt.attempt_number}
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-8">
-              <Score label="Substance" value={attempt.scores?.substance?.score} />
-              <Score label="Delivery" value={attempt.scores?.delivery?.score} />
-            </div>
+            <Movement
+              substance={movement(
+                attempt.scores?.substance?.score,
+                attempts[i - 1]?.scores?.substance?.score,
+              )}
+              delivery={movement(
+                attempt.scores?.delivery?.score,
+                attempts[i - 1]?.scores?.delivery?.score,
+              )}
+            />
 
             {attempt.feedback && (
               <p className="text-parchment font-body mt-5 text-sm leading-relaxed">
