@@ -162,11 +162,15 @@ export function AnswerRecorder({
         ),
       ]);
 
-      if (state.error) {
+      if (state.error && !state.ok) {
         setError(state.error);
         setPhase("review");
         return;
       }
+
+      // Saved, but feedback did not finish. The recording is safe, so
+      // move on rather than making them record it again.
+      if (state.error && state.ok) setError(state.error);
       // Success has to be handled explicitly. Relying on the page
       // revalidating left this component mounted with its phase still
       // "submitting", so the screen sat on "listening back" forever

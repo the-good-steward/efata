@@ -91,6 +91,53 @@ export async function submitAnswer(
     return { error: describeError(error, "transcribing your answer") };
   }
 
+  // Save the answer the moment it is transcribed.
+  //
+  // Evaluation is slow and can exceed the function time limit, and when
+  // it did, the whole request was killed and nothing was written: a
+  // tester recorded seven answers and none of them survived. The
+  // recording is the irreplaceable part. Scoring can be retried.
+  const path = `${user.id}/${sessionQuestionId}-${attemptNumber}.webm`;
+  const { error: uploadError } = await supabase.storage
+    .from("answers")
+    .upload(path, audio, {
+      contentType: audio.type || "audio/webm",
+      upsert: true,
+    });
+
+  if (uploadError) console.error("Audio upload failed:", uploadError);
+
+  const { data: attempt, error: insertError } = await supabase
+    .from("attempts")
+    .insert({
+      session_question_id: sessionQuestionId,
+      user_id: user.id,
+      attempt_number: attemptNumber,
+      audio_path: uploadError ? null : path,
+      transcript: transcript.text,
+      scores: {
+        script_overlap: previousRewrite
+          ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
+          : null,
+        delivery: { filler_words: countFillers(transcript.text) },
+        words_per_minute:
+          transcript.durationSeconds > 0
+            ? Math.round(
+                (transcript.text.split(/\s+/).length /
+                  transcript.durationSeconds) *
+                  60,
+              )
+            : null,
+      },
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !attempt) {
+    console.error("Attempt insert failed:", insertError);
+    return { error: `Couldn't save your answer: ${insertError?.message}` };
+  }
+
   // Answer keys are unreadable by clients on purpose, so the technical
   // rubric needs a server-side read to score against them.
   let answerKey = null;
@@ -109,6 +156,9 @@ export async function submitAnswer(
     }
   }
 
+  // Evaluation runs after the answer is already safe. If it fails or
+  // times out, the recording and transcript survive and the person can
+  // ask for feedback again rather than losing the answer.
   let result;
   try {
     result = await evaluateAnswer({
@@ -125,55 +175,45 @@ export async function submitAnswer(
     });
   } catch (error) {
     console.error("Evaluation failed:", error);
-    return { error: describeError(error, "evaluating your answer") };
+    revalidatePath(`/practice/${link.session_id}`);
+    return {
+      ok: true,
+      error:
+        "Your answer is saved, but the feedback didn't finish. Open the question again to retry it.",
+    };
   }
 
-  // Upload after evaluation succeeds, so a failed run doesn't leave
-  // orphaned audio behind.
-  const path = `${user.id}/${sessionQuestionId}-${attemptNumber}.webm`;
-  const { error: uploadError } = await supabase.storage
-    .from("answers")
-    .upload(path, audio, { contentType: audio.type || "audio/webm", upsert: true });
-
-  if (uploadError) console.error("Audio upload failed:", uploadError);
-
-  const { error: insertError } = await supabase.from("attempts").insert({
-    session_question_id: sessionQuestionId,
-    user_id: user.id,
-    attempt_number: attemptNumber,
-    audio_path: uploadError ? null : path,
-    transcript: transcript.text,
-    scores: {
-      // How much of this retry was lifted from the rewrite we showed
-      // them. Reading it back measures reading, not communicating, and
-      // leaves them with nothing they can reproduce in a live call.
-      script_overlap: previousRewrite
-        ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
-        : null,
-      one_thing: result.one_thing,
-      substance: result.substance,
-      delivery: {
-        ...result.delivery,
-        // Counted from the transcript rather than taken from the model,
-        // which approximates. A number the person can verify by reading
-        // their own transcript has to be right.
-        filler_words: countFillers(transcript.text),
-      },
-      words_per_minute:
-        transcript.durationSeconds > 0
-          ? Math.round(
-              (transcript.text.split(/\s+/).length / transcript.durationSeconds) * 60,
-            )
+  const { error: updateError } = await supabase
+    .from("attempts")
+    .update({
+      feedback: result.feedback,
+      improved_answer: result.improved_answer,
+      scores: {
+        script_overlap: previousRewrite
+          ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
           : null,
-    },
-    feedback: result.feedback,
-    improved_answer: result.improved_answer,
-  });
+        one_thing: result.one_thing,
+        substance: result.substance,
+        delivery: {
+          ...result.delivery,
+          // Counted from the transcript rather than taken from the
+          // model, which approximates. A number the person can check
+          // against their own transcript has to be right.
+          filler_words: countFillers(transcript.text),
+        },
+        words_per_minute:
+          transcript.durationSeconds > 0
+            ? Math.round(
+                (transcript.text.split(/\s+/).length /
+                  transcript.durationSeconds) *
+                  60,
+              )
+            : null,
+      },
+    })
+    .eq("id", attempt.id);
 
-  if (insertError) {
-    console.error("Attempt insert failed:", insertError);
-    return { error: `Couldn't save your attempt: ${insertError.message}` };
-  }
+  if (updateError) console.error("Attempt update failed:", updateError);
 
   revalidatePath(`/practice/${link.session_id}`);
   return { ok: true };
