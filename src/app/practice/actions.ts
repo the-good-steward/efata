@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { checkSessionLimit, type Tier } from "@/lib/limits";
 import { cacheKey, readCache, writeCache } from "@/lib/questions/cache";
+import { recordFailure } from "@/lib/failures";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   generateQuestions,
@@ -85,7 +86,12 @@ export async function createSession(
       (profile?.custom_role as string | null) ?? null,
     );
   } catch (error) {
-    console.error("Question generation failed:", error);
+    await recordFailure({
+      userId: user.id,
+      stage: "generation",
+      error,
+      context: { jobPostChars: jobPost.length, experienceLevel, englishLevel },
+    });
     return { error: describeGenerationError(error) };
   }
 

@@ -10,6 +10,7 @@ import {
 } from "@/lib/transcribe";
 import { evaluateAnswer, type Rubric } from "@/lib/evaluation/evaluate";
 import { checkAnswerLimit, type Tier } from "@/lib/limits";
+import { recordFailure } from "@/lib/failures";
 
 export type AnswerState = { error?: string; ok?: boolean };
 
@@ -87,7 +88,17 @@ export async function submitAnswer(
       audio.type || "audio/webm",
     );
   } catch (error) {
-    console.error("Transcription failed:", error);
+    await recordFailure({
+      userId: user.id,
+      stage: "transcription",
+      error,
+      context: {
+        audioBytes: audio.size,
+        audioType: audio.type || "unknown",
+        sessionQuestionId,
+        attemptNumber,
+      },
+    });
     return { error: describeError(error, "transcribing your answer") };
   }
 
@@ -105,7 +116,14 @@ export async function submitAnswer(
       upsert: true,
     });
 
-  if (uploadError) console.error("Audio upload failed:", uploadError);
+  if (uploadError) {
+    await recordFailure({
+      userId: user.id,
+      stage: "upload",
+      error: uploadError,
+      context: { audioBytes: audio.size, audioType: audio.type || "unknown" },
+    });
+  }
 
   const { data: attempt, error: insertError } = await supabase
     .from("attempts")
@@ -134,7 +152,12 @@ export async function submitAnswer(
     .single();
 
   if (insertError || !attempt) {
-    console.error("Attempt insert failed:", insertError);
+    await recordFailure({
+      userId: user.id,
+      stage: "attempt_insert",
+      error: insertError,
+      context: { sessionQuestionId, attemptNumber },
+    });
     return { error: `Couldn't save your answer: ${insertError?.message}` };
   }
 
@@ -174,7 +197,17 @@ export async function submitAnswer(
         : null,
     });
   } catch (error) {
-    console.error("Evaluation failed:", error);
+    await recordFailure({
+      userId: user.id,
+      stage: "evaluation",
+      error,
+      context: {
+        rubric: question.rubric,
+        attemptNumber,
+        transcriptWords: transcript.text.split(/\s+/).length,
+        hadAnswerKey: Boolean(answerKey),
+      },
+    });
     revalidatePath(`/practice/${link.session_id}`);
     return {
       ok: true,
@@ -213,7 +246,14 @@ export async function submitAnswer(
     })
     .eq("id", attempt.id);
 
-  if (updateError) console.error("Attempt update failed:", updateError);
+  if (updateError) {
+    await recordFailure({
+      userId: user.id,
+      stage: "attempt_update",
+      error: updateError,
+      context: { attemptId: attempt.id },
+    });
+  }
 
   revalidatePath(`/practice/${link.session_id}`);
   return { ok: true };
