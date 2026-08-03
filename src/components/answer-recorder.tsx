@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { submitAnswer, type AnswerState } from "@/app/practice/[sessionId]/actions";
 
 type Props = {
   sessionQuestionId: string;
   attemptNumber: number;
+  /** Called once the answer is saved, so the parent can leave the
+   *  recording state. Without it the recorder stays mounted and its
+   *  phase never leaves "submitting". */
+  onSubmitted?: () => void;
   /** Shown above the recorder on a retry, so the fix is in view while
    *  they speak. This is the point of the retry loop. */
   oneThing?: string | null;
@@ -41,7 +46,9 @@ export function AnswerRecorder({
   sessionQuestionId,
   attemptNumber,
   oneThing,
+  onSubmitted,
 }: Props) {
+  const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
   const [seconds, setSeconds] = useState(0);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -145,16 +152,31 @@ export function AnswerRecorder({
     formData.append("audio", blob, "answer.webm");
 
     try {
-      const state: AnswerState = await submitAnswer({}, formData);
+      const state: AnswerState = await Promise.race([
+        submitAnswer({}, formData),
+        // Belt and braces: if the request neither resolves nor rejects,
+        // surface something rather than spinning. Generous, because
+        // transcription plus evaluation genuinely takes a while.
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 120000),
+        ),
+      ]);
 
       if (state.error) {
         setError(state.error);
         setPhase("review");
         return;
       }
-      // Success revalidates the page, which re-renders with the
-      // feedback. The recording is kept until then, so nothing is lost
-      // if that render is slow.
+      // Success has to be handled explicitly. Relying on the page
+      // revalidating left this component mounted with its phase still
+      // "submitting", so the screen sat on "listening back" forever
+      // even though the answer had saved. A tester lost a whole
+      // session to this.
+      router.refresh();
+      onSubmitted?.();
+      setPhase("idle");
+      setBlob(null);
+      setSeconds(0);
     } catch {
       // A thrown action means the request died — usually the function
       // hitting its time limit. Previously this left the screen sitting

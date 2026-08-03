@@ -57,6 +57,7 @@ export function RetryPanel({
           sessionQuestionId={sessionQuestionId}
           attemptNumber={attemptNumber}
           oneThing={oneThing}
+          onSubmitted={() => setRecording(false)}
         />
         <button
           onClick={() => setRecording(false)}
