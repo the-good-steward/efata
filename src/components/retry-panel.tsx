@@ -126,11 +126,19 @@ export function RetryPanel({
             >
               Try that one again
             </button>
-            <p className="ef-caption text-faint text-center">
-              {rated
-                ? "After this one, I'll show you how it could be said better."
-                : "Tell us whether the feedback was useful first"}
-            </p>
+            {rated ? (
+              <div className="border-seaglass/25 bg-seaglass/5 rounded-[12px] px-4 py-3">
+                <p className="ef-ui text-seaglass">Waiting after this one</p>
+                <p className="ef-caption text-muted mt-1.5">
+                  The exact words to say, in your voice, ready to use on a
+                  real call. You only get them by trying once more.
+                </p>
+              </div>
+            ) : (
+              <p className="ef-caption text-faint text-center">
+                Tell us whether the feedback was useful first
+              </p>
+            )}
           </>
         ) : (
           <p className="ef-caption text-faint text-center">

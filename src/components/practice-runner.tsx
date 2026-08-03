@@ -171,6 +171,11 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   if (finished) {
     const answeredCount = questions.filter((q) => q.attempts.length > 0).length;
     const retried = questions.filter((q) => q.attempts.length > 1).length;
+    // Answered once and left there: they did the hard part and stopped
+    // one step short of the thing worth having.
+    const unfinished = questions
+      .map((q, i) => ({ q, i }))
+      .filter(({ q }) => q.attempts.length === 1);
     const fillers = questions
       .flatMap((q) => q.attempts)
       .map((a) => a.scores?.delivery?.filler_words ?? 0);
@@ -243,6 +248,30 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
             </p>
           )}
         </div>
+
+        {unfinished.length > 0 && (
+          <div className="border-seaglass/25 bg-seaglass/5 mt-8 rounded-[16px] p-5">
+            <p className="ef-ui text-seaglass">
+              {unfinished.length === 1
+                ? "One question still has words waiting"
+                : `${unfinished.length} questions still have words waiting`}
+            </p>
+            <p className="ef-body text-muted mt-2">
+              You answered {unfinished.length === 1 ? "it" : "them"} once. A
+              second run unlocks the exact wording for that answer, which is
+              the part you can take into a real call.
+            </p>
+            <button
+              onClick={() => {
+                setFinished(false);
+                setIndex(unfinished[0].i);
+              }}
+              className="bg-paper text-dusk mt-5 w-full rounded-full px-6 py-3.5 text-[17px] font-semibold transition-opacity hover:opacity-90"
+            >
+              Go back to {unfinished.length === 1 ? "it" : "the first one"}
+            </button>
+          </div>
+        )}
 
         <div className="mt-10 flex flex-col gap-3">
           <Link
@@ -410,7 +439,11 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
             onClick={() => setIndex((i) => i + 1)}
             className="ef-ui text-muted hover:text-paper inline transition-colors"
           >
-            {answered ? "Next question" : "Skip this one"}
+            {!answered
+              ? "Skip this one"
+              : attempts.length === 1
+                ? "Move on without the words"
+                : "Next question"}
           </button>
         )}
       </div>
