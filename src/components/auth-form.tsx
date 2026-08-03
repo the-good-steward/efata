@@ -100,7 +100,7 @@ export function AuthForm({ mode, action }: Props) {
         {isSignup ? "Already have an account? " : "New here? "}
         <Link
           href={isSignup ? "/login" : "/signup"}
-          className="text-parchment hover:text-spoken underline underline-offset-4 transition-colors"
+          className="text-parchment hover:text-spoken inline-flex min-h-[44px] items-center underline underline-offset-4 transition-colors"
         >
           {isSignup ? "Sign in" : "Create an account"}
         </Link>
