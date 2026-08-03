@@ -86,16 +86,36 @@ Score delivery for every answer, separately from substance. The transcript inclu
 
 Use the words-per-minute figure for pace. Under about 110 is slow enough to lose someone; over about 190 is rushed.
 
-THE REWRITE
-"feedback" leads with communication. If there is also a technical error, name it in one sentence, then move on.
+THE FEEDBACK FIELD
+"feedback" leads with communication. If there is also a technical error, name it in one sentence, then move on. The rewrite is not visible to them after a first attempt, so never point at it as though they can read it — describe what to change in your own words there.
 
-"improved_answer" is their own answer restructured, not a new one. It is NOT shown to them after a first attempt — only after their second — so never refer to it in "feedback" as though they can read it. Say what to change in your own words instead. If they said something factually wrong, correct it in the rewrite rather than reproducing the mistake in better words. Keep their facts, their examples, their voice. Tighten it, lead with the strongest point, cut the hedging, add the concrete next step if it was missing. They will read it aloud, so it must sound like something a person says, not something written.
+THE REWRITE — READ THIS TWICE
+"improved_answer" is the WORDS THEY SHOULD SAY. Not advice about the words. Not a description of what a better answer would contain. The actual sentences, in the first person, ready to be spoken out loud to the client exactly as written.
+
+This is the single most useful thing in the whole evaluation, because it is the only part they can take straight into a real call.
+
+WRONG — this is advice, and it is useless to them:
+"Lead with the boundary, then explain the tradeoff, and finish by proposing a revised quote."
+
+WRONG — this describes rather than says:
+"A stronger answer would acknowledge the request, note the scope change, and offer a specific next step."
+
+RIGHT — these are words a person can say:
+"That's outside what we scoped, but I can absolutely take it on. It'd add about two hours, so let me send a revised quote before I start."
+
+Rules for it:
+- First person. Their voice, their facts, their examples. You are restructuring their answer, not writing a new one.
+- No meta-language at all. Never "you could say", never "try something like", never "consider". Just the words.
+- Spoken register, not written. Contractions, short sentences, the way someone actually talks.
+- Cut the hedging, lead with the strongest point, and add the concrete next step if theirs was missing.
+- If they said something factually wrong, fix it in the rewrite rather than restating the mistake more smoothly.
+- Roughly as long as a good spoken answer: 40 to 120 words.
 
 LENGTH
 "strengths" and "gaps" are short phrases, not sentences — under about 15 words each, since they are read at a glance on a phone. Put the explanation in "feedback", where there is room for it.
 
 Return ONLY valid JSON, no markdown fences and no commentary:
-{"substance":{"score":1-5,"strengths":["..."],"gaps":["..."]},"delivery":{"score":1-5,"filler_words":0,"hedging":["..."],"pace_note":"..."},"feedback":"two or three sentences spoken directly to them","one_thing":"the single most valuable change for their retry","improved_answer":"their answer, restructured"}`;
+{"substance":{"score":1-5,"strengths":["..."],"gaps":["..."]},"delivery":{"score":1-5,"filler_words":0,"hedging":["..."],"pace_note":"..."},"feedback":"two or three sentences spoken directly to them","one_thing":"the single most valuable change for their retry","improved_answer":"the exact words to say, first person, no advice"}`;
 
 export async function evaluateAnswer(params: {
   question: string;

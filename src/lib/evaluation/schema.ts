@@ -63,7 +63,26 @@ export const evaluation = z.object({
   // The single most valuable change for the retry.
   one_thing: capped(400),
   // Their own answer, restructured. Same facts, same story, tightened.
-  improved_answer: z.string().min(20).transform((v) => v.trim()),
+  /**
+   * The words to say, not advice about them.
+   *
+   * This regressed once: an instruction meant for the feedback field
+   * was read as applying here, and the rewrite started returning
+   * coaching notes instead of speakable sentences. The prompt is the
+   * real fix; this catches it if it drifts again, since a rewrite that
+   * cannot be read aloud is worse than none.
+   */
+  improved_answer: z
+    .string()
+    .min(20)
+    .transform((v) => v.trim())
+    .refine(
+      (v) =>
+        !/^(lead with|start by|try |consider |you could|you should|a stronger answer|acknowledge the|instead of saying|begin by)/i.test(
+          v,
+        ),
+      { message: "improved_answer is advice, not the words to say" },
+    ),
 });
 
 export type Evaluation = z.infer<typeof evaluation>;
