@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Working } from "@/components/working";
 import { submitAnswer, type AnswerState } from "@/app/practice/[sessionId]/actions";
 
 type Props = {
@@ -308,23 +309,26 @@ export function AnswerRecorder({
       )}
 
       {phase === "submitting" && (
-        <div>
+        <>
           <SubmitWatchdog
             onTimeout={() => {
               setError(
-                "This is taking longer than it should. Your recording is safe — give it a moment, or send it again.",
+                "That took longer than it should have. Your answer may still have saved — reload the page to check before recording it again.",
               );
               setPhase("review");
+              onSubmittingChange?.(false);
             }}
           />
-          <p className="ef-label text-seaglass">Listening back</p>
-          <p className="ef-body text-paper mt-3">
-            Going through what you said.
-          </p>
-          <p className="ef-caption text-faint mt-1">
-            About twenty seconds. You can put the phone down.
-          </p>
-        </div>
+          <Working
+            lines={[
+              "Listening back to what you said",
+              "Counting the fillers and the pace",
+              "Looking for where you softened it",
+              "Writing your feedback",
+            ]}
+            note="About twenty seconds. You can put the phone down."
+          />
+        </>
       )}
 
       {error && (

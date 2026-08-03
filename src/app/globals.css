@@ -110,3 +110,37 @@ a.inline {
     transform: translateY(0);
   }
 }
+
+/* The mark breathing while the app works. Slow enough to be calming
+   rather than urgent — a spinner says busy, this says wait with me. */
+@media (prefers-reduced-motion: no-preference) {
+  .breathe {
+    animation: breathe 3.4s ease-in-out infinite;
+  }
+  .fade-line {
+    animation: fade-line 500ms ease-out both;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-line {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

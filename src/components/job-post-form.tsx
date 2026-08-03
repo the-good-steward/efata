@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Working } from "@/components/working";
 import { createSession, type SessionState } from "@/app/practice/actions";
 
 /**
@@ -10,9 +11,9 @@ import { createSession, type SessionState } from "@/app/practice/actions";
  */
 const STEPS = [
   "Reading the job post",
-  "Looking up what this role is actually asked",
-  "Working out what they'd test you on",
-  "Writing your questions",
+  "Looking up what this role actually gets asked",
+  "Working out what they would test you on",
+  "Writing questions for your level",
   "Nearly there",
 ];
 
@@ -60,6 +61,30 @@ export function JobPostForm() {
           className="border-rule text-parchment placeholder:text-ash/50 focus:border-spoken focus:ring-spoken/40 resize-y rounded-sm border bg-transparent px-3 py-2 font-body text-sm leading-relaxed outline-none focus:ring-2"
         />
       </label>
+
+      {state.error && (
+        <p
+          role="alert"
+          className="font-body rounded-sm border border-flag/40 bg-flag/10 px-3 py-2 text-sm text-flag"
+        >
+          {state.error}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={pending}
+        className="bg-parchment text-ink font-body hover:bg-parchment/85 focus-visible:ring-spoken focus-visible:ring-offset-ink self-start rounded-sm px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-60"
+      >
+        {pending ? "Researching and building…" : "Build my questions"}
+      </button>
+
+      {pending && (
+        <Working
+          lines={STEPS}
+          note="Up to a minute. It's reading what employers actually ask for this role, not guessing."
+        />
+      )}
 
       {state.error && (
         <p

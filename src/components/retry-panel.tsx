@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnswerRecorder } from "@/components/answer-recorder";
+import { Working } from "@/components/working";
 
 type Props = {
   sessionQuestionId: string;
@@ -137,14 +138,11 @@ export function RetryPanel({
       )}
 
       {!feedbackReady && !feedbackStalled && (
-        <div className="bg-raised mt-6 rounded-[16px] p-5">
-          <div className="flex items-center gap-3">
-            <span className="bg-seaglass inline-block h-2 w-2 animate-pulse rounded-full" />
-            <p className="ef-ui text-paper">Reading your answer back</p>
-          </div>
-          <p className="ef-caption text-faint mt-2">
-            A few seconds. Nothing to do yet.
-          </p>
+        <div className="mt-6">
+          <Working
+            lines={["Reading your answer back", "Writing your feedback"]}
+            note="A few seconds. Nothing to do yet."
+          />
         </div>
       )}
 
