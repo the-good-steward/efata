@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { RetryPanel } from "@/components/retry-panel";
 import { FeedbackRating } from "@/components/feedback-rating";
@@ -91,6 +91,44 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
     firstUnanswered === -1 ? 0 : firstUnanswered,
   );
   const [finished, setFinished] = useState(false);
+
+  /**
+   * Anchor for the question itself.
+   *
+   * Feedback and the recorder both appear below the question, so
+   * without this the page silently leaves you looking at whatever was
+   * on screen before — usually the bottom of the previous block, with
+   * the thing you just asked for out of view above or below you.
+   */
+  const anchorRef = useRef<HTMLDivElement>(null);
+
+  // Bring the question back into view when it changes. Without it,
+  // moving on leaves you staring at the footer of the previous answer.
+  useEffect(() => {
+    anchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [index]);
+
+  /**
+   * Briefly lock navigation after new feedback lands.
+   *
+   * Submitting an answer inserts a block of feedback above the Back and
+   * Next controls, so everything below it jumps. A tap already on its
+   * way down lands on whatever moved into that spot, which is how
+   * people ended up on the next question without choosing to be there.
+   * Half a second is enough to cover the reflow and short enough that
+   * nobody deliberately tapping Next will notice.
+   */
+  const totalAttempts = questions.reduce((n, q) => n + q.attempts.length, 0);
+  const [navLocked, setNavLocked] = useState(false);
+  const seenAttempts = useRef(totalAttempts);
+
+  useEffect(() => {
+    if (totalAttempts === seenAttempts.current) return;
+    seenAttempts.current = totalAttempts;
+    setNavLocked(true);
+    const timer = setTimeout(() => setNavLocked(false), 500);
+    return () => clearTimeout(timer);
+  }, [totalAttempts]);
   const [started, setStarted] = useState(
     questions.some((q) => q.attempts.length > 0),
   );
@@ -259,7 +297,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         />
       </div>
 
-      <div key={question.linkId} className="rise mt-12">
+      <div ref={anchorRef} key={question.linkId} className="rise mt-12 scroll-mt-6">
         {question.context && (
           <p className="text-ash font-body text-sm italic">
             {question.context}
@@ -353,7 +391,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
       <div className="border-hairline mt-14 flex items-center justify-between gap-4 border-t pt-6">
         <button
           onClick={() => setIndex((i) => Math.max(0, i - 1))}
-          disabled={index === 0}
+          disabled={index === 0 || navLocked}
           className="ef-ui text-muted hover:text-paper inline transition-colors disabled:opacity-30"
         >
           Back
@@ -362,7 +400,8 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         {isLast ? (
           <button
             onClick={() => setFinished(true)}
-            className="ef-ui text-muted hover:text-paper inline transition-colors"
+            disabled={navLocked}
+            className="ef-ui text-muted hover:text-paper inline transition-colors disabled:opacity-30"
           >
             Finish session
           </button>

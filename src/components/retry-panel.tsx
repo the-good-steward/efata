@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnswerRecorder } from "@/components/answer-recorder";
 
 type Props = {
@@ -35,6 +35,19 @@ export function RetryPanel({
   rated,
 }: Props) {
   const [recording, setRecording] = useState(false);
+  const recorderRef = useRef<HTMLDivElement>(null);
+
+  // Tapping 'try that one again' swaps the feedback for the recorder
+  // further down the page, which left people scrolling to find the
+  // thing they had just asked for.
+  useEffect(() => {
+    if (recording) {
+      recorderRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [recording]);
 
   if (!hasAttempted) {
     return (
@@ -52,7 +65,7 @@ export function RetryPanel({
 
   if (recording) {
     return (
-      <div className="mt-8">
+      <div ref={recorderRef} className="mt-8 scroll-mt-6">
         <AnswerRecorder
           sessionQuestionId={sessionQuestionId}
           attemptNumber={attemptNumber}
