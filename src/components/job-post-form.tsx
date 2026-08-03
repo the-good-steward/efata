@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createSession, type SessionState } from "@/app/practice/actions";
 
 /**
@@ -16,6 +17,7 @@ const STEPS = [
 ];
 
 export function JobPostForm() {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState<SessionState, FormData>(
     createSession,
     {},
@@ -29,6 +31,10 @@ export function JobPostForm() {
   // Derived from elapsed time rather than held as state that an effect
   // writes to, which keeps the lint rule happy and the logic simpler.
   const [ticks, setTicks] = useState(0);
+
+  useEffect(() => {
+    if (state.sessionId) router.push(`/practice/${state.sessionId}`);
+  }, [state.sessionId, router]);
 
   useEffect(() => {
     if (!pending) return;

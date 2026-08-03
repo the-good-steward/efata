@@ -121,6 +121,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
    */
   const totalAttempts = questions.reduce((n, q) => n + q.attempts.length, 0);
   const [navLocked, setNavLocked] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const seenAttempts = useRef(totalAttempts);
 
   useEffect(() => {
@@ -339,6 +340,9 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   const latest = attempts[attempts.length - 1];
   const answered = attempts.length > 0;
   const isLast = index === questions.length - 1;
+  // One answer is not practice. Moving on is blocked until the second
+  // run is done, which is where the change actually happens.
+  const owesRetry = attempts.length === 1;
 
   return (
     <div>
@@ -439,6 +443,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         ))}
 
         <RetryPanel
+          onSubmittingChange={setSubmitting}
           sessionQuestionId={question.linkId}
           attemptNumber={attempts.length + 1}
           hasAttempted={answered}
@@ -449,7 +454,17 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         />
       </div>
 
-      <div className="border-hairline mt-14 flex items-center justify-between gap-4 border-t pt-6">
+      {!submitting && owesRetry && (
+        <p className="ef-caption text-faint mt-8 text-center">
+          One more run at this one before you move on.
+        </p>
+      )}
+
+      <div
+        className={`border-hairline mt-6 flex items-center justify-between gap-4 border-t pt-6 transition-opacity ${
+          submitting ? "pointer-events-none opacity-0" : "opacity-100"
+        }`}
+      >
         <button
           onClick={() => setIndex((i) => Math.max(0, i - 1))}
           disabled={index === 0 || navLocked}
@@ -461,7 +476,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         {isLast ? (
           <button
             onClick={() => setFinished(true)}
-            disabled={navLocked}
+            disabled={navLocked || owesRetry}
             className="ef-ui text-muted hover:text-paper inline transition-colors disabled:opacity-30"
           >
             Finish session
@@ -471,11 +486,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
             onClick={() => setIndex((i) => i + 1)}
             className="ef-ui text-muted hover:text-paper inline transition-colors"
           >
-            {!answered
-              ? "Skip this one"
-              : attempts.length === 1
-                ? "Move on without the words"
-                : "Next question"}
+            {!answered ? "Skip this one" : "Next question"}
           </button>
         )}
       </div>

@@ -14,7 +14,7 @@ import {
   type RoleOption,
 } from "@/lib/questions/generate";
 
-export type SessionState = { error?: string };
+export type SessionState = { error?: string; sessionId?: string };
 
 const MIN_JOB_POST = 80;
 const MAX_JOB_POST = 12000;
@@ -181,7 +181,7 @@ export async function createSession(
   }
 
   revalidatePath("/practice");
-  redirect(`/practice/${session.id}`);
+  return { sessionId: session.id };
 }
 
 /**

@@ -11,7 +11,7 @@ type Props = {
   scriptOverlap: number | null;
   hasAttempted: boolean;
   rated: boolean;
-  onDone?: () => void;
+  onSubmittingChange?: (submitting: boolean) => void;
 };
 
 /**
@@ -33,6 +33,7 @@ export function RetryPanel({
   scriptOverlap,
   hasAttempted,
   rated,
+  onSubmittingChange,
 }: Props) {
   const [recording, setRecording] = useState(false);
   const recorderRef = useRef<HTMLDivElement>(null);
@@ -55,6 +56,7 @@ export function RetryPanel({
         sessionQuestionId={sessionQuestionId}
         attemptNumber={attemptNumber}
         oneThing={null}
+        onSubmittingChange={onSubmittingChange}
       />
     );
   }
@@ -70,6 +72,7 @@ export function RetryPanel({
           sessionQuestionId={sessionQuestionId}
           attemptNumber={attemptNumber}
           oneThing={oneThing}
+          onSubmittingChange={onSubmittingChange}
           onSubmitted={() => setRecording(false)}
         />
         <button
@@ -124,14 +127,14 @@ export function RetryPanel({
               disabled={!rated}
               className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Try that one again
+              Try it again
             </button>
             {rated ? (
               <div className="border-seaglass/25 bg-seaglass/5 rounded-[12px] px-4 py-3">
-                <p className="ef-ui text-seaglass">Waiting after this one</p>
+                <p className="ef-ui text-seaglass">After this run</p>
                 <p className="ef-caption text-muted mt-1.5">
                   The exact words to say, in your voice, ready to use on a
-                  real call. You only get them by trying once more.
+                  real call.
                 </p>
               </div>
             ) : (

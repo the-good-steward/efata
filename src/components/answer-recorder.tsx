@@ -11,6 +11,8 @@ type Props = {
    *  recording state. Without it the recorder stays mounted and its
    *  phase never leaves "submitting". */
   onSubmitted?: () => void;
+  /** Lets the page hide navigation while an answer is in flight. */
+  onSubmittingChange?: (submitting: boolean) => void;
   /** Shown above the recorder on a retry, so the fix is in view while
    *  they speak. This is the point of the retry loop. */
   oneThing?: string | null;
@@ -47,6 +49,7 @@ export function AnswerRecorder({
   attemptNumber,
   oneThing,
   onSubmitted,
+  onSubmittingChange,
 }: Props) {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
@@ -146,6 +149,7 @@ export function AnswerRecorder({
     if (!blob) return;
     setPhase("submitting");
     setError(null);
+    onSubmittingChange?.(true);
 
     const formData = new FormData();
     formData.append("session_question_id", sessionQuestionId);
@@ -165,6 +169,7 @@ export function AnswerRecorder({
       if (state.error && !state.ok) {
         setError(state.error);
         setPhase("review");
+        onSubmittingChange?.(false);
         return;
       }
 
@@ -177,6 +182,7 @@ export function AnswerRecorder({
       // even though the answer had saved. A tester lost a whole
       // session to this.
       router.refresh();
+      onSubmittingChange?.(false);
       onSubmitted?.();
       setPhase("idle");
       setBlob(null);
