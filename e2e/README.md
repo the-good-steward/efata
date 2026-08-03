@@ -1,48 +1,45 @@
 # Browser tests
 
-Real Chromium, real layout, real events. These exist because every bug
-that reached a tester lived in the gap between "the server responds"
-and "the page behaves": a spinner that never stopped, a page that did
-not scroll, a tap landing on a control that had just moved.
-
-None of that is visible from curl, a build, or a unit test.
+These drive a real Chromium against a real build. Every bug that
+reached a tester lived in the click path — a screen stuck on "listening
+back", answers silently lost, taps landing on the wrong control after a
+reflow — and none of it is visible from the server side.
 
 ## Running
 
 ```bash
-npm run build
-npm run start -- -p 3100 &
-npm run e2e
+npm run e2e            # phone and desktop
+npm run e2e:phone      # phone only, which is how users actually arrive
 ```
 
-Against a deployed build:
+Playwright builds and serves the app itself. To test against something
+already running, or against production:
 
 ```bash
-E2E_BASE=https://efata-five.vercel.app npm run e2e
+E2E_BASE_URL=http://localhost:3000 npm run e2e
 ```
 
-## Notes
+## Signed-in tests
 
-Chromium comes from `@sparticuz/chromium` on npm, because Playwright's
-CDN and Ubuntu's snap-based browsers are both unreachable from the
-build sandbox.
+The tests in `signed-in.spec.ts` skip unless credentials are provided:
 
-The browser is launched with fake media devices, so the microphone is
-granted without a prompt and recording can be exercised without a
-human. Google Fonts is unreachable from the sandbox, so its 403 is
-filtered from the console check.
+```bash
+E2E_EMAIL=qa@example.com E2E_PASSWORD=... npm run e2e:phone
+```
 
-## What is covered
+Use a throwaway account rather than your own. These create sessions and
+answers, which would otherwise pollute your progress figures.
 
-- The landing page renders and logs no console errors
-- Signed-out visitors are redirected rather than shown an error
-- The login form has its fields and does not overflow sideways
-- No tap target is under 44px
-- Signup is either open with a form or closed with an explanation
+## The browser
+
+Playwright's own download host is not reachable from the build
+sandbox, so Chromium comes from `@sparticuz/chromium` and is extracted
+to `/tmp/chromium` on first use. Override with `CHROMIUM_PATH` if a
+system browser is available.
 
 ## What is not covered yet
 
-The signed-in flow: recording, submitting, feedback appearing, the
-retry, scroll position, and the navigation lock. That needs a test
-account and seeded data, and it is where the worst bugs have been. It
-is the obvious next thing to add.
+Recording itself. Chromium is launched with a fake microphone, so a
+test can drive the recorder, but asserting on transcription and
+evaluation needs the AI services stubbed. That is the next thing worth
+adding, since it is where answers were being lost.
