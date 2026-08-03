@@ -45,6 +45,15 @@ export async function signup(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  // Enforced here as well as in the page. Hiding the form only hides
+  // it; the action is still reachable by anyone who wants to post to
+  // it directly.
+  if (process.env.EFATA_SIGNUPS_CLOSED === "true") {
+    return {
+      error: "New signups are paused for a couple of days while I fix something.",
+    };
+  }
+
   const { email, password } = readCredentials(formData);
 
   const invalid = validate(email, password);
