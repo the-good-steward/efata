@@ -11,6 +11,21 @@ type Props = {
   scriptOverlap: number | null;
   hasAttempted: boolean;
   rated: boolean;
+  /**
+   * Whether the feedback for the latest attempt has actually arrived.
+   *
+   * The answer is saved before it is scored, so there is a window where
+   * the attempt exists with nothing in it. Offering "try it again"
+   * during that window lets someone start their second run having read
+   * nothing, which is the one thing the second run is for.
+   */
+  feedbackReady: boolean;
+  /**
+   * Feedback that never arrived. Evaluation can fail while the answer
+   * itself saved fine, and leaving someone on a spinner forever is
+   * worse than telling them and letting them carry on.
+   */
+  feedbackStalled: boolean;
   onSubmittingChange?: (submitting: boolean) => void;
 };
 
@@ -33,6 +48,8 @@ export function RetryPanel({
   scriptOverlap,
   hasAttempted,
   rated,
+  feedbackReady,
+  feedbackStalled,
   onSubmittingChange,
 }: Props) {
   const [recording, setRecording] = useState(false);
@@ -119,7 +136,33 @@ export function RetryPanel({
         </div>
       )}
 
-      <div className="mt-6 flex flex-col gap-3">
+      {!feedbackReady && !feedbackStalled && (
+        <div className="bg-raised mt-6 rounded-[16px] p-5">
+          <div className="flex items-center gap-3">
+            <span className="bg-seaglass inline-block h-2 w-2 animate-pulse rounded-full" />
+            <p className="ef-ui text-paper">Reading your answer back</p>
+          </div>
+          <p className="ef-caption text-faint mt-2">
+            A few seconds. Nothing to do yet.
+          </p>
+        </div>
+      )}
+
+      {feedbackStalled && (
+        <div className="border-clay/40 bg-clay/10 mt-6 rounded-[16px] p-5">
+          <p className="ef-ui text-clay">The feedback didn&rsquo;t finish</p>
+          <p className="ef-caption text-muted mt-2">
+            Your answer and transcript are saved. Reload the page to try the
+            feedback again, or carry on and come back to it.
+          </p>
+        </div>
+      )}
+
+      <div
+        className={`mt-6 flex flex-col gap-3 ${
+          feedbackReady || feedbackStalled ? "" : "pointer-events-none hidden"
+        }`}
+      >
         {canRetry ? (
           <>
             <button

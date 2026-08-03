@@ -15,6 +15,7 @@ export type RunnerQuestion = {
   attempts: {
     id: string;
     attempt_number: number;
+    created_at: string;
     transcript: string | null;
     feedback: string | null;
     improved_answer: string | null;
@@ -122,6 +123,14 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   const totalAttempts = questions.reduce((n, q) => n + q.attempts.length, 0);
   const [navLocked, setNavLocked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // A ticking clock, so "has the feedback stalled" can be derived
+  // without reading the current time during render.
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setNow((n) => n + 1), 15_000);
+    return () => clearInterval(timer);
+  }, []);
   const seenAttempts = useRef(totalAttempts);
 
   useEffect(() => {
@@ -344,6 +353,10 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   // run is done, which is where the change actually happens.
   const owesRetry = attempts.length === 1;
 
+  // Six ticks of fifteen seconds is a minute and a half — long enough
+  // that a slow evaluation is not mistaken for a failed one.
+  const stalled = Boolean(latest) && !latest?.feedback && now >= 6;
+
   return (
     <div>
       <div className="flex items-baseline justify-between gap-4">
@@ -443,6 +456,8 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         ))}
 
         <RetryPanel
+          feedbackReady={Boolean(latest?.feedback)}
+          feedbackStalled={stalled}
           onSubmittingChange={setSubmitting}
           sessionQuestionId={question.linkId}
           attemptNumber={attempts.length + 1}
