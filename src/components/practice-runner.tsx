@@ -5,6 +5,7 @@ import Link from "next/link";
 import { RetryPanel } from "@/components/retry-panel";
 import { FeedbackRating } from "@/components/feedback-rating";
 import { MarkedTranscript } from "@/components/marked-transcript";
+import { buildVerdict, type SessionAnswer } from "@/lib/session-verdict";
 
 export type RunnerQuestion = {
   linkId: string;
@@ -173,6 +174,26 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
     const retried = questions.filter((q) => q.attempts.length > 1).length;
     // Answered once and left there: they did the hard part and stopped
     // one step short of the thing worth having.
+    const sessionAnswers: SessionAnswer[] = questions
+      .filter((q) => q.attempts.length > 0)
+      .map((q) => {
+        const first = q.attempts[0];
+        const last = q.attempts[q.attempts.length - 1];
+        return {
+          attemptCount: q.attempts.length,
+          fillerWords: last.scores?.delivery?.filler_words ?? 0,
+          wordCount: (last.transcript ?? "").trim()
+            ? (last.transcript ?? "").trim().split(/\s+/).length
+            : 0,
+          wordsPerMinute: last.scores?.words_per_minute ?? null,
+          substanceFirst: first.scores?.substance?.score ?? null,
+          substanceLast: last.scores?.substance?.score ?? null,
+          hedging: last.scores?.delivery?.hedging ?? [],
+        };
+      });
+
+    const verdict = buildVerdict(sessionAnswers, questions.length);
+
     const unfinished = questions
       .map((q, i) => ({ q, i }))
       .filter(({ q }) => q.attempts.length === 1);
@@ -198,9 +219,12 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
     return (
       <div className="rise">
         <p className="ef-label text-faint">Session finished</p>
-        <h1 className="ef-display text-paper mt-3">
+        <h1 className="ef-display text-paper mt-3">{verdict.headline}</h1>
+        <p className="ef-body text-paper-soft mt-4">{verdict.body}</p>
+        <p className="ef-caption text-faint mt-4">
           {answeredCount} of {questions.length} answered
-        </h1>
+          {retried > 0 ? ` · ${retried} with a second run` : ""}
+        </p>
 
         {answeredCount === 0 && (
           <div className="border-clay/40 bg-clay/10 mt-6 rounded-[12px] px-4 py-3">
@@ -291,9 +315,17 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           </button>
           <Link
             href="/practice"
+            className="ef-ui text-seaglass hover:text-paper text-center transition-colors"
+          >
+            {verdict.tone === "steady"
+              ? "Practise a harder job post"
+              : "Practise another set"}
+          </Link>
+          <Link
+            href="/recall"
             className="ef-ui text-faint hover:text-paper text-center transition-colors"
           >
-            Start a different session
+            Had a real interview? Log what they asked
           </Link>
         </div>
       </div>
