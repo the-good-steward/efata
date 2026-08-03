@@ -62,7 +62,7 @@ export async function signup(
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: { emailRedirectTo: `${origin}/auth/confirm` },
@@ -70,6 +70,19 @@ export async function signup(
 
   if (error) {
     return { error: error.message };
+  }
+
+  // With email confirmation switched off, Supabase returns a session
+  // straight away. Go on into the app rather than telling someone to
+  // check an inbox for a message that will never arrive.
+  //
+  // This also sidesteps the confirmation link breaking when signup
+  // starts in one browser and the email opens in another — which is
+  // what happens by default when a link is shared through Messenger,
+  // since it opens in an in-app browser.
+  if (data.session) {
+    revalidatePath("/", "layout");
+    redirect("/onboarding");
   }
 
   return {

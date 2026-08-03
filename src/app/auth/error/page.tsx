@@ -14,9 +14,14 @@ export default async function AuthErrorPage({
       <h1 className="text-parchment font-display text-4xl">
         That link didn&rsquo;t work
       </h1>
-      <p className="text-ash font-body mt-4 max-w-sm text-sm leading-relaxed">
-        Confirmation links expire after a short time and can only be used
-        once. Request a new one by signing up again with the same email.
+      <p className="ef-body text-paper-soft mt-4 max-w-sm">
+        This usually happens when the link opens in a different browser from
+        the one you signed up in — for example, signing up inside Messenger
+        and then opening the email in Safari or Chrome.
+      </p>
+      <p className="ef-body text-muted mt-4 max-w-sm">
+        Your account is fine. Try signing in with the email and password you
+        just used.
       </p>
 
       {reason && (
@@ -26,10 +31,10 @@ export default async function AuthErrorPage({
       )}
 
       <Link
-        href="/signup"
+        href="/login"
         className="bg-parchment text-ink font-body hover:bg-parchment/85 mt-8 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
       >
-        Back to sign up
+        Sign in
       </Link>
     </main>
   );
