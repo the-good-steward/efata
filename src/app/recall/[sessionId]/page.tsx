@@ -3,6 +3,13 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { RecallForm } from "@/components/recall-form";
 
+/**
+ * Server Actions inherit this page's limit, and question submission.
+ * The Vercel default is 10 seconds, which killed every answer
+ * mid-flight and lost it. 60 is the Hobby ceiling.
+ */
+export const maxDuration = 60;
+
 export const metadata = { title: "Log the questions · Efata" };
 
 export default async function RecallSessionPage({

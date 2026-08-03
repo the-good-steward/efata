@@ -159,6 +159,16 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           {answeredCount} of {questions.length} answered
         </h1>
 
+        {answeredCount === 0 && (
+          <div className="border-clay/40 bg-clay/10 mt-6 rounded-[12px] px-4 py-3">
+            <p className="ef-body text-clay">
+              Nothing was recorded. If you spoke and it never came back with
+              feedback, that is a fault at our end, not yours — the questions
+              are still here and worth another go.
+            </p>
+          </div>
+        )}
+
         <div className="border-hairline mt-8 flex flex-col gap-5 border-t pt-8">
           {retried > 0 && (
             <p className="ef-body text-paper-soft">
@@ -361,7 +371,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
             onClick={() => setIndex((i) => i + 1)}
             className="ef-ui text-muted hover:text-paper inline transition-colors"
           >
-            {answered ? "Next question" : "Skip for now"}
+            {answered ? "Next question" : "Skip this one"}
           </button>
         )}
       </div>

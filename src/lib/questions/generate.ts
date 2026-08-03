@@ -135,7 +135,10 @@ export async function generateQuestions(
       {
         type: "web_search_20250305",
         name: "web_search",
-        max_uses: 5,
+        // Kept low on purpose: the whole request must finish inside
+        // sixty seconds or the generation is killed and lost. Two
+        // searches is enough to ground the questions.
+        max_uses: 2,
       },
     ],
     // Generous budget on purpose. This model reasons before answering
@@ -162,7 +165,7 @@ ${roleCatalogue}${
             : ""
         }
 
-First, search the web for what is actually asked in interviews and client calls for this kind of role. Search two or three times with different angles, for example the role title plus "interview questions", the specific tools named in the job post, and what clients ask when hiring for this remotely. Read what you find before writing anything.
+First, search the web for what is actually asked in interviews and client calls for this kind of role. Search once or twice, no more — the role title plus "interview questions", and the specific tools named in the job post. Read what you find, then write. Do not keep searching for completeness; you are on a time budget and an unfinished response is worth nothing.
 
 Then write 7 questions for this job post: 4 hypothetical and 3 technical.
 

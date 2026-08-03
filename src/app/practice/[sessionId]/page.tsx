@@ -6,6 +6,13 @@ import {
   type RunnerQuestion,
 } from "@/components/practice-runner";
 
+/**
+ * Server Actions inherit this page's limit, and transcription plus evaluation for each answer.
+ * The Vercel default is 10 seconds, which killed every answer
+ * mid-flight and lost it. 60 is the Hobby ceiling.
+ */
+export const maxDuration = 60;
+
 export const metadata = { title: "Session · Efata" };
 
 type QuestionRow = {

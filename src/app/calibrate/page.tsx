@@ -3,6 +3,13 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CalibrationCard } from "@/components/calibration-card";
 
+/**
+ * Server Actions inherit this page's limit, and the stability check re-scores three times.
+ * The Vercel default is 10 seconds, which killed every answer
+ * mid-flight and lost it. 60 is the Hobby ceiling.
+ */
+export const maxDuration = 60;
+
 export const metadata = { title: "Calibration · Efata" };
 
 type AttemptRow = {

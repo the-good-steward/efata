@@ -24,6 +24,19 @@ const MAX_SECONDS = 150;
  */
 const PREP_SECONDS = 5;
 
+/**
+ * Nothing should sit on a loading state indefinitely. If the server has
+ * not answered in seventy seconds it is not going to: the function
+ * limit is sixty, so past that the request is already dead.
+ */
+function SubmitWatchdog({ onTimeout }: { onTimeout: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onTimeout, 70000);
+    return () => clearTimeout(timer);
+  }, [onTimeout]);
+  return null;
+}
+
 export function AnswerRecorder({
   sessionQuestionId,
   attemptNumber,
@@ -131,14 +144,27 @@ export function AnswerRecorder({
     formData.append("session_question_id", sessionQuestionId);
     formData.append("audio", blob, "answer.webm");
 
-    const state: AnswerState = await submitAnswer({}, formData);
+    try {
+      const state: AnswerState = await submitAnswer({}, formData);
 
-    if (state.error) {
-      setError(state.error);
+      if (state.error) {
+        setError(state.error);
+        setPhase("review");
+        return;
+      }
+      // Success revalidates the page, which re-renders with the
+      // feedback. The recording is kept until then, so nothing is lost
+      // if that render is slow.
+    } catch {
+      // A thrown action means the request died — usually the function
+      // hitting its time limit. Previously this left the screen sitting
+      // on "listening back" forever and the answer was gone. Now the
+      // recording is still in hand and can be sent again.
+      setError(
+        "That took too long and didn't go through. Your recording is still here — try sending it again.",
+      );
       setPhase("review");
-      return;
     }
-    // Success revalidates the page, which re-renders with the feedback.
   }
 
   const mmss = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
@@ -251,6 +277,14 @@ export function AnswerRecorder({
 
       {phase === "submitting" && (
         <div>
+          <SubmitWatchdog
+            onTimeout={() => {
+              setError(
+                "This is taking longer than it should. Your recording is safe — give it a moment, or send it again.",
+              );
+              setPhase("review");
+            }}
+          />
           <p className="ef-label text-seaglass">Listening back</p>
           <p className="ef-body text-paper mt-3">
             Going through what you said.

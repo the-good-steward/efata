@@ -4,6 +4,13 @@ import { createClient } from "@/lib/supabase/server";
 import { JobPostForm } from "@/components/job-post-form";
 import { AppHeader } from "@/components/app-header";
 
+/**
+ * Server Actions inherit this page's limit, and generation runs web searches and takes up to a minute.
+ * The Vercel default is 10 seconds, which killed every answer
+ * mid-flight and lost it. 60 is the Hobby ceiling.
+ */
+export const maxDuration = 60;
+
 export const metadata = { title: "Practice · Efata" };
 
 export default async function PracticePage() {

@@ -153,22 +153,18 @@ They rebuilt the answer in their own words rather than repeating our rewrite. If
   const message = await client.messages.create({
     model: MODEL,
     max_tokens: 8000,
-    // Search only on technical answers. Telling someone they are wrong
-    // is the highest-stakes thing this app does, so that judgment
-    // should be checked against sources rather than recalled. Adding it
-    // to every evaluation would cost latency on answers where there is
-    // no factual claim to verify.
-    ...(params.rubric === "technical"
-      ? {
-          tools: [
-            {
-              type: "web_search_20250305" as const,
-              name: "web_search" as const,
-              max_uses: 3,
-            },
-          ],
-        }
-      : {}),
+    // No web search here, deliberately.
+    //
+    // Verifying a claim mid-evaluation added twenty to forty seconds,
+    // and the whole request has to finish inside sixty. It was
+    // overrunning, which killed the answer and lost the recording —
+    // far worse than a slightly less certain technical judgment.
+    //
+    // The grounding is not lost: the answer key this scores against was
+    // researched with search when the question was created, and it
+    // carries a confidence flag telling the evaluator how much to trust
+    // it. Verification moved to where it can be paid for once, rather
+    // than on every answer.
     system: SYSTEM_PROMPT,
     messages: [
       {
