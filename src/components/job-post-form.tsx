@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Working } from "@/components/working";
 import { createSession, type SessionState } from "@/app/practice/actions";
@@ -31,21 +31,10 @@ export function JobPostForm() {
    */
   // Derived from elapsed time rather than held as state that an effect
   // writes to, which keeps the lint rule happy and the logic simpler.
-  const [ticks, setTicks] = useState(0);
 
   useEffect(() => {
     if (state.sessionId) router.push(`/practice/${state.sessionId}`);
   }, [state.sessionId, router]);
-
-  useEffect(() => {
-    if (!pending) return;
-    const timer = setInterval(() => {
-      setTicks((t) => t + 1);
-    }, 7000);
-    return () => clearInterval(timer);
-  }, [pending]);
-
-  const step = pending ? Math.min(ticks, STEPS.length - 1) : 0;
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -65,55 +54,24 @@ export function JobPostForm() {
       {state.error && (
         <p
           role="alert"
-          className="font-body rounded-sm border border-flag/40 bg-flag/10 px-3 py-2 text-sm text-flag"
+          className="ef-body border-clay/40 bg-clay/10 text-clay rounded-[12px] border px-4 py-3"
         >
           {state.error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="bg-parchment text-ink font-body hover:bg-parchment/85 focus-visible:ring-spoken focus-visible:ring-offset-ink self-start rounded-sm px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-60"
-      >
-        {pending ? "Researching and building…" : "Build my questions"}
-      </button>
-
-      {pending && (
+      {pending ? (
         <Working
           lines={STEPS}
           note="Up to a minute. It's reading what employers actually ask for this role, not guessing."
         />
-      )}
-
-      {state.error && (
-        <p
-          role="alert"
-          className="font-body rounded-sm border border-flag/40 bg-flag/10 px-3 py-2 text-sm text-flag"
+      ) : (
+        <button
+          type="submit"
+          className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
         >
-          {state.error}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={pending}
-        className="bg-parchment text-ink font-body hover:bg-parchment/85 focus-visible:ring-spoken focus-visible:ring-offset-ink self-start rounded-sm px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-60"
-      >
-        {pending ? "Researching and building…" : "Build my questions"}
-      </button>
-
-      {pending && (
-        <div className="bg-raised mt-2 rounded-[12px] p-5">
-          <div className="flex items-center gap-3">
-            <span className="bg-seaglass inline-block h-2 w-2 animate-pulse rounded-full" />
-            <p className="ef-ui text-paper">{STEPS[step]}</p>
-          </div>
-          <p className="ef-caption text-faint mt-3">
-            Up to a minute. It&rsquo;s reading what employers actually ask
-            for this role, not guessing.
-          </p>
-        </div>
+          Build my questions
+        </button>
       )}
     </form>
   );
