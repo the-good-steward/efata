@@ -35,12 +35,10 @@ You may ONLY return a role_slug that appears in the list below. Nothing else is 
 
 Set difficulty from the person's experience level, given in the message below. Pitch the technical questions at that level: too hard and they learn nothing, too easy and the practice is worthless.
 
-RESEARCH
-You have web search. Use it before writing technical questions. Look up what is genuinely asked for this role and what practitioners say separates a competent hire from a weak one. Prefer what real hiring managers and freelancers describe over generic career-advice listicles.
+GROUNDING
+Everything comes from the job post in front of you. Use its actual tools, industry, numbers and responsibilities. A question that could have been asked of anyone in any role is a wasted question.
 
-Synthesise what you find into your own questions. Never copy a question list verbatim from any page, and never reproduce more than a short phrase from a source. The point of searching is to make the questions realistic and current, not to republish someone else's content.
-
-If search turns up nothing useful for the role, say so by keeping the questions grounded in the job post itself rather than inventing generic ones.
+Where you are confident about what this role genuinely gets asked, use it. Where you are not, stay close to the post rather than inventing a plausible-sounding generality.
 
 RULES
 - Questions must be answerable out loud in 60 to 120 seconds.
@@ -49,7 +47,7 @@ RULES
 - Never ask for personal information, salary history, age, marital status, religion, or anything an employer should not ask.
 - For technical questions only, include "markers". "must_mention" lists the specific levers, metrics, or checks a strong answer names — concrete things like "checks retention in Instagram insights to see whether the first three seconds held", not vague ones like "shows good understanding". Name the actual screen, metric, or step wherever you can: these are read back to the person as the thing they should have reached for, so a vague marker produces vague feedback and a specific one hands them something they can use in the next call. "red_flags" lists what a bluffer says instead, such as naming a tactic with no way to measure whether it worked.
 
-- The markers are what a person's answer gets scored against, so they must be right. Base them on what you found while searching, not on what sounds plausible. Put the URLs you actually relied on in "sources". Set "confidence" to "researched" only when you found substantive material from people who do this work; set it to "unverified" when you are largely inferring, which is far better than guessing confidently. Be sceptical of agency marketing content: these topics attract a lot of search-optimised material that is confident and wrong. Prefer practitioners describing what they actually do.
+- The markers are what a person's answer gets scored against, so they must be right. Base them on what you found while searching, not on what sounds plausible. Put the URLs you actually relied on in "sources". Set "confidence" to "unverified" — you have no search here, so the markers are your best judgment rather than sourced. They are treated as a rough guide, and verified later when an answer is actually scored against them. Be sceptical of agency marketing content: these topics attract a lot of search-optimised material that is confident and wrong. Prefer practitioners describing what they actually do.
 - difficulty is 1 to 5, where 3 is a competent freelancer with a year of relevant experience.
 
 Return ONLY valid JSON, no markdown fences and no commentary, in exactly this shape:
@@ -131,21 +129,17 @@ export async function generateQuestions(
     // for this role, instead of the model recalling the genre from
     // training data. This is the difference between plausible-sounding
     // questions and real ones.
-    tools: [
-      {
-        type: "web_search_20250305",
-        name: "web_search",
-        // Kept low on purpose: the whole request must finish inside
-        // sixty seconds or the generation is killed and lost. Two
-        // searches is enough to ground the questions.
-        max_uses: 2,
-      },
-    ],
-    // Generous budget on purpose. This model reasons before answering
-    // and that reasoning is charged against max_tokens, so a tight
-    // budget truncates the JSON mid-structure and surfaces as a parse
-    // error rather than as an obvious limit problem.
-    max_tokens: 16000,
+    // No web search here, deliberately.
+    //
+    // Generation blocks the person: if this request runs out of time,
+    // they get an error and nothing is saved. Two searches plus a large
+    // reasoning budget kept it at the edge of the sixty second limit,
+    // which is what produced "this page couldn't load".
+    //
+    // Research moved to evaluation instead, where a failure is
+    // survivable: the answer is saved before it is scored, so a slow
+    // search costs feedback rather than the recording.
+    max_tokens: 8000,
     system: SYSTEM_PROMPT,
     messages: [
       {
@@ -165,9 +159,7 @@ ${roleCatalogue}${
             : ""
         }
 
-First, search the web for what is actually asked in interviews and client calls for this kind of role. Search once or twice, no more — the role title plus "interview questions", and the specific tools named in the job post. Read what you find, then write. Do not keep searching for completeness; you are on a time budget and an unfinished response is worth nothing.
-
-Then write 7 questions for this job post: 4 hypothetical and 3 technical.
+Write 7 questions for this job post: 4 hypothetical and 3 technical.
 
 --- JOB POST ---
 ${jobPost}

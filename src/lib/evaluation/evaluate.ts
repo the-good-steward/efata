@@ -173,6 +173,25 @@ They rebuilt the answer in their own words rather than repeating our rewrite. If
   const message = await client.messages.create({
     model: MODEL,
     max_tokens: 8000,
+    // Search only for technical answers, where there is a factual claim
+    // worth checking and the reference criteria were not researched at
+    // generation time.
+    //
+    // Safe here in a way it was not during generation: the answer, the
+    // audio and the transcript are all written before this runs, so if
+    // this overruns the person loses feedback they can ask for again,
+    // not the recording itself.
+    ...(params.rubric === "technical"
+      ? {
+          tools: [
+            {
+              type: "web_search_20250305" as const,
+              name: "web_search" as const,
+              max_uses: 2,
+            },
+          ],
+        }
+      : {}),
     // No web search here, deliberately.
     //
     // Verifying a claim mid-evaluation added twenty to forty seconds,
