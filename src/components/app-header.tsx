@@ -41,6 +41,7 @@ export function AppHeader({ email }: { email?: string | null }) {
           <Link
             key={item.href}
             href={item.href}
+            prefetch
             className="ef-ui text-muted hover:text-paper inline whitespace-nowrap transition-colors"
           >
             {item.label}

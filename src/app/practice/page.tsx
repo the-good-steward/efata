@@ -23,19 +23,23 @@ export default async function PracticePage() {
 
   // New accounts go through onboarding first: without a level, question
   // difficulty would default to beginner for everyone.
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("onboarded_at")
-    .eq("id", user.id)
-    .maybeSingle();
+  // Run together rather than one after another. These were three
+  // sequential round trips to Supabase, which is most of why a tap on
+  // the navigation felt slow.
+  const [{ data: profile }, { data: sessions }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("onboarded_at")
+      .eq("id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("sessions")
+      .select("id, title, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10),
+  ]);
 
   if (profile && !profile.onboarded_at) redirect("/onboarding");
-
-  const { data: sessions } = await supabase
-    .from("sessions")
-    .select("id, title, created_at")
-    .order("created_at", { ascending: false })
-    .limit(10);
 
   return (
     <main className="flex flex-1 flex-col px-6 py-16">

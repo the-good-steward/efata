@@ -115,9 +115,14 @@ export default async function ProgressPage() {
 
   const { data: rows } = await supabase
     .from("attempts")
+    // transcript is only used for a word count, which the server can do
+    // here rather than shipping every transcript to the browser.
     .select("created_at, transcript, scores, session_question_id, attempt_number")
     .order("created_at", { ascending: true })
-    .limit(300);
+    // Sixty is more than the charts can meaningfully draw, and a
+    // fraction of the payload. Three hundred rows of transcripts is a
+    // lot to send to a phone to render two lines.
+    .limit(60);
 
   const points: AttemptPoint[] = (rows ?? []).map((row) => {
     const scores = row.scores as {

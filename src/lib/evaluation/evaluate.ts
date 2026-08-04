@@ -198,7 +198,11 @@ They rebuilt the answer in their own words rather than repeating our rewrite. If
     // audio and the transcript are all written before this runs, so if
     // this overruns the person loses feedback they can ask for again,
     // not the recording itself.
-    ...(params.rubric === "technical"
+    // First attempt only. A retry is judged on whether the delivery
+    // moved, and the factual side was already checked the first time
+    // round — searching again mostly costs the person another twenty
+    // seconds of waiting.
+    ...(params.rubric === "technical" && params.attemptNumber === 1
       ? {
           tools: [
             {
