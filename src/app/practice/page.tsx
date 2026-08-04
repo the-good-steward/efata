@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { JobPostForm } from "@/components/job-post-form";
 import { AppHeader } from "@/components/app-header";
+import { SchemaWarning } from "@/components/schema-warning";
 
 /**
  * Server Actions inherit this page's limit, and generation runs web searches and takes up to a minute.
@@ -45,6 +46,8 @@ export default async function PracticePage() {
     <main className="flex flex-1 flex-col px-6 py-16">
       <div className="mx-auto w-full max-w-xl">
         <AppHeader email={user.email} />
+
+        <SchemaWarning />
 
         <div>
           <h1 className="ef-display text-paper">Start a session</h1>
