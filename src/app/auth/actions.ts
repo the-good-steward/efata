@@ -34,7 +34,13 @@ export async function login(
 
   if (error) {
     // Don't reveal whether the address exists.
-    return { error: "That email and password don't match." };
+    // Deliberately does not say which of the two was wrong: naming it
+    // would turn the form into a way to check whether an address has an
+    // account. The nudge toward a reset is the useful part.
+    return {
+      error:
+        "That email and password don't match. Check for a typo — the Show button will let you read it back.",
+    };
   }
 
   revalidatePath("/", "layout");

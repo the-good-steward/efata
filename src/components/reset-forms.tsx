@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   requestPasswordReset,
   updatePassword,
@@ -20,6 +20,7 @@ export function ForgotForm() {
     requestPasswordReset,
     {},
   );
+  const [email, setEmail] = useState("");
 
   return (
     <div className="w-full max-w-sm">
@@ -38,6 +39,8 @@ export function ForgotForm() {
             name="email"
             autoComplete="email"
             required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             className={field}
           />
         </label>
@@ -79,6 +82,8 @@ export function ResetForm() {
     updatePassword,
     {},
   );
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
 
   return (
     <div className="w-full max-w-sm">
@@ -93,12 +98,16 @@ export function ResetForm() {
           name="password"
           label="New password"
           autoComplete="new-password"
+          value={password}
+          onChange={setPassword}
         />
 
         <PasswordField
           name="confirm"
           label="Again"
           autoComplete="new-password"
+          value={confirm}
+          onChange={setConfirm}
         />
 
         {state.error && (

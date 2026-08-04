@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Mark } from "@/components/logo";
 import { PasswordField } from "@/components/password-field";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import type { AuthState } from "@/app/auth/actions";
 
 type Props = {
@@ -18,6 +18,17 @@ export function AuthForm({ mode, action }: Props) {
   );
 
   const isSignup = mode === "signup";
+
+  /**
+   * Held here rather than left to the DOM.
+   *
+   * React resets an uncontrolled form once its action completes, so a
+   * rejected sign-in wiped both fields and made someone retype
+   * everything to fix a single mistyped character. On a phone that is
+   * enough friction to make people give up.
+   */
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <div className="w-full max-w-sm">
@@ -41,6 +52,8 @@ export function AuthForm({ mode, action }: Props) {
             name="email"
             autoComplete="email"
             required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             className="border-rule text-parchment focus:border-spoken focus:ring-spoken/40 rounded-sm border bg-transparent px-3 py-2 text-base outline-none focus:ring-2"
           />
         </label>
@@ -50,6 +63,8 @@ export function AuthForm({ mode, action }: Props) {
           label="Password"
           autoComplete={isSignup ? "new-password" : "current-password"}
           hint={isSignup ? "At least 8 characters." : undefined}
+          value={password}
+          onChange={setPassword}
         />
 
         {state.error && (

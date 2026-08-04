@@ -17,11 +17,16 @@ export function PasswordField({
   label,
   autoComplete,
   hint,
+  value,
+  onChange,
 }: {
   name: string;
   label: string;
   autoComplete: string;
   hint?: string;
+  /** Controlled so a failed submit does not wipe what was typed. */
+  value?: string;
+  onChange?: (value: string) => void;
 }) {
   const [visible, setVisible] = useState(false);
 
@@ -36,6 +41,9 @@ export function PasswordField({
           autoComplete={autoComplete}
           required
           minLength={8}
+          {...(onChange
+            ? { value: value ?? "", onChange: (e) => onChange(e.target.value) }
+            : {})}
           className="border-edge text-paper focus:border-seaglass w-full rounded-[12px] border bg-transparent py-3 pr-20 pl-4 text-[17px] outline-none"
         />
 

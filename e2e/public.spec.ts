@@ -87,3 +87,21 @@ test("password can be shown and hidden", async ({ page }) => {
   // never offering the toggle.
   await expect(input).toHaveValue("hunter2hunter2");
 });
+
+test("a rejected sign-in keeps what was typed", async ({ page }) => {
+  await page.goto("/login");
+
+  const email = page.locator('input[name="email"]');
+  const password = page.locator('input[name="password"]');
+
+  await email.fill("someone@example.com");
+  await password.fill("wrongpassword");
+  await page.getByRole("button", { name: /^sign in$/i }).click();
+
+  await expect(page.getByRole("alert")).toBeVisible();
+
+  // Retyping everything to fix one character is what made people give
+  // up, so both fields must survive the rejection.
+  await expect(email).toHaveValue("someone@example.com");
+  await expect(password).toHaveValue("wrongpassword");
+});
