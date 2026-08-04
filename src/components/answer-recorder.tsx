@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Working } from "@/components/working";
+import { AnswerPlayback } from "@/components/answer-playback";
 import { submitAnswer, type AnswerState } from "@/app/practice/[sessionId]/actions";
 
 type Props = {
@@ -285,11 +286,7 @@ export function AnswerRecorder({
 
       {phase === "review" && blob && (
         <div className="flex flex-col gap-4">
-          <audio
-            controls
-            src={URL.createObjectURL(blob)}
-            className="w-full max-w-sm"
-          />
+          <AnswerPlayback blob={blob} />
           <div className="flex gap-3">
             <button
               onClick={submit}
