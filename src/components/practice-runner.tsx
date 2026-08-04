@@ -349,6 +349,22 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
     );
   }
 
+  /**
+   * The rating is asked twice per session at most: once on a
+   * situational question and once on a technical one.
+   *
+   * Asking after every answer trains people to tap whatever clears the
+   * screen, which is worse data than none. Two considered answers beat
+   * ten reflexive ones, and one of each type is enough to tell whether
+   * a problem is with the feedback in general or only with the
+   * technical side.
+   */
+  const firstSituational = questions.findIndex(
+    (q) => q.type !== "technical",
+  );
+  const firstTechnical = questions.findIndex((q) => q.type === "technical");
+  const asksForRating = index === firstSituational || index === firstTechnical;
+
   const question = questions[index];
   if (!question) return null;
 
@@ -455,10 +471,12 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
               Double-check anything technical before you repeat it to a client.
             </p>
 
-            <FeedbackRating
-              attemptId={attempt.id}
-              existing={attempt.rated ? { useful: true, issue: null } : null}
-            />
+            {asksForRating && attempt.feedback && (
+              <FeedbackRating
+                attemptId={attempt.id}
+                existing={attempt.rated ? { useful: true, issue: null } : null}
+              />
+            )}
           </div>
         ))}
 

@@ -89,7 +89,7 @@ export const generationResult = z.object({
   title: capped(120).refine((v) => v.length >= 3, {
     message: "title is too short",
   }),
-  questions: z.array(generatedQuestion).min(4).max(10),
+  questions: z.array(generatedQuestion).min(3).max(8),
 });
 
 export type GeneratedQuestion = z.infer<typeof generatedQuestion>;

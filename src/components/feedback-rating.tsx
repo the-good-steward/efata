@@ -48,8 +48,11 @@ export function FeedbackRating({
 
   return (
     <div className="border-rule/60 mt-5 border-t pt-4">
-      <p className="text-ash font-body text-xs">
+      <p className="ef-caption text-ink-3">
         Did this feedback tell you something you can use?
+      </p>
+      <p className="ef-caption text-ink-3/70">
+        Asked twice a session, not every time.
       </p>
 
       <div className="mt-3 flex gap-2">

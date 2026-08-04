@@ -162,7 +162,9 @@ ${roleCatalogue}${
             : ""
         }
 
-Write exactly 7 questions for this job post: 4 hypothetical and 3 technical. Not six, not eight, count them before you return. The person is told how many are coming, and a set that does not match reads as something having gone wrong.
+Write exactly 5 questions for this job post: 2 hypothetical and 3 technical. Not four, not six, count them before you return. The person is told how many are coming, and a set that does not match reads as something having gone wrong.
+
+Five with two attempts each is ten spoken answers, which is already a long session. Weight it toward technical because that is where the questions have to earn their place, and the situational ones repeat across roles in a way the technical ones do not.
 
 --- JOB POST ---
 ${jobPost}
