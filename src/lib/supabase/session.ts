@@ -12,6 +12,10 @@ const PUBLIC_ROUTES = [
   "/signup",
   "/auth/confirm",
   "/auth/error",
+  "/forgot",
+  // The recovery link lands here with a session, but the proxy runs
+  // before that session is established on the very first request.
+  "/auth/reset",
 ];
 
 export async function updateSession(request: NextRequest) {

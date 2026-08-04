@@ -96,6 +96,17 @@ export function AuthForm({ mode, action }: Props) {
         </button>
       </form>
 
+      {!isSignup && (
+        <p className="ef-body text-muted mt-6">
+          <Link
+            href="/forgot"
+            className="hover:text-paper underline underline-offset-4 transition-colors"
+          >
+            Forgotten your password?
+          </Link>
+        </p>
+      )}
+
       <p className="text-ash font-body mt-6 text-sm">
         {isSignup ? "Already have an account? " : "New here? "}
         <Link

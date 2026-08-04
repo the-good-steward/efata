@@ -96,3 +96,77 @@ export async function logout() {
   revalidatePath("/", "layout");
   redirect("/login");
 }
+
+/**
+ * Send a reset link.
+ *
+ * Always reports success, even for an address with no account. Saying
+ * "no account found" turns this form into a way to discover who has
+ * signed up, which matters more than usual when the users are
+ * freelancers who may not want that known.
+ */
+export async function requestPasswordReset(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email || !email.includes("@")) {
+    return { error: "Enter the email you signed up with." };
+  }
+
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/confirm?next=/auth/reset`,
+  });
+
+  // Logged, not shown: a mail failure must not reveal whether the
+  // address exists either.
+  if (error) console.error("Password reset request failed:", error);
+
+  return {
+    message: `If ${email} has an account, a reset link is on its way. It expires in an hour.`,
+  };
+}
+
+/**
+ * Set a new password.
+ *
+ * The recovery link signs the person in before they reach this, so the
+ * session is the proof of identity. No old password is asked for —
+ * they are here because they do not have it.
+ */
+export async function updatePassword(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters." };
+  }
+  if (password !== confirm) {
+    return { error: "Those two passwords don't match." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error:
+        "That reset link has expired or was already used. Request a new one.",
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  redirect("/practice");
+}

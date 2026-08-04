@@ -43,3 +43,26 @@ test("signup validates before submitting", async ({ page }) => {
   // The browser's own validation should stop this reaching the server.
   await expect(page).toHaveURL(/\/signup/);
 });
+
+test("password reset is reachable and does not leak account existence", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("link", { name: /forgotten your password/i }).click();
+  await expect(page).toHaveURL(/\/forgot/);
+
+  await page.locator('input[name="email"]').fill("nobody-here@example.com");
+  await page.getByRole("button", { name: /send the link/i }).click();
+
+  // The same reassurance regardless of whether the account exists —
+  // otherwise this form becomes a way to discover who has signed up.
+  const message = page.getByRole("status");
+  await expect(message).toBeVisible();
+  await expect(message).toContainText(/has an account/i);
+});
+
+test("an unauthenticated reset page explains itself", async ({ page }) => {
+  await page.goto("/auth/reset");
+  await expect(page.getByText(/link has expired/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: /send a new link/i })).toBeVisible();
+});
