@@ -35,6 +35,7 @@ export function AppHeader({ email }: { email?: string | null }) {
       <nav className="border-hairline mt-6 flex gap-6 overflow-x-auto border-t pt-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {[
           { href: "/practice", label: "Practice" },
+          { href: "/drill", label: "Daily drill" },
           { href: "/progress", label: "Progress" },
           { href: "/recall", label: "Log an interview" },
         ].map((item) => (

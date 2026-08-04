@@ -54,7 +54,7 @@ export async function submitAnswer(
   // if this session_question belongs to the caller.
   const { data: link } = await supabase
     .from("session_questions")
-    .select("id, session_id, questions (id, body, rubric)")
+    .select("id, session_id, questions (id, body, rubric, context, source)")
     .eq("id", sessionQuestionId)
     .maybeSingle();
 
@@ -64,6 +64,8 @@ export async function submitAnswer(
     id: string;
     body: string;
     rubric: Rubric;
+    context: string | null;
+    source: string;
   } | null;
 
   if (!question) return { error: "That question could not be loaded." };
@@ -186,6 +188,8 @@ export async function submitAnswer(
   try {
     result = await evaluateAnswer({
       question: question.body,
+      // On a drill the context field holds the move being practised.
+      move: question.source === "curated" ? question.context : null,
       rubric: question.rubric,
       transcript: transcript.text,
       durationSeconds: transcript.durationSeconds,

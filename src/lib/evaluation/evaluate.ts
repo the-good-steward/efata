@@ -125,6 +125,8 @@ Return ONLY valid JSON, no markdown fences and no commentary:
 
 export async function evaluateAnswer(params: {
   question: string;
+  /** For a drill: the one habit being practised. */
+  move?: string | null;
   rubric: Rubric;
   transcript: string;
   durationSeconds: number;
@@ -235,7 +237,15 @@ They rebuilt the answer in their own words rather than repeating our rewrite. If
         role: "user",
         content: `${RUBRICS[params.rubric]}
 
-QUESTION ASKED
+${
+          params.move
+            ? `THIS IS A DRILL. The one thing they are practising is: ${params.move}
+
+Judge them mainly on that. Say plainly whether they did it, and if not, what got in the way. Everything else is secondary here, and a long list of other observations would bury the one thing they came to work on. Keep the feedback to that move and one sentence of delivery.
+
+`
+            : ""
+        }QUESTION ASKED
 ${params.question}
 ${keySection}${retrySection}
 
