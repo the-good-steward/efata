@@ -16,7 +16,7 @@ export default async function AuthErrorPage({
       </h1>
       <p className="ef-body text-paper-soft mt-4 max-w-sm">
         This usually happens when the link opens in a different browser from
-        the one you signed up in — for example, signing up inside Messenger
+ the one you signed up in, for example, signing up inside Messenger
         and then opening the email in Safari or Chrome.
       </p>
       <p className="ef-body text-muted mt-4 max-w-sm">

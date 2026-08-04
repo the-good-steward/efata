@@ -129,7 +129,7 @@ export function CalibrationCard(props: Props) {
                   <tr key={label} className="border-rule/60 border-t">
                     <td className="text-ash py-2">{label}</td>
                     <td className="py-2 text-right">{mine}</td>
-                    <td className="py-2 text-right">{efata ?? "—"}</td>
+ <td className="py-2 text-right">{efata ?? ", "}</td>
                     <td
                       className={`py-2 text-right ${
                         diff == null || diff === 0
@@ -139,7 +139,7 @@ export function CalibrationCard(props: Props) {
                             : "text-flag"
                       }`}
                     >
-                      {diff == null ? "—" : diff > 0 ? `+${diff}` : diff}
+ {diff == null ? ", " : diff > 0 ? `+${diff}` : diff}
                     </td>
                   </tr>
                 );
@@ -168,7 +168,7 @@ export function CalibrationCard(props: Props) {
 
           {stability.runs && (
             <p className="text-ash font-body mt-3 text-xs">
-              Same transcript, three fresh runs — substance{" "}
+ Same transcript, three fresh runs, substance{" "}
               {stability.runs.map((r) => r.substance).join(", ")}; delivery{" "}
               {stability.runs.map((r) => r.delivery).join(", ")}.
             </p>

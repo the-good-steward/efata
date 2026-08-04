@@ -119,14 +119,14 @@ export function RetryPanel({
       {/*
         The better version is withheld until the retry is spent.
         Offering it after the first attempt would turn the second into
-        recitation — they would read our wording rather than rebuild the
+ recitation, they would read our wording rather than rebuild the
         answer, which is the skill that transfers to a live call.
       */}
       {!canRetry && improvedAnswer && (
         <div className="border-seaglass/30 bg-raised rounded-[16px] border p-5">
           <p className="ef-ui text-seaglass">Here it is said better</p>
           <p className="ef-caption text-faint mt-3">
-            Same answer, same facts, yours — softeners out.
+ Same answer, same facts, yours, softeners out.
           </p>
           <p className="ef-body text-paper border-seaglass/40 mt-3 border-l-2 pl-4 italic">
             &ldquo;{improvedAnswer}&rdquo;

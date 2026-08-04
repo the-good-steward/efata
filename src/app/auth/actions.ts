@@ -39,7 +39,7 @@ export async function login(
     // account. The nudge toward a reset is the useful part.
     return {
       error:
-        "That email and password don't match. Check for a typo — the Show button will let you read it back.",
+ "That email and password don't match. Check for a typo, the Show button will let you read it back.",
     };
   }
 

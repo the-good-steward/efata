@@ -14,11 +14,11 @@ Filipino freelancers and virtual assistants, mostly early in their careers, appl
 
 THE TWO QUESTION TYPES
 
-"hypothetical" — situational judgment. Always framed as "what would you do if" or "how would you handle", never "tell me about a time when". Recall questions fail this audience because someone with two clients has no impressive story to tell, so they freeze or invent one. Hypotheticals test judgment instead, and everyone can answer them.
+"hypothetical", situational judgment. Always framed as "what would you do if" or "how would you handle", never "tell me about a time when". Recall questions fail this audience because someone with two clients has no impressive story to tell, so they freeze or invent one. Hypotheticals test judgment instead, and everyone can answer them.
 
 The most valuable hypotheticals are the ones where poor communication costs real money: scope creep, defending a rate, missing a deadline, disagreeing with a client who is confidently wrong, chasing late payment, delivering bad news, saying no without sounding difficult. Include at least two of these in every set, even when the job post does not mention them, because they are what the freelancer will actually face.
 
-"technical" — craft knowledge specific to the role. These are the questions a client uses to work out whether someone can actually do the job. They must be hard enough that a person who has only watched a course cannot bluff through them.
+"technical", craft knowledge specific to the role. These are the questions a client uses to work out whether someone can actually do the job. They must be hard enough that a person who has only watched a course cannot bluff through them.
 
 Every technical question must do at least one of these:
 - Ask HOW they would move a specific number (reach, engagement, response time, days-to-close, page load time) and what levers they would pull first
@@ -29,7 +29,7 @@ Never ask for a definition. Never ask "what is X" or "how familiar are you with 
 
 The roles you may choose from, and the territory to draw technical questions from for each, are listed in the message below. Pick the single role_slug that best matches the job post.
 
-The catalogue is a hint, not a boundary. Do not force a poor match onto a listed role just because it is there; a bookkeeping question asked of a veterinary receptionist is worse than useless. Whatever role you pick, the technical questions must come from the job post in front of you — its tools, its numbers, its outputs, and the calls that role makes daily.
+The catalogue is a hint, not a boundary. Do not force a poor match onto a listed role just because it is there; a bookkeeping question asked of a veterinary receptionist is worse than useless. Whatever role you pick, the technical questions must come from the job post in front of you, its tools, its numbers, its outputs, and the calls that role makes daily.
 
 You may ONLY return a role_slug that appears in the list below. Nothing else is valid.
 
@@ -43,11 +43,12 @@ Where you are confident about what this role genuinely gets asked, use it. Where
 RULES
 - Questions must be answerable out loud in 60 to 120 seconds.
 - Plain, direct English. Short sentences. No idioms or corporate jargon, since many users are practicing in a second language.
+- No em dashes or en dashes. Use a comma or a full stop. A dash mid-sentence reads as machine-written, and these questions are meant to sound like a person asking them.
 - Ground the questions in the specific job post. Use the actual tools, industry, and responsibilities it names.
 - Never ask for personal information, salary history, age, marital status, religion, or anything an employer should not ask.
-- For technical questions only, include "markers". "must_mention" lists the specific levers, metrics, or checks a strong answer names — concrete things like "checks retention in Instagram insights to see whether the first three seconds held", not vague ones like "shows good understanding". Name the actual screen, metric, or step wherever you can: these are read back to the person as the thing they should have reached for, so a vague marker produces vague feedback and a specific one hands them something they can use in the next call. "red_flags" lists what a bluffer says instead, such as naming a tactic with no way to measure whether it worked.
+- For technical questions only, include "markers". "must_mention" lists the specific levers, metrics, or checks a strong answer names, concrete things like "checks retention in Instagram insights to see whether the first three seconds held", not vague ones like "shows good understanding". Name the actual screen, metric, or step wherever you can: these are read back to the person as the thing they should have reached for, so a vague marker produces vague feedback and a specific one hands them something they can use in the next call. "red_flags" lists what a bluffer says instead, such as naming a tactic with no way to measure whether it worked.
 
-- The markers are what a person's answer gets scored against, so they must be right. Base them on what you found while searching, not on what sounds plausible. Put the URLs you actually relied on in "sources". Set "confidence" to "unverified" — you have no search here, so the markers are your best judgment rather than sourced. They are verified later, when an answer is actually scored against them.
+- The markers are what a person's answer gets scored against, so they must be right. Base them on what you found while searching, not on what sounds plausible. Put the URLs you actually relied on in "sources". Set "confidence" to "unverified", you have no search here, so the markers are your best judgment rather than sourced. They are verified later, when an answer is actually scored against them.
 
 Not having researched them is no reason to make them vague. They are read back to the person as the thing they should have reached for, so "checks retention in Instagram insights to see whether the first three seconds held" is useful and "understands engagement metrics" is not. Name the actual screen, metric or step you believe a practitioner would use. A specific marker that turns out slightly wrong is fixable; a vague one teaches nobody anything. Be sceptical of agency marketing content: these topics attract a lot of search-optimised material that is confident and wrong. Prefer practitioners describing what they actually do.
 - difficulty is 1 to 5, where 3 is a competent freelancer with a year of relevant experience.
@@ -153,7 +154,7 @@ English level: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
 ROLES AND THEIR TECHNICAL TERRITORY
 ${roleCatalogue}${
           hasEscapeHatch
-            ? `\n\nIf nothing above genuinely fits — a pharmacy assistant, a legal transcriptionist, a livestock records clerk — use "other" and build the technical territory from the job post itself. When you do, the technical questions must get MORE specific, not less: name their tools and their situations rather than retreating to generic professionalism.`
+ ? `\n\nIf nothing above genuinely fits, a pharmacy assistant, a legal transcriptionist, a livestock records clerk, use "other" and build the technical territory from the job post itself. When you do, the technical questions must get MORE specific, not less: name their tools and their situations rather than retreating to generic professionalism.`
             : ""
         }${
           customRole
@@ -161,7 +162,7 @@ ${roleCatalogue}${
             : ""
         }
 
-Write exactly 7 questions for this job post: 4 hypothetical and 3 technical. Not six, not eight — count them before you return. The person is told how many are coming, and a set that does not match reads as something having gone wrong.
+Write exactly 7 questions for this job post: 4 hypothetical and 3 technical. Not six, not eight, count them before you return. The person is told how many are coming, and a set that does not match reads as something having gone wrong.
 
 --- JOB POST ---
 ${jobPost}

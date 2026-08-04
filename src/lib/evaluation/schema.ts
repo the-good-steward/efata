@@ -10,9 +10,25 @@ import { z } from "zod";
  * do it again for no reason they can see. Structural problems still
  * fail loudly; verbosity does not.
  */
+/**
+ * Strips dashes the model used despite being told not to.
+ *
+ * The prompt does the work; this catches the leftovers, because one
+ * stray em dash undoes the effort of writing everything else so it
+ * does not read as machine-written.
+ */
+function undash(value: string): string {
+  return value
+    .replace(/\s+[—–]\s+/g, ", ")
+    .replace(/[—–]/g, ", ")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s*\./g, ".")
+    .replace(/\s{2,}/g, " ");
+}
+
 function capped(max: number) {
   return z.string().transform((value) => {
-    const trimmed = value.trim();
+    const trimmed = undash(value.trim());
     return trimmed.length <= max
       ? trimmed
       : trimmed.slice(0, max - 1).trimEnd() + "\u2026";
@@ -41,7 +57,9 @@ function list(max: number, itemMax: number) {
         .filter(Boolean)
         .slice(0, max)
         .map((item) =>
-          item.length <= itemMax ? item.trim() : item.slice(0, itemMax).trim(),
+          undash(
+            item.length <= itemMax ? item.trim() : item.slice(0, itemMax).trim(),
+          ),
         ),
     );
 }
@@ -59,7 +77,7 @@ export const evaluation = z.object({
     pace_note: z.union([z.string(), z.null()]).optional().transform((v) => (v ?? "").trim().slice(0, 300)),
   }),
   // Spoken directly to the person.
-  feedback: z.string().min(20).transform((v) => v.trim()),
+  feedback: z.string().min(20).transform((v) => undash(v.trim())),
   // The single most valuable change for the retry.
   one_thing: capped(400),
   // Their own answer, restructured. Same facts, same story, tightened.
@@ -75,7 +93,7 @@ export const evaluation = z.object({
   improved_answer: z
     .string()
     .min(20)
-    .transform((v) => v.trim())
+    .transform((v) => undash(v.trim()))
     .refine(
       (v) =>
         !/^(lead with|start by|try |consider |you could|you should|a stronger answer|acknowledge the|instead of saying|begin by)/i.test(

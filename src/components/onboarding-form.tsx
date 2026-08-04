@@ -88,7 +88,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
         </legend>
         <p className="text-ash font-body mt-2 text-sm">
           This sets how hard the questions are. Be honest rather than
-          ambitious — questions pitched above you teach you less.
+ ambitious, questions pitched above you teach you less.
         </p>
         <div className="mt-5 flex flex-col gap-2">
           {EXPERIENCE.map((option) => (

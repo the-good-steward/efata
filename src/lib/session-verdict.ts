@@ -89,7 +89,7 @@ export function buildVerdict(
   if (problems.length === 0) {
     return {
       headline: "That would hold up on a call",
-      body: `You answered ${answered} in a row without the wheels coming off — clean of filler, steady pace, and you said what you meant. The thing to keep an eye on is whether it holds when the questions are unfamiliar${
+ body: `You answered ${answered} in a row without the wheels coming off, clean of filler, steady pace, and you said what you meant. The thing to keep an eye on is whether it holds when the questions are unfamiliar${
         unfinished > 0 ? ", and you left a few without a second run" : ""
       }.`,
       actions: unfinished > 0
@@ -110,7 +110,7 @@ export function buildVerdict(
       improved > 0
         ? `You did move on ${improved} of them between attempts, which is the part that transfers.`
         : "A second run at the same question is where that usually shifts."
-    } Pick the first one and ignore the rest for now — trying to fix everything at once fixes nothing.`,
+ } Pick the first one and ignore the rest for now, trying to fix everything at once fixes nothing.`,
     actions: unfinished > 0
       ? ["finish_retries", "practise_again"]
       : ["practise_again", "log_real"],

@@ -359,7 +359,7 @@ export async function rescoreAttempt(
     });
     return {
       error:
-        "That didn't work either. Your answer is still saved — try again in a moment.",
+ "That didn't work either. Your answer is still saved, try again in a moment.",
     };
   }
 

@@ -75,7 +75,7 @@ export async function checkSessionLimit(
       allowed: false,
       message:
         tier === "free"
-          ? `That's ${cap} new sets today. Practise the ones you already have — a second run at the same question does more than a fresh set.`
+ ? `That's ${cap} new sets today. Practise the ones you already have, a second run at the same question does more than a fresh set.`
           : `That's ${cap} sets today. Come back tomorrow.`,
     };
   }

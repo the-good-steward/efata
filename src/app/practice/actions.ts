@@ -224,7 +224,7 @@ function describeGenerationError(error: unknown): string {
     return `The questions came back in the wrong shape. (${message})`;
   }
   if (message.includes("valid JSON") || message.includes("returned no text")) {
-    return "The AI returned something unreadable. Try again — this is usually transient.";
+ return "The AI returned something unreadable. Try again, this is usually transient.";
   }
 
   // Include the underlying message. A bare "try again" on an error we

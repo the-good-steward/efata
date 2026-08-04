@@ -247,7 +247,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           <div className="border-clay/40 bg-clay/10 mt-6 rounded-[12px] px-4 py-3">
             <p className="ef-body text-clay">
               Nothing was recorded. If you spoke and it never came back with
-              feedback, that is a fault at our end, not yours — the questions
+ feedback, that is a fault at our end, not yours, the questions
               are still here and worth another go.
             </p>
           </div>

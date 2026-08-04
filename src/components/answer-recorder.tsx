@@ -197,7 +197,7 @@ export function AnswerRecorder({
       // on "listening back" forever and the answer was gone. Now the
       // recording is still in hand and can be sent again.
       setError(
-        "That took too long and didn't go through. Your recording is still here — try sending it again.",
+ "That took too long and didn't go through. Your recording is still here, try sending it again.",
       );
       setPhase("review");
     }
@@ -312,7 +312,7 @@ export function AnswerRecorder({
           <SubmitWatchdog
             onTimeout={() => {
               setError(
-                "That took longer than it should have. Your answer may still have saved — reload the page to check before recording it again.",
+ "That took longer than it should have. Your answer may still have saved, reload the page to check before recording it again.",
               );
               setPhase("review");
               onSubmittingChange?.(false);
