@@ -37,7 +37,23 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-        run: npm run e2e
+        # Output is captured so a failure can be read on the run summary
+        # rather than by digging into a log or downloading an artifact.
+        run: npm run e2e 2>&1 | tee /tmp/e2e.log
+
+      - name: Put the failure on the summary
+        if: failure()
+        run: |
+          {
+            echo "## Test failures"
+            echo
+            echo '```'
+            # The lines that name what broke: failing tests, the
+            # assertion, and the counts.
+            grep -E "✘|✗|Error:|expect\(|Received|Timed out|[0-9]+ failed|[0-9]+ passed" /tmp/e2e.log \
+              | head -60 || tail -60 /tmp/e2e.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload failure screenshots
         if: failure()
