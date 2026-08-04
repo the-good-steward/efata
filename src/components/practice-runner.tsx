@@ -173,7 +173,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           onClick={() => setStarted(true)}
           className="bg-paper text-dusk mt-10 w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
         >
-          Start · {questions.length} questions
+          Start · {questions.length} question{questions.length === 1 ? "" : "s"}
         </button>
       </div>
     );
@@ -361,7 +361,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
     <div>
       <div className="flex items-baseline justify-between gap-4">
         <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
-          {index + 1} of {questions.length}
+          {isLast ? "Last question" : `${index + 1} of ${questions.length}`}
         </span>
         <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
           {question.type === "technical" ? "Technical" : "Situational"}

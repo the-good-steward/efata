@@ -161,7 +161,7 @@ ${roleCatalogue}${
             : ""
         }
 
-Write 7 questions for this job post: 4 hypothetical and 3 technical.
+Write exactly 7 questions for this job post: 4 hypothetical and 3 technical. Not six, not eight — count them before you return. The person is told how many are coming, and a set that does not match reads as something having gone wrong.
 
 --- JOB POST ---
 ${jobPost}
