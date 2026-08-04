@@ -65,6 +65,8 @@ This is the highest-value sentence in the whole evaluation. It hands someone a l
 
 It is not a correction and does not lower the substance score. Their answer can be good and still be missing this.
 
+Never substitute a generality for it. "Be more specific", "add more detail", "consider mentioning metrics", "show your process" are all failures — they describe the shape of a better answer without handing over anything usable. If you cannot name a concrete lever, metric, screen or check, leave this out entirely rather than filling the space with advice that could apply to anyone.
+
 If the answer is technically fine and communicated badly, that is the more useful thing to tell them, and it should lead.
 
 VOICE
@@ -141,15 +143,30 @@ export async function evaluateAnswer(params: {
       ? Math.round((words / params.durationSeconds) * 60)
       : 0;
 
+  // Two different kinds of caution, and conflating them cost the
+  // feedback its usefulness.
+  //
+  // Being careful about PENALISING someone for departing from criteria
+  // we have not verified is right. Being careful about NAMING a
+  // specific lever is wrong: naming it is the most valuable thing the
+  // evaluation does, and the previous wording told the model to
+  // distrust exactly the material that sentence is drawn from. The
+  // result was generic feedback.
+  //
+  // So: unverified criteria must not lower a score, but they are still
+  // the starting point for what to name — checked with search first
+  // where it matters.
   const keySection = params.answerKey
-    ? `\nREFERENCE CRITERIA${
+    ? `\nWHAT A PRACTITIONER WOULD REACH FOR
+${(params.answerKey.must_mention ?? []).join("; ")}
+Signs of bluffing: ${(params.answerKey.red_flags ?? []).join("; ")}
+
+Use these to spot what they missed, and name it as concretely as it is written here. ${
         params.answerKey.confidence === "researched"
-          ? " (researched from practitioner sources)"
-          : " (NOT verified — treat as a rough guide, not ground truth, and do not mark an answer down purely for departing from it)"
-      }
-What a strong answer covers: ${(params.answerKey.must_mention ?? []).join("; ")}
-Signs of bluffing: ${(params.answerKey.red_flags ?? []).join("; ")}`
-    : "\nNo reference criteria are available for this question. Judge on the merits and keep the technical score conservative rather than confident.";
+          ? "These were researched from practitioner sources."
+          : "These were written without research, so verify anything you are about to call wrong before you say it — but do NOT let that uncertainty flatten your feedback into generalities. Name the specific metric, screen or check; if you are unsure it is the right one, say so in the same sentence rather than saying nothing."
+      } Never mark an answer down purely for departing from these.`
+    : "\nNo reference criteria for this question. Work out yourself what a practitioner would have reached for and name it specifically. Keep the technical score conservative, but the feedback specific — an unsure score and vague advice are different failures, and only the second is useless.";
 
   const retrySection =
     params.attemptNumber > 1 && params.previousTranscript
