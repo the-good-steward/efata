@@ -22,7 +22,12 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3210",
     launchOptions: {
-      executablePath: process.env.CHROMIUM_PATH ?? "/tmp/chromium",
+      // On CI, Playwright installs its own Chromium. In the build
+      // sandbox that download is blocked, so a bundled binary is used
+      // instead.
+      executablePath:
+        process.env.CHROMIUM_PATH ??
+        (process.env.CI ? undefined : "/tmp/chromium"),
       args: [
         "--no-sandbox",
         "--disable-dev-shm-usage",
