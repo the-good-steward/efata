@@ -8,10 +8,6 @@ import { submitAnswer, type AnswerState } from "@/app/practice/[sessionId]/actio
 type Props = {
   sessionQuestionId: string;
   attemptNumber: number;
-  /** Called once the answer is saved, so the parent can leave the
-   *  recording state. Without it the recorder stays mounted and its
-   *  phase never leaves "submitting". */
-  onSubmitted?: () => void;
   /** Lets the page hide navigation while an answer is in flight. */
   onSubmittingChange?: (submitting: boolean) => void;
   /** Shown above the recorder on a retry, so the fix is in view while
@@ -49,7 +45,6 @@ export function AnswerRecorder({
   sessionQuestionId,
   attemptNumber,
   oneThing,
-  onSubmitted,
   onSubmittingChange,
 }: Props) {
   const router = useRouter();
@@ -177,17 +172,21 @@ export function AnswerRecorder({
       // Saved, but feedback did not finish. The recording is safe, so
       // move on rather than making them record it again.
       if (state.error && state.ok) setError(state.error);
-      // Success has to be handled explicitly. Relying on the page
-      // revalidating left this component mounted with its phase still
-      // "submitting", so the screen sat on "listening back" forever
-      // even though the answer had saved. A tester lost a whole
-      // session to this.
+      /**
+       * Deliberately does NOT reset here.
+       *
+       * Resetting on success put the component back to its idle state
+       * while the server data describing the new attempt was still in
+       * flight, so the page rendered from stale props: the Submit
+       * button flashed back, and after a second attempt it still
+       * believed only one had happened and offered another retry.
+       *
+       * Staying in the sent state means the last thing on screen is
+       * honest — the answer is away, feedback is coming — and this
+       * component is unmounted by its parent once the new attempt
+       * actually arrives. One source of truth, which is the server.
+       */
       router.refresh();
-      onSubmittingChange?.(false);
-      onSubmitted?.();
-      setPhase("idle");
-      setBlob(null);
-      setSeconds(0);
     } catch {
       // A thrown action means the request died — usually the function
       // hitting its time limit. Previously this left the screen sitting

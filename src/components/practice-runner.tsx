@@ -456,13 +456,16 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         ))}
 
         <RetryPanel
+          // Keyed on the attempt count so a confirmed new attempt
+          // remounts this and clears its local state. Without it, the
+          // recorder's own idea of where it was outlived the data.
+          key={`${question.linkId}-${attempts.length}`}
           feedbackReady={Boolean(latest?.feedback)}
           feedbackStalled={stalled}
           onSubmittingChange={setSubmitting}
           sessionQuestionId={question.linkId}
           attemptNumber={attempts.length + 1}
           hasAttempted={answered}
-          rated={latest ? latest.rated : true}
           improvedAnswer={latest?.improved_answer ?? null}
           scriptOverlap={latest?.scores?.script_overlap ?? null}
           oneThing={latest?.scores?.one_thing ?? null}
