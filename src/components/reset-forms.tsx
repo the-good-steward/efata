@@ -8,6 +8,7 @@ import {
   type AuthState,
 } from "@/app/auth/actions";
 import { Mark } from "@/components/logo";
+import { PasswordField } from "@/components/password-field";
 
 const field =
   "border-edge text-paper focus:border-seaglass w-full rounded-[12px] border bg-transparent px-4 py-3 text-[17px] outline-none";
@@ -88,29 +89,17 @@ export function ResetForm() {
       </p>
 
       <form action={formAction} className="mt-8 flex flex-col gap-4">
-        <label className="flex flex-col gap-2">
-          <span className="ef-label text-faint">New password</span>
-          <input
-            type="password"
-            name="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            className={field}
-          />
-        </label>
+        <PasswordField
+          name="password"
+          label="New password"
+          autoComplete="new-password"
+        />
 
-        <label className="flex flex-col gap-2">
-          <span className="ef-label text-faint">Again</span>
-          <input
-            type="password"
-            name="confirm"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            className={field}
-          />
-        </label>
+        <PasswordField
+          name="confirm"
+          label="Again"
+          autoComplete="new-password"
+        />
 
         {state.error && (
           <p role="alert" className="ef-body text-clay">

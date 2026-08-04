@@ -66,3 +66,24 @@ test("an unauthenticated reset page explains itself", async ({ page }) => {
   await expect(page.getByText(/link has expired/i)).toBeVisible();
   await expect(page.getByRole("link", { name: /send a new link/i })).toBeVisible();
 });
+
+test("password can be shown and hidden", async ({ page }) => {
+  await page.goto("/login");
+
+  const input = page.locator('input[name="password"]');
+  await input.fill("hunter2hunter2");
+
+  // Hidden by default: practising somewhere public is common.
+  await expect(input).toHaveAttribute("type", "password");
+
+  const toggle = page.getByRole("button", { name: /show password/i });
+  await toggle.click();
+  await expect(input).toHaveAttribute("type", "text");
+
+  await page.getByRole("button", { name: /hide password/i }).click();
+  await expect(input).toHaveAttribute("type", "password");
+
+  // The value must survive toggling — losing it would be worse than
+  // never offering the toggle.
+  await expect(input).toHaveValue("hunter2hunter2");
+});

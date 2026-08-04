@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Mark } from "@/components/logo";
+import { PasswordField } from "@/components/password-field";
 import { useActionState } from "react";
 import type { AuthState } from "@/app/auth/actions";
 
@@ -44,24 +45,12 @@ export function AuthForm({ mode, action }: Props) {
           />
         </label>
 
-        <label className="flex flex-col gap-2">
-          <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
-            Password
-          </span>
-          <input
-            type="password"
-            name="password"
-            autoComplete={isSignup ? "new-password" : "current-password"}
-            required
-            minLength={8}
-            className="border-rule text-parchment focus:border-spoken focus:ring-spoken/40 rounded-sm border bg-transparent px-3 py-2 text-base outline-none focus:ring-2"
-          />
-          {isSignup && (
-            <span className="text-ash font-body text-xs">
-              At least 8 characters.
-            </span>
-          )}
-        </label>
+        <PasswordField
+          name="password"
+          label="Password"
+          autoComplete={isSignup ? "new-password" : "current-password"}
+          hint={isSignup ? "At least 8 characters." : undefined}
+        />
 
         {state.error && (
           <p
