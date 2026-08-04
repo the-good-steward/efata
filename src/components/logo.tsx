@@ -19,7 +19,7 @@ export function Mark({
   size = 40,
   className = "",
   /** Set on light backgrounds; uses Dusk and Deep sea glass instead. */
-  onLight = false,
+  onLight = true,
 }: {
   size?: number;
   className?: string;
@@ -41,7 +41,7 @@ export function Mark({
     >
       <g
         fill="none"
-        stroke={onLight ? "#1C2B33" : "#EDE6D6"}
+        stroke={onLight ? "#1C2B33" : "#F5F1E8"}
         strokeWidth={stroke}
         strokeLinecap="round"
       >
@@ -49,7 +49,7 @@ export function Mark({
         <path d="M10,22 C36,78 74,80 96,58" />
       </g>
       {showDot && (
-        <circle cx="112" cy="50" r="6" fill={onLight ? "#2E6E70" : "#8FAFAE"} />
+        <circle cx="112" cy="50" r="6" fill={onLight ? "#275F61" : "#8FAFAE"} />
       )}
     </svg>
   );
@@ -70,7 +70,7 @@ export function Wordmark({
     <span className={`inline-flex items-center gap-3 ${className}`}>
       <Mark size={size} />
       <span
-        className="font-display text-parchment"
+        className="font-serif text-ink"
         style={{ fontWeight: 600, fontSize: size * 0.62 }}
       >
         efata

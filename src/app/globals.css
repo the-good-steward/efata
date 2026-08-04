@@ -1,27 +1,62 @@
 @import "tailwindcss";
 
-
+/*
+ * Efata theme.
+ *
+ * Paper is the ground. Dusk is held back for the two moments when
+ * someone is actually speaking — the held breath and the recording — so
+ * a dark screen means "your turn" and nothing else.
+ */
 @theme {
-  /* Ground and surfaces */
-  --color-dusk: #1C2B33;         /* app background */
-  --color-dusk-quiet: #16232A;   /* the held-breath state — everything but the question recedes */
-  --color-raised: #22343D;       /* cards, transcript blocks, inputs */
-  --color-hairline: #22303A;     /* dividers on dusk */
-  --color-edge: #33454F;         /* input borders, unselected option borders */
+  /* Paper: everything except speaking */
+  --color-ground: #f5f1e8;
+  --color-quiet: #f0ebdf;
+  --color-raised: #ede7da;
+  --color-hairline: #e2daca;
+  --color-track: #e7e0d0;
+  --color-edge: #d8d0be;
 
-  /* Text on dusk */
-  --color-paper: #EDE6D6;        /* primary text, primary button fill */
-  --color-paper-soft: #B9C4C9;   /* secondary text */
-  --color-muted: #9DACB4;        /* tertiary text, captions */
-  --color-faint: #7E8D95;        /* labels, helper text */
-  --color-disabled: #68787F;     /* placeholder, disabled label */
+  --color-ink: #1c2b33;
+  --color-ink-2: #46545c;
+  --color-ink-3: #4f5d57;
 
-  /* Accents */
-  --color-seaglass: #8FAFAE;     /* the spoken word: live dot, the better line, the user's own voice. On dusk only. */
-  --color-seaglass-deep: #2E6E70;/* same accent on light backgrounds — AA on paper */
-  --color-lamp: #B8863E;         /* progress only. Never a call to action. */
-  --color-clay: #D08E74;         /* a flagged hedge, on dusk */
-  --color-clay-deep: #9E5B48;    /* a flagged hedge, on paper */
+  --color-seaglass: #275f61;
+  --color-clay: #8e4a38;
+  --color-lamp: #8a5e1f;
+
+  /* Night: the held breath and the recording, and nowhere else */
+  --color-night: #1c2b33;
+  --color-night-quiet: #16232a;
+  --color-night-text: #f5f1e8;
+  --color-night-text-2: #b9c4c9;
+  --color-night-faint: #7e8d95;
+  --color-night-fainter: #4e5c64;
+  --color-night-track: #233139;
+  --color-night-seaglass: #8fafae;
+
+  /*
+   * Legacy aliases.
+   *
+   * The old dark theme named colours by appearance, so 'paper' meant
+   * light text and 'dusk' meant a dark fill. Inverting the two values
+   * flips every existing screen to the light theme without touching
+   * each file, and keeps the primary button correct: bg-paper on
+   * text-dusk was a light fill with dark text, and is now a dark fill
+   * with light text, which is what the new spec asks for.
+   *
+   * These go as the screens are rebuilt.
+   */
+  --color-paper: #1c2b33;
+  --color-dusk: #f5f1e8;
+  --color-parchment: #1c2b33;
+  --color-paper-soft: #46545c;
+  --color-muted: #4f5d57;
+  --color-faint: #4f5d57;
+  --color-ash: #4f5d57;
+  --color-disabled: #6b7770;
+  --color-rule: #e2daca;
+  --color-spoken: #275f61;
+  --color-flag: #8e4a38;
 
   --font-serif: "Source Serif 4", Georgia, serif;
   --font-sans: "Work Sans", system-ui, sans-serif;
@@ -29,60 +64,17 @@
   --radius-field: 12px;
   --radius-card: 16px;
   --radius-sheet: 18px;
-
-  /* recording starts when the line completes */
-  --animate-breath: breath 5s cubic-bezier(.4, 0, .2, 1) forwards;
-  --animate-listening: listening 2.4s ease-in-out infinite;
-}
-
-@keyframes breath {
-  from { transform: scaleX(.06); opacity: .5; }
-  to   { transform: scaleX(1);   opacity: 1; }
-}
-
-@keyframes listening {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: .35; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* the breath still has to take five seconds — hold the full line instead of growing it */
-  .breath-line { animation: none !important; transform: scaleX(1); opacity: .5; }
-}
-
-/* Type scale — apply as utilities, e.g. class="ef-question"
-   Body and answer text never below 16px. Labels/timers may reach 12px at 4.5:1.
-   Tap targets never below 44px. */
-@layer components {
-  .ef-display  { font-family: var(--font-serif); font-weight: 600; font-size: 40px; line-height: 44px; }
-  .ef-question { font-family: var(--font-serif); font-weight: 400; font-size: 28px; line-height: 36px; text-wrap: pretty; }
-  .ef-label    { font-family: var(--font-sans); font-weight: 600; font-size: 13px; line-height: 16px; letter-spacing: .18em; text-transform: uppercase; }
-  .ef-body     { font-family: var(--font-sans); font-weight: 400; font-size: 17px; line-height: 28px; }
-  .ef-ui       { font-family: var(--font-sans); font-weight: 500; font-size: 15px; line-height: 20px; }
-  .ef-caption  { font-family: var(--font-sans); font-weight: 400; font-size: 13px; line-height: 20px; }
-}
-
-/* Semantic aliases kept so existing components resolve to the theme. */
-@theme inline {
-  --color-ink: var(--color-dusk);
-  --color-parchment: var(--color-paper);
-  --color-ash: var(--color-muted);
-  --color-rule: var(--color-hairline);
-  --color-spoken: var(--color-seaglass);
-  --color-flag: var(--color-clay);
-  --color-lamp: var(--color-lamp);
-  --font-display: var(--font-serif);
-  --font-body: var(--font-sans);
 }
 
 body {
-  background: var(--color-dusk);
-  color: var(--color-paper);
+  background: var(--color-ground);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 17px;
-  line-height: 28px;
+  line-height: 1.7;
 }
 
+/* Tap targets never below 44px. */
 button,
 [role="button"],
 select,
@@ -94,16 +86,85 @@ a.inline {
   min-height: 0;
 }
 
+@layer components {
+  .ef-question {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1.32;
+    text-wrap: pretty;
+  }
+  .ef-transcript {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 25px;
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .ef-display {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 34px;
+    line-height: 1.2;
+    text-wrap: pretty;
+  }
+  .ef-body {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  .ef-ui {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+  .ef-label {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.25;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .ef-caption {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+}
+
+@media (min-width: 768px) {
+  .ef-question {
+    font-size: 48px;
+  }
+  .ef-transcript {
+    font-size: 36px;
+  }
+  .ef-display {
+    font-size: 44px;
+  }
+}
+
+/* Screens ease in. Nothing else moves. */
 @media (prefers-reduced-motion: no-preference) {
   .rise {
-    animation: rise 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: rise 550ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .breath-line {
+    animation: breath 5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .live-dot {
+    animation: listening 2.4s ease-in-out infinite;
   }
 }
 
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -111,36 +172,32 @@ a.inline {
   }
 }
 
-/* The mark breathing while the app works. Slow enough to be calming
-   rather than urgent — a spinner says busy, this says wait with me. */
-@media (prefers-reduced-motion: no-preference) {
-  .breathe {
-    animation: breathe 3.4s ease-in-out infinite;
+@keyframes breath {
+  from {
+    transform: scaleX(0.06);
+    opacity: 0.5;
   }
-  .fade-line {
-    animation: fade-line 500ms ease-out both;
+  to {
+    transform: scaleX(1);
+    opacity: 1;
   }
 }
 
-@keyframes breathe {
+@keyframes listening {
   0%,
   100% {
-    opacity: 0.55;
-    transform: scale(0.97);
+    opacity: 1;
   }
   50% {
-    opacity: 1;
-    transform: scale(1);
+    opacity: 0.35;
   }
 }
 
-@keyframes fade-line {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+/* The breath still has to take five seconds; hold the line instead. */
+@media (prefers-reduced-motion: reduce) {
+  .breath-line {
+    animation: none;
+    transform: scaleX(1);
+    opacity: 0.5;
   }
 }
