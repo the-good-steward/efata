@@ -462,6 +462,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           key={`${question.linkId}-${attempts.length}`}
           feedbackReady={Boolean(latest?.feedback)}
           feedbackStalled={stalled}
+          attemptId={latest?.id ?? null}
           onSubmittingChange={setSubmitting}
           sessionQuestionId={question.linkId}
           attemptNumber={attempts.length + 1}

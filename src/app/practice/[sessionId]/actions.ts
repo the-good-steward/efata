@@ -279,3 +279,116 @@ function describeError(error: unknown, during: string): string {
   }
   return `Something went wrong ${during}: ${message.slice(0, 200)}`;
 }
+
+export type RescoreState = { error?: string; ok?: boolean };
+
+/**
+ * Score an answer that was saved but never evaluated.
+ *
+ * Evaluation runs after the answer is written, so it can fail on its
+ * own and leave a complete recording with no feedback. Until now the
+ * only advice was to reload, which did nothing — nothing re-ran the
+ * evaluation. This does.
+ */
+export async function rescoreAttempt(
+  _prev: RescoreState,
+  formData: FormData,
+): Promise<RescoreState> {
+  const attemptId = String(formData.get("attempt_id") ?? "");
+  if (!attemptId) return { error: "Missing attempt." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Your session expired. Sign in again." };
+
+  // RLS means this only returns the caller's own attempt.
+  const { data: attempt } = await supabase
+    .from("attempts")
+    .select(
+      "id, transcript, attempt_number, feedback, session_question_id, session_questions (session_id, questions (id, body, rubric))",
+    )
+    .eq("id", attemptId)
+    .maybeSingle();
+
+  if (!attempt) return { error: "That answer isn't one of yours." };
+  if (attempt.feedback) return { ok: true };
+  if (!attempt.transcript) {
+    return { error: "That answer has no transcript to work from." };
+  }
+
+  const nested = attempt.session_questions as unknown as {
+    session_id: string;
+    questions: { id: string; body: string; rubric: Rubric } | null;
+  } | null;
+  const question = nested?.questions;
+  if (!question) return { error: "Couldn't load the question." };
+
+  let answerKey = null;
+  if (question.rubric === "technical") {
+    try {
+      const admin = createAdminClient();
+      const { data } = await admin
+        .from("question_answer_keys")
+        .select("markers")
+        .eq("question_id", question.id)
+        .maybeSingle();
+      answerKey = (data?.markers as { must_mention?: string[] }) ?? null;
+    } catch (error) {
+      console.error("Answer key lookup failed:", error);
+    }
+  }
+
+  let result;
+  try {
+    result = await evaluateAnswer({
+      question: question.body,
+      rubric: question.rubric,
+      transcript: attempt.transcript,
+      durationSeconds: 75,
+      answerKey,
+      attemptNumber: attempt.attempt_number as number,
+    });
+  } catch (error) {
+    await recordFailure({
+      userId: user.id,
+      stage: "evaluation_retry",
+      error,
+      context: { attemptId, rubric: question.rubric },
+    });
+    return {
+      error:
+        "That didn't work either. Your answer is still saved — try again in a moment.",
+    };
+  }
+
+  const { error: updateError } = await supabase
+    .from("attempts")
+    .update({
+      feedback: result.feedback,
+      improved_answer: result.improved_answer,
+      scores: {
+        one_thing: result.one_thing,
+        substance: result.substance,
+        delivery: {
+          ...result.delivery,
+          filler_words: countFillers(attempt.transcript),
+        },
+      },
+    })
+    .eq("id", attemptId);
+
+  if (updateError) {
+    await recordFailure({
+      userId: user.id,
+      stage: "rescore_update",
+      error: updateError,
+      context: { attemptId },
+    });
+    return { error: "Couldn't save the feedback. Try again." };
+  }
+
+  revalidatePath(`/practice/${nested?.session_id}`);
+  return { ok: true };
+}

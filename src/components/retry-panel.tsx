@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnswerRecorder } from "@/components/answer-recorder";
 import { Working } from "@/components/working";
+import { RescoreButton } from "@/components/rescore-button";
 
 type Props = {
   sessionQuestionId: string;
@@ -26,6 +27,8 @@ type Props = {
    * worse than telling them and letting them carry on.
    */
   feedbackStalled: boolean;
+  /** The attempt awaiting feedback, so it can be scored again. */
+  attemptId: string | null;
   onSubmittingChange?: (submitting: boolean) => void;
 };
 
@@ -49,6 +52,7 @@ export function RetryPanel({
   hasAttempted,
   feedbackReady,
   feedbackStalled,
+  attemptId,
   onSubmittingChange,
 }: Props) {
   const [recording, setRecording] = useState(false);
@@ -147,9 +151,10 @@ export function RetryPanel({
         <div className="border-clay/40 bg-clay/10 mt-6 rounded-[16px] p-5">
           <p className="ef-ui text-clay">The feedback didn&rsquo;t finish</p>
           <p className="ef-caption text-muted mt-2">
-            Your answer and transcript are saved. Reload the page to try the
-            feedback again, or carry on and come back to it.
+            Your answer and transcript are saved. This happens when the
+            scoring takes too long, and it can be run again.
           </p>
+          {attemptId && <RescoreButton attemptId={attemptId} />}
         </div>
       )}
 
