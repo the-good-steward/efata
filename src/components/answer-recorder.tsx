@@ -187,6 +187,9 @@ export function AnswerRecorder({
        * component is unmounted by its parent once the new attempt
        * actually arrives. One source of truth, which is the server.
        */
+      // The parent also clears this when the new attempt arrives; doing
+      // it here too just makes the navigation reappear a moment sooner.
+      onSubmittingChange?.(false);
       router.refresh();
     } catch {
       // A thrown action means the request died — usually the function

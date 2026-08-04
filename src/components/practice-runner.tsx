@@ -136,6 +136,13 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   useEffect(() => {
     if (totalAttempts === seenAttempts.current) return;
     seenAttempts.current = totalAttempts;
+
+    // A confirmed attempt means nothing is in flight any more. Clearing
+    // this here rather than trusting the recorder to report back means
+    // a missed callback cannot leave the navigation hidden for good —
+    // which is exactly what stranded someone with no way to continue.
+    setSubmitting(false);
+
     setNavLocked(true);
     const timer = setTimeout(() => setNavLocked(false), 500);
     return () => clearTimeout(timer);
@@ -481,7 +488,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
 
       <div
         className={`border-hairline mt-6 flex items-center justify-between gap-4 border-t pt-6 transition-opacity ${
-          submitting ? "pointer-events-none opacity-0" : "opacity-100"
+          submitting ? "opacity-30" : "opacity-100"
         }`}
       >
         <button
