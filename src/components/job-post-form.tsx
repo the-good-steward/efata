@@ -36,6 +36,16 @@ export function JobPostForm() {
     if (state.sessionId) router.push(`/practice/${state.sessionId}`);
   }, [state.sessionId, router]);
 
+  /**
+   * Stay in the waiting state through the navigation.
+   *
+   * `pending` goes false the moment the action returns, but the page
+   * has not moved yet, so the form re-rendered and the button flashed
+   * back for an instant before the questions appeared. Holding the
+   * waiting state until the route actually changes removes that.
+   */
+  const working = pending || Boolean(state.sessionId);
+
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <label className="flex flex-col gap-2">
@@ -60,10 +70,14 @@ export function JobPostForm() {
         </p>
       )}
 
-      {pending ? (
+      {working ? (
         <Working
-          lines={STEPS}
-          note="Up to a minute. It's reading what employers actually ask for this role, not guessing."
+          lines={state.sessionId ? ["Opening your questions"] : STEPS}
+          note={
+            state.sessionId
+              ? "Ready."
+              : "Up to a minute. It's reading what employers actually ask for this role, not guessing."
+          }
         />
       ) : (
         <button
