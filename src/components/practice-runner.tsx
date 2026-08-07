@@ -350,20 +350,19 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   }
 
   /**
-   * The rating is asked twice per session at most: once on a
-   * situational question and once on a technical one.
+   * Asked once per session, on a technical question.
    *
    * Asking after every answer trains people to tap whatever clears the
-   * screen, which is worse data than none. Two considered answers beat
-   * ten reflexive ones, and one of each type is enough to tell whether
-   * a problem is with the feedback in general or only with the
-   * technical side.
+   * screen, which is worse data than none. With only three questions,
+   * asking twice would be two thirds of the session. Technical is the
+   * one to ask about: it is where the feedback is most likely to be
+   * wrong, and where being wrong costs the most.
    */
-  const firstSituational = questions.findIndex(
-    (q) => q.type !== "technical",
-  );
   const firstTechnical = questions.findIndex((q) => q.type === "technical");
-  const asksForRating = index === firstSituational || index === firstTechnical;
+  // Falls back to the first question when a set happens to have no
+  // technical one, so the session still asks once.
+  const ratingIndex = firstTechnical === -1 ? 0 : firstTechnical;
+  const asksForRating = index === ratingIndex;
 
   const question = questions[index];
   if (!question) return null;

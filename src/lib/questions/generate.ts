@@ -164,9 +164,11 @@ ${roleCatalogue}${
             : ""
         }
 
-Write exactly 5 questions for this job post: 2 hypothetical and 3 technical. Not four, not six, count them before you return. The person is told how many are coming, and a set that does not match reads as something having gone wrong.
+Write exactly 3 questions for this job post: 1 hypothetical and 2 technical. Count them before you return.
 
-Five with two attempts each is ten spoken answers, which is already a long session. Weight it toward technical because that is where the questions have to earn their place, and the situational ones repeat across roles in a way the technical ones do not.
+Three with two attempts each is six spoken answers, which is about fifteen minutes and as much as anyone will do properly in one sitting. Because there are so few, every one has to earn its place: no warm-ups, no throat-clearing, nothing that could have been asked of someone in a different job.
+
+Weight it toward technical because that is where the questions have to be specific to this role. The situational one should be the money question, the one where poor communication costs them income: scope, rate, a deadline, or saying no.
 
 --- JOB POST ---
 ${jobPost}

@@ -52,7 +52,7 @@ export function FeedbackRating({
         Did this feedback tell you something you can use?
       </p>
       <p className="ef-caption text-ink-3/70">
-        Asked twice a session, not every time.
+        Asked once a session, not every time.
       </p>
 
       <div className="mt-3 flex gap-2">
