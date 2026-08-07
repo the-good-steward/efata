@@ -262,19 +262,22 @@ a.inline {
 }
 
 /*
- * Footer padding that respects the phone's own bottom bar.
+ * Footer padding.
  *
- * A fixed 40px sat too low: on a phone the browser chrome and the home
- * indicator already take space below the viewport, so the button ended
- * up floating well clear of the content it belongs to. This gives it a
- * modest gap and adds only whatever the device actually reserves.
+ * The action sits in the lower third with real air beneath it, rather
+ * than pinned to the bottom edge. A button hard against the edge reads
+ * as an afterthought and sits awkwardly close to the phone's own
+ * gestures; lifting it makes it part of the screen it belongs to.
+ *
+ * The safe area is added on top, so a device that reserves space gets
+ * that as well rather than instead.
  */
 .pb-safe {
-  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 @media (min-width: 768px) {
   .pb-safe {
-    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
   }
 }
