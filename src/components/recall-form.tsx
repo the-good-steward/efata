@@ -21,7 +21,7 @@ export function RecallForm({ sessionId }: { sessionId: string }) {
     <form ref={formRef} action={formAction} className="flex flex-col gap-6">
       <input type="hidden" name="session_id" value={sessionId} />
       <label className="flex flex-col gap-2">
-        <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+        <span className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
           The question
         </span>
         <textarea
@@ -29,12 +29,12 @@ export function RecallForm({ sessionId }: { sessionId: string }) {
           rows={3}
           required
           placeholder="As close to their words as you remember."
-          className="border-rule text-parchment placeholder:text-ash/50 focus:border-spoken focus:ring-spoken/40 resize-y rounded-sm border bg-transparent px-3 py-2 font-body text-sm leading-relaxed outline-none focus:ring-2"
+          className="border-edge text-ink placeholder:text-ink-3/60 focus:border-spoken focus:ring-spoken/40 resize-y rounded-sm border bg-transparent px-3 py-2 font-body text-sm leading-relaxed outline-none focus:ring-2"
         />
       </label>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+        <legend className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
           What kind of question
         </legend>
         <div className="mt-1 flex gap-2">
@@ -50,7 +50,7 @@ export function RecallForm({ sessionId }: { sessionId: string }) {
                 required
                 className="peer sr-only"
               />
-              <div className="border-rule peer-checked:border-spoken peer-checked:bg-spoken/10 text-parchment font-body rounded-sm border px-3 py-2.5 text-center text-sm transition-colors">
+              <div className="border-hairline peer-checked:border-spoken peer-checked:bg-seaglass/10 text-ink font-body rounded-sm border px-3 py-2.5 text-center text-sm transition-colors">
                 {option.label}
               </div>
             </label>
@@ -59,7 +59,7 @@ export function RecallForm({ sessionId }: { sessionId: string }) {
       </fieldset>
 
       {state.error && (
-        <p role="alert" className="font-body text-sm text-flag">
+        <p role="alert" className="font-body text-sm text-clay">
           {state.error}
         </p>
       )}
@@ -76,7 +76,7 @@ export function RecallForm({ sessionId }: { sessionId: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="bg-parchment text-ink font-body hover:bg-parchment/85 self-start rounded-sm px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-60"
+        className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? "Saving…" : "Add this question"}
       </button>

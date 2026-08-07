@@ -49,7 +49,7 @@ export function JobPostForm() {
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <label className="flex flex-col gap-2">
-        <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+        <span className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
           Paste the job post
         </span>
         <textarea
@@ -57,7 +57,7 @@ export function JobPostForm() {
           rows={10}
           required
           placeholder="Paste the full listing from OnlineJobs.ph, Upwork, LinkedIn, or a client's brief. The more detail, the sharper the questions."
-          className="border-rule text-parchment placeholder:text-ash/50 focus:border-spoken focus:ring-spoken/40 resize-y rounded-sm border bg-transparent px-3 py-2 font-body text-sm leading-relaxed outline-none focus:ring-2"
+          className="border-edge text-ink placeholder:text-ink-3/60 focus:border-spoken focus:ring-spoken/40 resize-y rounded-sm border bg-transparent px-3 py-2 font-body text-sm leading-relaxed outline-none focus:ring-2"
         />
       </label>
 
@@ -82,7 +82,7 @@ export function JobPostForm() {
       ) : (
         <button
           type="submit"
-          className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
+          className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Build my questions
         </button>

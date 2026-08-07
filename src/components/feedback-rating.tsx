@@ -34,11 +34,11 @@ export function FeedbackRating({
 
   if ((answered || existing || state.ok) && !showIssues) {
     return (
-      <p className="text-ash font-body mt-5 text-xs">
+      <p className="text-ink-3 font-body mt-5 text-xs">
         Noted.{" "}
         <button
           onClick={() => setShowIssues(true)}
-          className="hover:text-parchment underline underline-offset-4 transition-colors"
+          className="hover:text-ink underline underline-offset-4 transition-colors"
         >
           Change it
         </button>
@@ -47,7 +47,7 @@ export function FeedbackRating({
   }
 
   return (
-    <div className="border-rule/60 mt-5 border-t pt-4">
+    <div className="border-hairline/60 mt-5 border-t pt-4">
       <p className="ef-caption text-ink-3">
         Did this feedback tell you something you can use?
       </p>
@@ -67,7 +67,7 @@ export function FeedbackRating({
           <button
             type="submit"
             disabled={pending}
-            className="border-rule text-parchment font-body hover:border-spoken hover:text-spoken rounded-sm border px-3 py-1.5 text-xs transition-colors disabled:opacity-60"
+            className="border-edge text-ink font-body hover:border-spoken hover:text-seaglass rounded-sm border px-3 py-1.5 text-xs transition-colors disabled:opacity-60"
           >
             Yes
           </button>
@@ -75,7 +75,7 @@ export function FeedbackRating({
 
         <button
           onClick={() => setShowIssues(true)}
-          className="border-rule text-parchment font-body hover:border-spoken hover:text-spoken rounded-sm border px-3 py-1.5 text-xs transition-colors"
+          className="border-edge text-ink font-body hover:border-spoken hover:text-seaglass rounded-sm border px-3 py-1.5 text-xs transition-colors"
         >
           Not really
         </button>
@@ -86,7 +86,7 @@ export function FeedbackRating({
           <input type="hidden" name="attempt_id" value={attemptId} />
           <input type="hidden" name="useful" value="no" />
 
-          <p className="text-ash font-body text-xs">What was off about it?</p>
+          <p className="text-ink-3 font-body text-xs">What was off about it?</p>
 
           <div className="flex flex-col gap-1.5">
             {ISSUES.map((issue) => (
@@ -98,7 +98,7 @@ export function FeedbackRating({
                   required
                   className="peer sr-only"
                 />
-                <span className="border-rule text-ash peer-checked:border-spoken peer-checked:text-parchment font-body block rounded-sm border px-3 py-1.5 text-xs transition-colors">
+                <span className="border-hairline text-ink-3 peer-checked:border-spoken peer-checked:text-ink font-body block rounded-sm border px-3 py-1.5 text-xs transition-colors">
                   {issue.label}
                 </span>
               </label>
@@ -109,13 +109,13 @@ export function FeedbackRating({
             type="text"
             name="note"
             placeholder="Optional: what should it have said?"
-            className="border-rule text-parchment placeholder:text-ash/50 focus:border-spoken rounded-sm border bg-transparent px-3 py-1.5 font-body text-xs outline-none"
+            className="border-edge text-ink placeholder:text-ink-3/60 focus:border-spoken rounded-sm border bg-transparent px-3 py-1.5 font-body text-xs outline-none"
           />
 
           <button
             type="submit"
             disabled={pending}
-            className="bg-parchment text-ink font-body hover:bg-parchment/85 self-start rounded-sm px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-60"
+            className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {pending ? "Sending…" : "Send"}
           </button>
@@ -123,7 +123,7 @@ export function FeedbackRating({
       )}
 
       {state.error && (
-        <p className="font-body mt-2 text-xs text-flag">{state.error}</p>
+        <p className="font-body mt-2 text-xs text-clay">{state.error}</p>
       )}
     </div>
   );

@@ -26,20 +26,20 @@ export default async function RecallPage() {
       <div className="mx-auto w-full max-w-lg">
         <Link
           href="/practice"
-          className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
+          className="text-ink-3 font-body hover:text-ink text-sm underline underline-offset-4 transition-colors"
         >
           Back to practice
         </Link>
 
-        <h1 className="text-parchment font-display mt-8 text-4xl">
+        <h1 className="text-ink font-display mt-8 text-4xl">
           What were you actually asked?
         </h1>
-        <p className="text-ash font-body mt-4 text-sm leading-relaxed">
+        <p className="text-ink-3 font-body mt-4 text-sm leading-relaxed">
           Just had a real interview or client call? Start with what you applied
           to, then write down the questions while the wording is fresh.
         </p>
 
-        <div className="border-rule mt-10 border-t pt-10">
+        <div className="border-hairline mt-10 border-t pt-10">
           <RecallStartForm
             roles={roles ?? []}
             defaultRoleId={(profile?.primary_role_id as string | null) ?? null}

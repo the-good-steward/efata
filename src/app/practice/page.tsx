@@ -51,7 +51,7 @@ export default async function PracticePage() {
 
         <div>
           <h1 className="ef-display text-paper">Start a session</h1>
-          <p className="ef-body text-paper-soft mt-4">
+          <p className="ef-body text-ink-2 mt-4">
             Paste a job post. Efata builds the questions you&rsquo;re likely
             to face, including the ones about scope, rates and deadlines that
             most people freeze on.
@@ -61,7 +61,7 @@ export default async function PracticePage() {
             <JobPostForm />
           </div>
 
-          <p className="ef-caption text-faint mt-6">
+          <p className="ef-caption text-ink-3 mt-6">
             Any job post works, whatever the role. Questions are researched
             from what employers actually ask, then written for your level.
             A rehearsal, not a prediction.
@@ -70,7 +70,7 @@ export default async function PracticePage() {
 
         {sessions && sessions.length > 0 && (
           <div className="border-hairline mt-16 border-t pt-10">
-            <h2 className="ef-label text-faint">Recent sessions</h2>
+            <h2 className="ef-label text-ink-3">Recent sessions</h2>
             <ul className="mt-5 flex flex-col gap-2">
               {sessions.map((session) => (
                 <li key={session.id}>

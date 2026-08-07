@@ -25,7 +25,7 @@ export function RescoreButton({ attemptId }: { attemptId: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="bg-paper text-dusk w-full rounded-full px-6 py-3.5 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:opacity-60"
+        className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? "Scoring it now…" : "Get my feedback"}
       </button>

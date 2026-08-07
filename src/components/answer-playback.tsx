@@ -56,7 +56,7 @@ export function AnswerPlayback({ blob }: { blob: Blob }) {
     <div>
       <audio ref={audioRef} controls src={url} preload="metadata" className="w-full" />
       {!ready && (
-        <p className="ef-caption text-faint mt-2">Preparing playback…</p>
+        <p className="ef-caption text-ink-3 mt-2">Preparing playback…</p>
       )}
     </div>
   );

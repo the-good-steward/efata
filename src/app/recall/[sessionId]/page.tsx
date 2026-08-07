@@ -52,31 +52,31 @@ export default async function RecallSessionPage({
       <div className="mx-auto w-full max-w-lg">
         <Link
           href="/recall"
-          className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
+          className="text-ink-3 font-body hover:text-ink text-sm underline underline-offset-4 transition-colors"
         >
           Log a different interview
         </Link>
 
-        <h1 className="text-parchment font-display mt-8 text-3xl">
+        <h1 className="text-ink font-display mt-8 text-3xl">
           {session.title ?? "That interview"}
         </h1>
 
         {session.job_post && (
           <details className="mt-4">
-            <summary className="text-ash font-body cursor-pointer text-sm underline underline-offset-4">
+            <summary className="text-ink-3 font-body cursor-pointer text-sm underline underline-offset-4">
               The job post
             </summary>
-            <p className="text-parchment/80 font-body border-rule mt-3 max-h-64 overflow-y-auto border-l pl-4 text-sm leading-relaxed whitespace-pre-line">
+            <p className="text-ink/80 font-body border-hairline mt-3 max-h-64 overflow-y-auto border-l pl-4 text-sm leading-relaxed whitespace-pre-line">
               {session.job_post}
             </p>
           </details>
         )}
 
-        <div className="border-rule mt-10 border-t pt-10">
-          <h2 className="text-parchment font-display text-xl">
+        <div className="border-hairline mt-10 border-t pt-10">
+          <h2 className="text-ink font-display text-xl">
             Add a question they asked
           </h2>
-          <p className="text-ash font-body mt-2 text-sm">
+          <p className="text-ink-3 font-body mt-2 text-sm">
             One at a time. Add as many as you remember.
           </p>
           <div className="mt-6">
@@ -85,17 +85,17 @@ export default async function RecallSessionPage({
         </div>
 
         {logged.length > 0 && (
-          <div className="border-rule mt-16 border-t pt-10">
-            <h2 className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+          <div className="border-hairline mt-16 border-t pt-10">
+            <h2 className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               {logged.length} logged
             </h2>
             <ul className="mt-6 flex flex-col gap-5">
               {logged.map((question) => (
                 <li key={question.id}>
-                  <p className="text-parchment font-body text-sm leading-relaxed">
+                  <p className="text-ink font-body text-sm leading-relaxed">
                     {question.body}
                   </p>
-                  <p className="text-ash font-body mt-1 text-xs">
+                  <p className="text-ink-3 font-body mt-1 text-xs">
                     {question.type === "technical"
                       ? "About the work"
                       : "About a situation"}
@@ -106,11 +106,11 @@ export default async function RecallSessionPage({
 
             <Link
               href={`/practice/${sessionId}`}
-              className="bg-parchment text-ink font-body hover:bg-parchment/85 mt-8 inline-block rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+              className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Practise these
             </Link>
-            <p className="text-ash font-body mt-3 text-xs">
+            <p className="text-ink-3 font-body mt-3 text-xs">
               Real questions from a real interview. Answer them out loud and
               get feedback, same as any session.
             </p>

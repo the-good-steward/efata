@@ -212,7 +212,7 @@ export function AnswerRecorder({
           <p className="text-lamp font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
             This time
           </p>
-          <p className="text-parchment font-body mt-2 text-sm leading-relaxed">
+          <p className="text-ink font-body mt-2 text-sm leading-relaxed">
             {oneThing}
           </p>
         </div>
@@ -222,11 +222,11 @@ export function AnswerRecorder({
         <div>
           <button
             onClick={ready}
-            className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
+            className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {attemptNumber > 1 ? "I'm ready" : "I'm ready"}
           </button>
-          <p className="ef-caption text-faint mt-3 text-center">
+          <p className="ef-caption text-ink-3 mt-3 text-center">
             Aim for 60 to 90 seconds
           </p>
         </div>
@@ -256,13 +256,13 @@ export function AnswerRecorder({
                 style={{ transition: "stroke-dashoffset 1s linear" }}
               />
             </svg>
-            <span className="text-parchment font-display text-2xl tabular-nums">
+            <span className="text-ink font-display text-2xl tabular-nums">
               {prepLeft}
             </span>
           </div>
           <div>
             <p className="ef-body text-paper">Take a breath.</p>
-            <p className="ef-caption text-faint">
+            <p className="ef-caption text-ink-3">
               Recording starts on its own
             </p>
           </div>
@@ -273,15 +273,15 @@ export function AnswerRecorder({
         <div className="flex items-center gap-4">
           <button
             onClick={stopRecording}
-            className="font-body rounded-sm border border-spoken/60 px-4 py-2.5 text-sm font-medium text-spoken transition-colors hover:bg-spoken/10"
+            className="font-body rounded-sm border border-spoken/60 px-4 py-2.5 text-sm font-medium text-seaglass transition-colors hover:bg-seaglass/10"
           >
             Done
           </button>
-          <span className="text-ash font-body flex items-center gap-2 text-sm tabular-nums">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-spoken" />
+          <span className="text-ink-3 font-body flex items-center gap-2 text-sm tabular-nums">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-seaglass" />
             {mmss}
           </span>
-          <span className="ef-caption text-faint">
+          <span className="ef-caption text-ink-3">
             Aim for 60 to 90 seconds
           </span>
         </div>
@@ -293,13 +293,13 @@ export function AnswerRecorder({
           <div className="flex gap-3">
             <button
               onClick={submit}
-              className="bg-parchment text-ink font-body hover:bg-parchment/85 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors"
+              className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Send this one
             </button>
             <button
               onClick={discard}
-              className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
+              className="text-ink-3 font-body hover:text-ink text-sm underline underline-offset-4 transition-colors"
             >
               Record it again
             </button>
@@ -333,7 +333,7 @@ export function AnswerRecorder({
       {error && (
         <p
           role="alert"
-          className="font-body mt-4 rounded-sm border border-flag/40 bg-flag/10 px-3 py-2 text-sm text-flag"
+          className="font-body mt-4 rounded-sm border border-clay/40 bg-clay/10 px-3 py-2 text-sm text-clay"
         >
           {error}
         </p>

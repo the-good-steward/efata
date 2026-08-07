@@ -32,11 +32,11 @@ export function AuthForm({ mode, action }: Props) {
 
   return (
     <div className="w-full max-w-sm">
-      <Mark size={36} className="text-parchment mb-8" />
-      <h1 className="text-parchment font-display text-4xl">
+      <Mark size={36} className="text-ink mb-8" />
+      <h1 className="text-ink font-display text-4xl">
         {isSignup ? "Create your account" : "Sign in"}
       </h1>
-      <p className="text-ash font-body mt-3 text-sm leading-relaxed">
+      <p className="text-ink-3 font-body mt-3 text-sm leading-relaxed">
         {isSignup
           ? "Start practicing the conversations that win the work."
           : "Pick up where you left off."}
@@ -44,7 +44,7 @@ export function AuthForm({ mode, action }: Props) {
 
       <form action={formAction} className="mt-8 flex flex-col gap-4">
         <label className="flex flex-col gap-2">
-          <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+          <span className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
             Email
           </span>
           <input
@@ -54,7 +54,7 @@ export function AuthForm({ mode, action }: Props) {
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="border-rule text-parchment focus:border-spoken focus:ring-spoken/40 rounded-sm border bg-transparent px-3 py-2 text-base outline-none focus:ring-2"
+            className="border-edge text-ink focus:border-spoken focus:ring-spoken/40 rounded-sm border bg-transparent px-3 py-2 text-base outline-none focus:ring-2"
           />
         </label>
 
@@ -70,7 +70,7 @@ export function AuthForm({ mode, action }: Props) {
         {state.error && (
           <p
             role="alert"
-            className="font-body rounded-sm border border-flag/40 bg-flag/10 px-3 py-2 text-sm text-flag"
+            className="font-body rounded-sm border border-clay/40 bg-clay/10 px-3 py-2 text-sm text-clay"
           >
             {state.error}
           </p>
@@ -88,7 +88,7 @@ export function AuthForm({ mode, action }: Props) {
         <button
           type="submit"
           disabled={pending}
-          className="bg-parchment text-ink font-body hover:bg-parchment/85 focus-visible:ring-spoken focus-visible:ring-offset-ink mt-2 rounded-sm px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-60"
+          className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending
             ? isSignup
@@ -101,7 +101,7 @@ export function AuthForm({ mode, action }: Props) {
       </form>
 
       {!isSignup && (
-        <p className="ef-body text-muted mt-6">
+        <p className="ef-body text-ink-3 mt-6">
           <Link
             href="/forgot"
             className="hover:text-paper underline underline-offset-4 transition-colors"
@@ -111,11 +111,11 @@ export function AuthForm({ mode, action }: Props) {
         </p>
       )}
 
-      <p className="text-ash font-body mt-6 text-sm">
+      <p className="text-ink-3 font-body mt-6 text-sm">
         {isSignup ? "Already have an account? " : "New here? "}
         <Link
           href={isSignup ? "/login" : "/signup"}
-          className="text-parchment hover:text-spoken inline-flex min-h-[44px] items-center underline underline-offset-4 transition-colors"
+          className="text-ink hover:text-seaglass inline-flex min-h-[44px] items-center underline underline-offset-4 transition-colors"
         >
           {isSignup ? "Sign in" : "Create an account"}
         </Link>

@@ -94,12 +94,12 @@ export function MarkedTranscript({
       </p>
 
       {open !== null && (
-        <p className="ef-caption text-muted border-clay/40 mt-4 border-l-2 pl-4">
+        <p className="ef-caption text-ink-3 border-clay/40 mt-4 border-l-2 pl-4">
           {explain(pieces[Number(open)] ?? "")}
         </p>
       )}
 
-      <p className="ef-caption text-faint mt-5">
+      <p className="ef-caption text-ink-3 mt-5">
         {phrases.length === 1
           ? "One softener, marked in clay. Tap it to see what it does."
           : `${phrases.length} softeners, marked in clay. Tap one to see what it does.`}

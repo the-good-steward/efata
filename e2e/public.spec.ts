@@ -105,3 +105,32 @@ test("a rejected sign-in keeps what was typed", async ({ page }) => {
   await expect(email).toHaveValue("someone@example.com");
   await expect(password).toHaveValue("wrongpassword");
 });
+
+test("buttons have readable labels", async ({ page }) => {
+  for (const path of ["/login", "/signup", "/forgot"]) {
+    await page.goto(path);
+
+    const buttons = page.locator("button[type=submit]");
+    const count = await buttons.count();
+
+    for (let i = 0; i < count; i++) {
+      const button = buttons.nth(i);
+      if (!(await button.isVisible())) continue;
+
+      // A label the same colour as its own background is invisible,
+      // which is exactly what shipped when the theme was inverted.
+      const { colour, background } = await button.evaluate((el) => {
+        const style = getComputedStyle(el);
+        return { colour: style.color, background: style.backgroundColor };
+      });
+
+      expect(
+        colour,
+        `${path}: button text and fill are the same colour`,
+      ).not.toBe(background);
+
+      const label = (await button.textContent())?.trim() ?? "";
+      expect(label.length, `${path}: button has no label`).toBeGreaterThan(1);
+    }
+  }
+});

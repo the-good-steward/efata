@@ -61,7 +61,7 @@ function Stat({ value, label }: { value: string; label: string }) {
       <p className="font-serif text-paper text-[26px] leading-none tabular-nums">
         {value}
       </p>
-      <p className="ef-caption text-faint mt-1.5 leading-tight">{label}</p>
+      <p className="ef-caption text-ink-3 mt-1.5 leading-tight">{label}</p>
     </div>
   );
 }
@@ -79,12 +79,12 @@ function Metric({
 }) {
   return (
     <section className="bg-raised mt-4 rounded-[16px] p-5">
-      <h2 className="ef-label text-faint">{title}</h2>
+      <h2 className="ef-label text-ink-3">{title}</h2>
       <p className="font-serif text-paper mt-2 text-[22px] leading-snug">
         {headline}
       </p>
       <Sparkline series={series} />
-      <p className="ef-body text-paper-soft mt-3">{reading}</p>
+      <p className="ef-body text-ink-2 mt-3">{reading}</p>
     </section>
   );
 }
@@ -175,7 +175,7 @@ export default async function ProgressPage() {
         <h1 className="ef-display text-paper">What&rsquo;s changed</h1>
 
         {p.answers === 0 ? (
-          <p className="ef-body text-paper-soft mt-4">
+          <p className="ef-body text-ink-2 mt-4">
             Nothing recorded yet. Answer a few questions out loud and this
             fills in.
           </p>
@@ -197,7 +197,7 @@ export default async function ProgressPage() {
             </div>
 
             {p.retriesTaken > 0 && (
-              <p className="ef-body text-paper-soft mt-4">
+              <p className="ef-body text-ink-2 mt-4">
                 {p.retriesImproved === p.retriesTaken
                   ? "Every second attempt beat the first. The retry is doing its work."
                   : p.retriesImproved === 0
@@ -222,7 +222,7 @@ export default async function ProgressPage() {
 
             {p.topHedges.length > 0 && (
               <section className="bg-raised mt-4 rounded-[16px] p-5">
-                <h2 className="ef-label text-faint">
+                <h2 className="ef-label text-ink-3">
                   What you keep reaching for
                 </h2>
                 <ul className="mt-4 flex flex-col gap-2.5">
@@ -231,13 +231,13 @@ export default async function ProgressPage() {
                       <span className="text-clay font-serif text-[19px]">
                         &ldquo;{h.phrase}&rdquo;
                       </span>
-                      <span className="ef-caption text-faint tabular-nums">
+                      <span className="ef-caption text-ink-3 tabular-nums">
                         {h.count} times
                       </span>
                     </li>
                   ))}
                 </ul>
-                <p className="ef-body text-paper-soft mt-4">
+                <p className="ef-body text-ink-2 mt-4">
                   Catching one of these mid-sentence is the whole skill. You do
                   not need to fix all of them.
                 </p>
@@ -246,7 +246,7 @@ export default async function ProgressPage() {
 
             <Link
               href="/practice"
-              className="bg-paper text-dusk mt-8 block w-full rounded-full px-6 py-4 text-center text-[17px] font-semibold transition-opacity hover:opacity-90"
+              className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Practise again
             </Link>

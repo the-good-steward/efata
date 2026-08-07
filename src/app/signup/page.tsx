@@ -28,14 +28,14 @@ export default function SignupPage() {
             Paused for a day or two
           </h1>
 
-          <p className="ef-body text-paper-soft mt-5">
+          <p className="ef-body text-ink-2 mt-5">
             A tester found that recordings were not saving properly. That is
             fixed, and I would rather sort out the rest before letting more
             people in than have anyone lose a session they spent twenty
             minutes on.
           </p>
 
-          <p className="ef-body text-muted mt-4">
+          <p className="ef-body text-ink-3 mt-4">
             If I sent you the link, I will message you when it is open. Thank
             you for being early.
           </p>

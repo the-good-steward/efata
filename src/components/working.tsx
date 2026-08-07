@@ -46,7 +46,7 @@ export function Working({
         {lines[index]}
       </p>
 
-      {note && <p className="ef-caption text-faint mt-3 max-w-xs">{note}</p>}
+      {note && <p className="ef-caption text-ink-3 mt-3 max-w-xs">{note}</p>}
     </div>
   );
 }

@@ -107,15 +107,15 @@ export default async function CalibratePage() {
       <div className="mx-auto w-full max-w-2xl">
         <Link
           href="/practice"
-          className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
+          className="text-ink-3 font-body hover:text-ink text-sm underline underline-offset-4 transition-colors"
         >
           Back to practice
         </Link>
 
-        <h1 className="text-parchment font-display mt-8 text-4xl">
+        <h1 className="text-ink font-display mt-8 text-4xl">
           Calibration
         </h1>
-        <p className="text-ash font-body mt-4 max-w-lg text-sm leading-relaxed">
+        <p className="text-ink-3 font-body mt-4 max-w-lg text-sm leading-relaxed">
           Score each answer yourself before seeing Efata&rsquo;s score. If the
           two mostly agree, the scoring is worth trusting. If they don&rsquo;t,
           better to find out here than after a cohort has been told they were
@@ -123,31 +123,31 @@ export default async function CalibratePage() {
         </p>
 
         {pairs.length > 0 && (
-          <div className="border-rule mt-10 border-t pt-8">
-            <h2 className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+          <div className="border-hairline mt-10 border-t pt-8">
+            <h2 className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               Agreement so far, on substance
             </h2>
-            <div className="text-parchment font-body mt-4 flex flex-wrap gap-8 text-sm">
+            <div className="text-ink font-body mt-4 flex flex-wrap gap-8 text-sm">
               <span>
                 <span className="font-display text-2xl tabular-nums">
                   {exact}
                 </span>
-                <span className="text-ash">/{pairs.length} exact</span>
+                <span className="text-ink-3">/{pairs.length} exact</span>
               </span>
               <span>
                 <span className="font-display text-2xl tabular-nums">
                   {within1}
                 </span>
-                <span className="text-ash">/{pairs.length} within 1</span>
+                <span className="text-ink-3">/{pairs.length} within 1</span>
               </span>
               <span>
                 <span className="font-display text-2xl tabular-nums">
                   {meanGap && Number(meanGap) > 0 ? `+${meanGap}` : meanGap}
                 </span>
-                <span className="text-ash"> mean gap</span>
+                <span className="text-ink-3"> mean gap</span>
               </span>
             </div>
-            <p className="text-ash font-body mt-4 text-xs leading-relaxed">
+            <p className="text-ink-3 font-body mt-4 text-xs leading-relaxed">
               A positive mean gap means Efata scores higher than you do, which
               is the direction that would send someone into a real call
               overconfident. Eight or more pairs before reading much into this.
@@ -156,15 +156,15 @@ export default async function CalibratePage() {
         )}
 
         {reports.length > 0 && (
-          <div className="border-rule mt-10 border-t pt-8">
-            <h2 className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+          <div className="border-hairline mt-10 border-t pt-8">
+            <h2 className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               What people said about the feedback
             </h2>
-            <p className="text-parchment font-body mt-4 text-sm">
+            <p className="text-ink font-body mt-4 text-sm">
               <span className="font-display text-2xl tabular-nums">
                 {usefulCount}
               </span>
-              <span className="text-ash">
+              <span className="text-ink-3">
                 /{reports.length} found it useful
               </span>
             </p>
@@ -176,16 +176,16 @@ export default async function CalibratePage() {
                   .map(([issue, count]) => (
                     <li
                       key={issue}
-                      className="text-parchment font-body flex justify-between text-sm"
+                      className="text-ink font-body flex justify-between text-sm"
                     >
                       <span>{ISSUE_LABELS[issue] ?? issue}</span>
-                      <span className="text-ash tabular-nums">{count}</span>
+                      <span className="text-ink-3 tabular-nums">{count}</span>
                     </li>
                   ))}
               </ul>
             )}
 
-            <p className="text-ash font-body mt-5 text-xs leading-relaxed">
+            <p className="text-ink-3 font-body mt-5 text-xs leading-relaxed">
               &ldquo;Misheard them&rdquo; points at transcription, not
               evaluation. &ldquo;Too vague&rdquo; points at the prompt.
               &ldquo;Got the work wrong&rdquo; is the one worth reading the
@@ -196,7 +196,7 @@ export default async function CalibratePage() {
         )}
 
         {attempts.length === 0 ? (
-          <p className="text-ash font-body mt-12 text-sm">
+          <p className="text-ink-3 font-body mt-12 text-sm">
             Nothing to calibrate yet. Record some answers first, ideally a mix
             you already know to be strong and weak.
           </p>

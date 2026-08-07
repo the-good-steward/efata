@@ -67,7 +67,7 @@ function Movement({
   if (!substance && !delivery) return null;
 
   const tone = (t: "up" | "flat" | "down") =>
-    t === "up" ? "text-spoken" : t === "down" ? "text-flag" : "text-ash";
+    t === "up" ? "text-seaglass" : t === "down" ? "text-clay" : "text-ink-3";
 
   return (
     <div className="mt-4 flex flex-col gap-1">
@@ -154,31 +154,31 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   if (!started) {
     return (
       <div className="rise">
-        <h1 className="text-parchment font-display text-4xl">
+        <h1 className="text-ink font-display text-4xl">
           Before you start
         </h1>
 
-        <div className="border-rule mt-8 flex flex-col gap-5 border-t pt-8">
-          <p className="text-parchment font-body text-base leading-relaxed">
+        <div className="border-hairline mt-8 flex flex-col gap-5 border-t pt-8">
+          <p className="text-ink font-body text-base leading-relaxed">
             Don&rsquo;t overthink your answers, and don&rsquo;t over-practise.
             The goal is to train how you think when you&rsquo;re put on the
             spot.
           </p>
-          <p className="ef-body text-paper-soft">
+          <p className="ef-body text-ink-2">
             Nothing here is scored. Nobody else hears these.
           </p>
-          <p className="ef-body text-muted">
+          <p className="ef-body text-ink-3">
             One question at a time. Five seconds after each one appears,
             recording starts on its own. Aim for 60 to 90 seconds.
           </p>
-          <p className="text-ash font-body text-sm leading-relaxed">
+          <p className="text-ink-3 font-body text-sm leading-relaxed">
             You can stop early, listen back, and try again after the feedback.
           </p>
         </div>
 
         <button
           onClick={() => setStarted(true)}
-          className="bg-paper text-dusk mt-10 w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
+          className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Start · {questions.length} question{questions.length === 1 ? "" : "s"}
         </button>
@@ -235,10 +235,10 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
 
     return (
       <div className="rise">
-        <p className="ef-label text-faint">Session finished</p>
+        <p className="ef-label text-ink-3">Session finished</p>
         <h1 className="ef-display text-paper mt-3">{verdict.headline}</h1>
-        <p className="ef-body text-paper-soft mt-4">{verdict.body}</p>
-        <p className="ef-caption text-faint mt-4">
+        <p className="ef-body text-ink-2 mt-4">{verdict.body}</p>
+        <p className="ef-caption text-ink-3 mt-4">
           {answeredCount} of {questions.length} answered
           {retried > 0 ? ` · ${retried} with a second run` : ""}
         </p>
@@ -255,7 +255,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
 
         <div className="border-hairline mt-8 flex flex-col gap-5 border-t pt-8">
           {retried > 0 && (
-            <p className="ef-body text-paper-soft">
+            <p className="ef-body text-ink-2">
               You went back and did {retried}{" "}
               {retried === 1 ? "question" : "questions"} a second time. That
               second run is where the change actually happens.
@@ -264,18 +264,18 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
 
           {topHedges.length > 0 && (
             <div>
-              <p className="ef-label text-faint">What you reached for</p>
+              <p className="ef-label text-ink-3">What you reached for</p>
               <ul className="mt-3 flex flex-col gap-1">
                 {topHedges.map(([phrase, count]) => (
                   <li key={phrase} className="ef-body text-paper">
                     &ldquo;{phrase}&rdquo;{" "}
-                    <span className="text-faint">
+                    <span className="text-ink-3">
                       · {count} {count === 1 ? "time" : "times"}
                     </span>
                   </li>
                 ))}
               </ul>
-              <p className="ef-caption text-faint mt-3">
+              <p className="ef-caption text-ink-3 mt-3">
                 Catching one of these mid-sentence on a real call is the whole
                 skill. You do not need to fix all of them.
               </p>
@@ -283,7 +283,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           )}
 
           {firstFillers != null && lastFillers != null && fillers.length > 2 && (
-            <p className="ef-body text-paper-soft">
+            <p className="ef-body text-ink-2">
               You started at {firstFillers} filler words and finished at{" "}
               {lastFillers}.
             </p>
@@ -297,7 +297,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
                 ? "One question still has words waiting"
                 : `${unfinished.length} questions still have words waiting`}
             </p>
-            <p className="ef-body text-muted mt-2">
+            <p className="ef-body text-ink-3 mt-2">
               You answered {unfinished.length === 1 ? "it" : "them"} once. A
               second run unlocks the exact wording for that answer, which is
               the part you can take into a real call.
@@ -307,7 +307,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
                 setFinished(false);
                 setIndex(unfinished[0].i);
               }}
-              className="bg-paper text-dusk mt-5 w-full rounded-full px-6 py-3.5 text-[17px] font-semibold transition-opacity hover:opacity-90"
+              className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Go back to {unfinished.length === 1 ? "it" : "the first one"}
             </button>
@@ -317,7 +317,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         <div className="mt-10 flex flex-col gap-3">
           <Link
             href="/progress"
-            className="bg-paper text-dusk block w-full rounded-full px-6 py-4 text-center text-[17px] font-semibold transition-opacity hover:opacity-90"
+            className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             See how this compares
           </Link>
@@ -326,7 +326,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
               setFinished(false);
               setIndex(0);
             }}
-            className="ef-ui text-muted hover:text-paper transition-colors"
+            className="ef-ui text-ink-3 hover:text-paper transition-colors"
           >
             Back to the questions
           </button>
@@ -340,7 +340,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           </Link>
           <Link
             href="/recall"
-            className="ef-ui text-faint hover:text-paper text-center transition-colors"
+            className="ef-ui text-ink-3 hover:text-paper text-center transition-colors"
           >
             Had a real interview? Log what they asked
           </Link>
@@ -382,10 +382,10 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-4">
-        <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+        <span className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
           {isLast ? "Last question" : `${index + 1} of ${questions.length}`}
         </span>
-        <span className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+        <span className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
           {question.type === "technical" ? "Technical" : "Situational"}
         </span>
       </div>
@@ -399,18 +399,18 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
 
       <div ref={anchorRef} key={question.linkId} className="rise mt-12 scroll-mt-6">
         {question.context && (
-          <p className="text-ash font-body text-sm italic">
+          <p className="text-ink-3 font-body text-sm italic">
             {question.context}
           </p>
         )}
 
-        <p className="text-parchment font-display mt-3 text-[28px] leading-9">
+        <p className="text-ink font-display mt-3 text-[28px] leading-9">
           {question.body}
         </p>
 
         {attempts.map((attempt, i) => (
-          <div key={attempt.id} className="border-rule/60 mt-10 border-l-2 pl-5">
-            <p className="text-ash font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
+          <div key={attempt.id} className="border-hairline/60 mt-10 border-l-2 pl-5">
+            <p className="text-ink-3 font-body text-[13px] font-semibold tracking-[0.18em] uppercase">
               Attempt {attempt.attempt_number}
             </p>
 
@@ -427,7 +427,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
 
             {attempt.transcript && (
               <div className="bg-raised mt-6 rounded-[16px] p-5">
-                <p className="ef-label text-faint mb-4">What you said</p>
+                <p className="ef-label text-ink-3 mb-4">What you said</p>
                 <MarkedTranscript
                   transcript={attempt.transcript}
                   hedges={attempt.scores?.delivery?.hedging ?? []}
@@ -445,14 +445,14 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
                   <p className="font-display text-paper text-[28px] tabular-nums">
                     {attempt.scores.delivery.filler_words ?? 0}
                   </p>
-                  <p className="ef-caption text-faint">filler words</p>
+                  <p className="ef-caption text-ink-3">filler words</p>
                 </div>
                 {attempt.scores.words_per_minute && (
                   <div>
                     <p className="font-display text-paper text-[28px] tabular-nums">
                       {attempt.scores.words_per_minute}
                     </p>
-                    <p className="ef-caption text-faint">
+                    <p className="ef-caption text-ink-3">
                       words per minute ·{" "}
                       {attempt.scores.words_per_minute > 190
                         ? "quick"
@@ -465,7 +465,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
               </div>
             )}
 
-            <p className="text-ash/70 font-body mt-4 text-xs leading-relaxed">
+            <p className="text-ink-3/70 font-body mt-4 text-xs leading-relaxed">
               Efata can get things wrong, including facts about your field.
               Double-check anything technical before you repeat it to a client.
             </p>
@@ -498,7 +498,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
       </div>
 
       {!submitting && owesRetry && (
-        <p className="ef-caption text-faint mt-8 text-center">
+        <p className="ef-caption text-ink-3 mt-8 text-center">
           One more run at this one before you move on.
         </p>
       )}
@@ -511,7 +511,7 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
         <button
           onClick={() => setIndex((i) => Math.max(0, i - 1))}
           disabled={index === 0 || navLocked}
-          className="ef-ui text-muted hover:text-paper inline transition-colors disabled:opacity-30"
+          className="ef-ui text-ink-3 hover:text-paper inline transition-colors disabled:opacity-30"
         >
           Back
         </button>
@@ -520,24 +520,24 @@ export function PracticeRunner({ questions }: { questions: RunnerQuestion[] }) {
           <button
             onClick={() => setFinished(true)}
             disabled={navLocked || owesRetry}
-            className="ef-ui text-muted hover:text-paper inline transition-colors disabled:opacity-30"
+            className="ef-ui text-ink-3 hover:text-paper inline transition-colors disabled:opacity-30"
           >
             Finish session
           </button>
         ) : (
           <button
             onClick={() => setIndex((i) => i + 1)}
-            className="ef-ui text-muted hover:text-paper inline transition-colors"
+            className="ef-ui text-ink-3 hover:text-paper inline transition-colors"
           >
             {!answered ? "Skip this one" : "Next question"}
           </button>
         )}
       </div>
 
-      <p className="text-ash/60 font-body mt-10 text-xs">
+      <p className="text-ink-3/60 font-body mt-10 text-xs">
         <Link
           href={`/recall`}
-          className="hover:text-parchment underline underline-offset-4 transition-colors"
+          className="hover:text-ink underline underline-offset-4 transition-colors"
         >
           Had a real interview? Log what they asked
         </Link>

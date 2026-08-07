@@ -26,12 +26,12 @@ export async function SchemaWarning() {
               <span className="tabular-nums">{gap.migration}</span> · missing{" "}
               <span className="text-clay">{gap.missing}</span>
             </p>
-            <p className="ef-caption text-muted">{gap.breaks}</p>
+            <p className="ef-caption text-ink-3">{gap.breaks}</p>
           </li>
         ))}
       </ul>
 
-      <p className="ef-caption text-faint mt-4">
+      <p className="ef-caption text-ink-3 mt-4">
         Run the matching file from supabase/migrations in the SQL editor.
         Until then that feature is quietly doing nothing.
       </p>

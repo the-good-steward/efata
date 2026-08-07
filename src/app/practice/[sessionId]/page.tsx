@@ -104,11 +104,11 @@ export default async function SessionPage({
         <div className="flex items-baseline justify-between gap-4">
           <Link
             href="/practice"
-            className="text-ash font-body hover:text-parchment text-sm underline underline-offset-4 transition-colors"
+            className="text-ink-3 font-body hover:text-ink text-sm underline underline-offset-4 transition-colors"
           >
             Leave session
           </Link>
-          <span className="text-ash/70 font-body max-w-[60%] truncate text-right text-xs">
+          <span className="text-ink-3/70 font-body max-w-[60%] truncate text-right text-xs">
             {session.title ?? "Practice session"}
           </span>
         </div>

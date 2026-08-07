@@ -25,7 +25,7 @@ export function AppHeader({ email }: { email?: string | null }) {
         <form action={logout}>
           <button
             type="submit"
-            className="text-faint hover:text-paper ef-caption inline whitespace-nowrap transition-colors"
+            className="text-ink-3 hover:text-paper ef-caption inline whitespace-nowrap transition-colors"
           >
             Sign out
           </button>
@@ -43,7 +43,7 @@ export function AppHeader({ email }: { email?: string | null }) {
             key={item.href}
             href={item.href}
             prefetch
-            className="ef-ui text-muted hover:text-paper inline whitespace-nowrap transition-colors"
+            className="ef-ui text-ink-3 hover:text-paper inline whitespace-nowrap transition-colors"
           >
             {item.label}
           </Link>

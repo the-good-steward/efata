@@ -32,7 +32,7 @@ export function PasswordField({
 
   return (
     <label className="flex flex-col gap-2">
-      <span className="ef-label text-faint">{label}</span>
+      <span className="ef-label text-ink-3">{label}</span>
 
       <div className="relative">
         <input
@@ -44,7 +44,7 @@ export function PasswordField({
           {...(onChange
             ? { value: value ?? "", onChange: (e) => onChange(e.target.value) }
             : {})}
-          className="border-edge text-paper focus:border-seaglass w-full rounded-[12px] border bg-transparent py-3 pr-20 pl-4 text-[17px] outline-none"
+          className="border-edge text-ink focus:border-seaglass w-full rounded-[12px] border bg-transparent py-3 pr-20 pl-4 text-[17px] outline-none"
         />
 
         <button
@@ -52,13 +52,13 @@ export function PasswordField({
           onClick={() => setVisible((v) => !v)}
           aria-pressed={visible}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="text-muted hover:text-paper absolute top-1/2 right-1 -translate-y-1/2 rounded-full px-4 text-[15px] font-medium transition-colors"
+          className="text-ink-3 hover:text-paper absolute top-1/2 right-1 -translate-y-1/2 rounded-full px-4 text-[15px] font-medium transition-colors"
         >
           {visible ? "Hide" : "Show"}
         </button>
       </div>
 
-      {hint && <span className="ef-caption text-faint">{hint}</span>}
+      {hint && <span className="ef-caption text-ink-3">{hint}</span>}
     </label>
   );
 }

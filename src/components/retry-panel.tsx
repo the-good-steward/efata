@@ -96,7 +96,7 @@ export function RetryPanel({
         />
         <button
           onClick={() => setRecording(false)}
-          className="text-faint hover:text-paper ef-caption mt-4 inline underline underline-offset-4 transition-colors"
+          className="text-ink-3 hover:text-paper ef-caption mt-4 inline underline underline-offset-4 transition-colors"
         >
           Back to the feedback
         </button>
@@ -125,13 +125,13 @@ export function RetryPanel({
       {!canRetry && improvedAnswer && (
         <div className="border-seaglass/30 bg-raised rounded-[16px] border p-5">
           <p className="ef-ui text-seaglass">Here it is said better</p>
-          <p className="ef-caption text-faint mt-3">
+          <p className="ef-caption text-ink-3 mt-3">
  Same answer, same facts, yours, softeners out.
           </p>
           <p className="ef-body text-paper border-seaglass/40 mt-3 border-l-2 pl-4 italic">
             &ldquo;{improvedAnswer}&rdquo;
           </p>
-          <p className="ef-caption text-faint mt-4">
+          <p className="ef-caption text-ink-3 mt-4">
             Say it aloud once before you move on. Hearing your own words come
             out cleanly is what makes them stick.
           </p>
@@ -150,7 +150,7 @@ export function RetryPanel({
       {feedbackStalled && (
         <div className="border-clay/40 bg-clay/10 mt-6 rounded-[16px] p-5">
           <p className="ef-ui text-clay">The feedback didn&rsquo;t finish</p>
-          <p className="ef-caption text-muted mt-2">
+          <p className="ef-caption text-ink-3 mt-2">
             Your answer and transcript are saved. This happens when the
             scoring takes too long, and it can be run again.
           </p>
@@ -167,20 +167,20 @@ export function RetryPanel({
           <>
             <button
               onClick={() => setRecording(true)}
-              className="bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
+              className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Try it again
             </button>
             <div className="border-seaglass/25 bg-seaglass/5 rounded-[12px] px-4 py-3">
               <p className="ef-ui text-seaglass">After this run</p>
-              <p className="ef-caption text-muted mt-1.5">
+              <p className="ef-caption text-ink-3 mt-1.5">
                 The exact words to say, in your voice, ready to use on a real
                 call.
               </p>
             </div>
           </>
         ) : (
-          <p className="ef-caption text-faint text-center">
+          <p className="ef-caption text-ink-3 text-center">
             Two attempts is enough on one question. Take that version with you
             and keep going.
           </p>

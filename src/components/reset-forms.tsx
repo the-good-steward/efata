@@ -11,9 +11,9 @@ import { Mark } from "@/components/logo";
 import { PasswordField } from "@/components/password-field";
 
 const field =
-  "border-edge text-paper focus:border-seaglass w-full rounded-[12px] border bg-transparent px-4 py-3 text-[17px] outline-none";
+  "border-edge text-ink focus:border-seaglass w-full rounded-[12px] border bg-transparent px-4 py-3 text-[17px] outline-none";
 const primary =
-  "bg-paper text-dusk w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:opacity-60";
+  "bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50";
 
 export function ForgotForm() {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
@@ -26,14 +26,14 @@ export function ForgotForm() {
     <div className="w-full max-w-sm">
       <Mark size={36} />
       <h1 className="ef-display text-paper mt-8">Forgotten password</h1>
-      <p className="ef-body text-paper-soft mt-4">
+      <p className="ef-body text-ink-2 mt-4">
         Give us the email you signed up with and we&rsquo;ll send a link to set
         a new one.
       </p>
 
       <form action={formAction} className="mt-8 flex flex-col gap-4">
         <label className="flex flex-col gap-2">
-          <span className="ef-label text-faint">Email</span>
+          <span className="ef-label text-ink-3">Email</span>
           <input
             type="email"
             name="email"
@@ -65,7 +65,7 @@ export function ForgotForm() {
         </button>
       </form>
 
-      <p className="ef-body text-muted mt-6">
+      <p className="ef-body text-ink-3 mt-6">
         <Link
           href="/login"
           className="hover:text-paper underline underline-offset-4 transition-colors"
@@ -89,7 +89,7 @@ export function ResetForm() {
     <div className="w-full max-w-sm">
       <Mark size={36} />
       <h1 className="ef-display text-paper mt-8">Set a new password</h1>
-      <p className="ef-body text-paper-soft mt-4">
+      <p className="ef-body text-ink-2 mt-4">
         Eight characters or more. You&rsquo;ll be signed in straight after.
       </p>
 
