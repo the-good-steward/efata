@@ -7,6 +7,12 @@ import HeldBreath from "@/components/session/HeldBreath";
 import RecordingScreen from "@/components/session/Recording";
 import ListenBack from "@/components/session/ListenBack";
 import WhatYouSaid, { type Token } from "@/components/session/WhatYouSaid";
+import WhatItCostYou from "@/components/session/WhatItCostYou";
+import TheCounts from "@/components/session/TheCounts";
+import WhatMoved from "@/components/session/WhatMoved";
+import YoursSaidStraight from "@/components/session/YoursSaidStraight";
+import SessionVerdict from "@/components/session/SessionVerdict";
+import { buildVerdict, type SessionAnswer } from "@/lib/session-verdict";
 import { submitAnswer, type AnswerState } from "@/app/practice/[sessionId]/actions";
 import type { RunnerQuestion } from "@/components/practice-runner";
 
@@ -22,7 +28,12 @@ type Phase =
   | "breath"
   | "recording"
   | "listen"
-  | "transcript";
+  | "transcript"
+  | "read"
+  | "counts"
+  | "moved"
+  | "rewrite"
+  | "verdict";
 
 const BREATH_MS = 5000;
 const MAX_SECONDS = 100;
@@ -239,27 +250,159 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
     );
   }
 
+  const delivery = latest?.scores?.delivery;
+  const fillerCount = delivery?.filler_words ?? 0;
+  const wpm = latest?.scores?.words_per_minute ?? 0;
+  const takeLength = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+
   if (phase === "transcript" && latest?.transcript) {
-    const hedges = latest.scores?.delivery?.hedging ?? [];
+    const hedges = delivery?.hedging ?? [];
     return (
       <WhatYouSaid
         index={index + 1}
         total={questions.length}
         tokens={tokenise(latest.transcript, hedges)}
         hedgeCount={hedges.length}
-        attempt={attemptNumber === 1 ? 2 : 1}
+        attempt={attempts.length >= 2 ? 2 : 1}
+        onContinue={() => setPhase(attempts.length >= 2 ? "moved" : "read")}
+        onLeave={() => router.push("/practice")}
+      />
+    );
+  }
+
+  if (phase === "read" && latest) {
+    return (
+      <WhatItCostYou
+        index={index + 1}
+        total={questions.length}
+        read={latest.feedback ?? ""}
+        fillerCount={fillerCount}
+        wpm={wpm}
+        nextLabel="Say it again"
+        onCounts={() => setPhase("counts")}
+        onBack={() => setPhase("transcript")}
         onContinue={() => {
-          // Feedback screens land next; for now the loop returns to the
-          // question so a session can still be completed.
-          if (attempts.length >= 2 && index + 1 < questions.length) {
-            setIndex(index + 1);
-          }
+          setSeconds(0);
           setBlob(null);
           audioRef.current = null;
           setAnalysisPct(0);
-          setPhase("question");
+          setBreathDone(false);
+          setPhase("breath");
         }}
         onLeave={() => router.push("/practice")}
+      />
+    );
+  }
+
+  if (phase === "counts") {
+    return (
+      <TheCounts
+        index={index + 1}
+        total={questions.length}
+        fillerCount={fillerCount}
+        takeLength={takeLength}
+        wpm={wpm}
+        wpmNote={
+          wpm > 190
+            ? "words per minute · quick"
+            : wpm < 110
+              ? "words per minute · slow"
+              : "words per minute · steady"
+        }
+        phrases={delivery?.hedging ?? []}
+        onBack={() => setPhase("read")}
+        onLeave={() => router.push("/practice")}
+      />
+    );
+  }
+
+  if (phase === "moved" && latest) {
+    const first = attempts[0];
+    return (
+      <WhatMoved
+        index={index + 1}
+        total={questions.length}
+        summary={latest.feedback ?? ""}
+        fillerCount={fillerCount}
+        previousFillerCount={first?.scores?.delivery?.filler_words ?? 0}
+        wpm={wpm}
+        previousWpm={first?.scores?.words_per_minute ?? 0}
+        onContinue={() => setPhase("rewrite")}
+        onLeave={() => router.push("/practice")}
+      />
+    );
+  }
+
+  // The rewrite is reachable only from "moved", which itself is only
+  // reachable once two attempts exist. If it could be read earlier the
+  // second attempt would become recitation.
+  if (phase === "rewrite" && latest?.improved_answer) {
+    const isLast = index + 1 >= questions.length;
+    return (
+      <YoursSaidStraight
+        index={index + 1}
+        total={questions.length}
+        rewrite={latest.improved_answer}
+        playing={false}
+        isLastQuestion={isLast}
+        onNext={() => {
+          if (isLast) {
+            setPhase("verdict");
+            return;
+          }
+          setIndex(index + 1);
+          setSeconds(0);
+          setBlob(null);
+          audioRef.current = null;
+          setAnalysisPct(0);
+          setBreathDone(false);
+          setPhase("question");
+        }}
+      />
+    );
+  }
+
+  if (phase === "verdict") {
+    const answers: SessionAnswer[] = questions
+      .filter((q) => q.attempts.length > 0)
+      .map((q) => {
+        const a = q.attempts[q.attempts.length - 1];
+        const f = q.attempts[0];
+        return {
+          attemptCount: q.attempts.length,
+          fillerWords: a.scores?.delivery?.filler_words ?? 0,
+          wordCount: (a.transcript ?? "").trim().split(/\s+/).length,
+          wordsPerMinute: a.scores?.words_per_minute ?? null,
+          substanceFirst: f.scores?.substance?.score ?? null,
+          substanceLast: a.scores?.substance?.score ?? null,
+          hedging: a.scores?.delivery?.hedging ?? [],
+        };
+      });
+
+    const verdict = buildVerdict(answers, questions.length);
+    const before = questions.reduce(
+      (n, q) => n + (q.attempts[0]?.scores?.delivery?.hedging?.length ?? 0),
+      0,
+    );
+    const after = questions.reduce(
+      (n, q) =>
+        n +
+        (q.attempts.length > 1
+          ? (q.attempts[q.attempts.length - 1]?.scores?.delivery?.hedging
+              ?.length ?? 0)
+          : 0),
+      0,
+    );
+
+    return (
+      <SessionVerdict
+        questionCount={questions.length}
+        headline={verdict.headline}
+        body={verdict.body}
+        softenersBefore={before}
+        softenersAfter={after}
+        onLogInterview={() => router.push("/recall")}
+        onBackToPractice={() => router.push("/practice")}
       />
     );
   }
