@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { JobPostForm } from "@/components/job-post-form";
 import { AppHeader } from "@/components/app-header";
 import { SchemaWarning } from "@/components/schema-warning";
+import { HomeRunner } from "@/components/home-runner";
 import { TodaysDrill } from "@/components/todays-drill";
 
 /**
@@ -66,6 +67,18 @@ export default async function PracticePage() {
   const drillDoneToday = runs.some(
     (r) => (r.created_at as string).slice(0, 10) === today,
   );
+
+  /**
+   * The redesigned home owns the whole viewport, like the session
+   * screens, so it cannot sit inside this page's header and container.
+   */
+  if (process.env.EFATA_NEW_SESSION === "true") {
+    return (
+      <div className="h-dvh">
+        <HomeRunner questionCount={3} />
+      </div>
+    );
+  }
 
   return (
     <main className="flex flex-1 flex-col px-6 py-16">

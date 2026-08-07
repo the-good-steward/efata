@@ -25,7 +25,20 @@ export async function createSession(
 ): Promise<SessionState> {
   const jobPost = String(formData.get("job_post") ?? "").trim();
 
-  if (jobPost.length < MIN_JOB_POST) {
+  // Screenshots arrive as files; the model reads the post out of them.
+  const files = formData
+    .getAll("screenshots")
+    .filter((f): f is File => f instanceof File && f.size > 0)
+    .slice(0, 6);
+
+  const images = await Promise.all(
+    files.map(async (file) => ({
+      mediaType: file.type || "image/png",
+      base64: Buffer.from(await file.arrayBuffer()).toString("base64"),
+    })),
+  );
+
+  if (images.length === 0 && jobPost.length < MIN_JOB_POST) {
     return {
       error:
         "That's too short to work from. Paste the full job post, including the responsibilities.",
@@ -60,9 +73,12 @@ export async function createSession(
   // it. Job posts repeat: cross-posted listings, agency templates, and
   // a cohort practising the same role.
   const admin = createAdminClient();
+  // Screenshots are not cached: two people photographing the same post
+  // produce different bytes, so a hit is vanishingly unlikely and the
+  // key would only ever grow.
   const key = cacheKey(jobPost, experienceLevel, englishLevel);
 
-  let generated = await readCache(admin, key);
+  let generated = images.length === 0 ? await readCache(admin, key) : null;
   const cacheHit = Boolean(generated);
 
   // Only a real generation costs money, so only a real generation is
@@ -84,6 +100,7 @@ export async function createSession(
       experienceLevel,
       (roleRows ?? []) as RoleOption[],
       (profile?.custom_role as string | null) ?? null,
+      images,
     );
   } catch (error) {
     await recordFailure({
@@ -95,7 +112,7 @@ export async function createSession(
     return { error: describeGenerationError(error) };
   }
 
-  if (!cacheHit) await writeCache(admin, key, generated);
+  if (!cacheHit && images.length === 0) await writeCache(admin, key, generated);
 
   // maybeSingle, not single: an untagged session is fine, a crash is not.
   const { data: role } = generated.role_slug

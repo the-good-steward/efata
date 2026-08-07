@@ -102,12 +102,15 @@ const LEVEL_GUIDANCE: Record<EnglishLevel, string> = {
  * Throws if the model returns anything that fails validation, so a bad
  * generation never reaches the database.
  */
+export type JobPostImage = { mediaType: string; base64: string };
+
 export async function generateQuestions(
   jobPost: string,
   englishLevel: EnglishLevel,
   experienceLevel: ExperienceLevel = "beginner",
   roles: RoleOption[] = [],
   customRole: string | null = null,
+  images: JobPostImage[] = [],
 ): Promise<GenerationResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set.");
@@ -149,7 +152,29 @@ export async function generateQuestions(
     messages: [
       {
         role: "user",
-        content: `Experience level of the person practising: ${experienceLevel}. ${EXPERIENCE_GUIDANCE[experienceLevel]}
+        content: [
+          /*
+           * Screenshots first, when there are any.
+           *
+           * Job posts circulate as images in Facebook groups far more
+           * than as copyable text, and selecting long text on a phone
+           * is awkward. The model reads the post out of the image, so
+           * nothing downstream needs to know which way it arrived.
+           */
+          ...images.map((image) => ({
+            type: "image" as const,
+            source: {
+              type: "base64" as const,
+              media_type: image.mediaType as
+                | "image/png"
+                | "image/jpeg"
+                | "image/webp",
+              data: image.base64,
+            },
+          })),
+          {
+            type: "text" as const,
+            text: `Experience level of the person practising: ${experienceLevel}. ${EXPERIENCE_GUIDANCE[experienceLevel]}
 
 English level: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
 
@@ -171,8 +196,10 @@ Three with two attempts each is six spoken answers, which is about fifteen minut
 Weight it toward technical because that is where the questions have to be specific to this role. The situational one should be the money question, the one where poor communication costs them income: scope, rate, a deadline, or saying no.
 
 --- JOB POST ---
-${jobPost}
+${jobPost || "(the post is in the images above)"}
 --- END JOB POST ---`,
+          },
+        ],
       },
     ],
     }),
