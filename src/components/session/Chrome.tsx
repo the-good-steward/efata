@@ -25,10 +25,12 @@ export function Screen({
   return (
     <div className={`animate-rise flex h-full min-h-0 flex-col overflow-hidden ${GROUND[ground]}`}>
       {header}
-      <div className="flex min-h-0 flex-1 flex-col justify-center gap-6 px-8 pb-5 md:mx-auto md:w-[800px] md:px-0">
+      <div className="flex min-h-0 flex-1 flex-col justify-center gap-6 px-8 pb-3 md:mx-auto md:w-[800px] md:px-0">
         {children}
       </div>
-      {footer ? <div className="px-6 pb-10 md:mx-auto md:w-[800px] md:px-0 md:pb-14">{footer}</div> : null}
+      {footer ? (
+        <div className="pb-safe px-6 md:mx-auto md:w-[800px] md:px-0">{footer}</div>
+      ) : null}
     </div>
   );
 }
@@ -48,7 +50,7 @@ export function Primary({ label, onClick, dusk = false }: { label: string; onCli
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-full px-14 py-[18px] text-[17px] font-semibold ${
+      className={`w-full rounded-full px-8 py-4 text-[17px] font-semibold ${
         dusk ? "bg-paper text-ink" : "bg-ink text-paper"
       }`}
     >
@@ -62,7 +64,7 @@ export function Secondary({ label, onClick, dusk = false }: { label: string; onC
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-full border px-14 py-[17px] text-[17px] font-medium ${
+      className={`w-full rounded-full border px-8 py-[15px] text-[17px] font-medium ${
         dusk ? "border-sea-dusk text-sea-dusk" : "border-edge text-ink"
       }`}
     >
@@ -73,7 +75,7 @@ export function Secondary({ label, onClick, dusk = false }: { label: string; onC
 
 export function Quiet({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="w-full px-6 py-4 text-[16px] font-medium text-ink-3">
+    <button type="button" onClick={onClick} className="w-full px-6 py-3 text-[16px] font-medium text-ink-3">
       {label}
     </button>
   );

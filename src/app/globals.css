@@ -260,3 +260,21 @@ a.inline {
     opacity: 0.5;
   }
 }
+
+/*
+ * Footer padding that respects the phone's own bottom bar.
+ *
+ * A fixed 40px sat too low: on a phone the browser chrome and the home
+ * indicator already take space below the viewport, so the button ended
+ * up floating well clear of the content it belongs to. This gives it a
+ * modest gap and adds only whatever the device actually reserves.
+ */
+.pb-safe {
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .pb-safe {
+    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}

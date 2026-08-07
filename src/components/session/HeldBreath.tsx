@@ -26,7 +26,7 @@ export default function HeldBreath({
           <p className="text-[16px] tracking-[0.04em] text-dusk-3">{caption}</p>
         </div>
       </div>
-      <p className="absolute inset-x-0 bottom-11 text-center text-[15px] text-dusk-faint">
+      <p className="absolute inset-x-0 bottom-8 text-center text-[15px] text-dusk-faint">
         Recording starts on its own
       </p>
     </Screen>
