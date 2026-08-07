@@ -14,6 +14,7 @@ const PUBLIC_ROUTES = [
   "/auth/error",
   "/forgot",
   "/design-check",
+  "/env-check",
   // The recovery link lands here with a session, but the proxy runs
   // before that session is established on the very first request.
   "/auth/reset",
