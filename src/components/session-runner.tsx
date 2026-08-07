@@ -58,6 +58,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
   const [playing, setPlaying] = useState(false);
   const [analysisPct, setAnalysisPct] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [breathDone, setBreathDone] = useState(false);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -68,11 +69,12 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
   const latest = attempts[attempts.length - 1];
   const attemptNumber = (attempts.length + 1) as 1 | 2;
 
-  // The breath is exactly five seconds, then recording begins on its
-  // own. Nothing announces it, which is the point.
+  // The breath is five seconds of nothing being asked of them. When it
+  // finishes the action appears, and they open the microphone
+  // themselves rather than being caught mid-thought.
   useEffect(() => {
     if (phase !== "breath") return;
-    const timer = setTimeout(() => setPhase("recording"), BREATH_MS);
+    const timer = setTimeout(() => setBreathDone(true), BREATH_MS);
     return () => clearTimeout(timer);
   }, [phase]);
 
@@ -178,6 +180,8 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
     return (
       <HeldBreath
         question={question.body}
+        ready={breathDone}
+        onStart={() => setPhase("recording")}
         caption={
           attemptNumber === 2 && latest?.scores?.one_thing
             ? latest.scores.one_thing
@@ -226,6 +230,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
           setBlob(null);
           audioRef.current = null;
           setAnalysisPct(0);
+          setBreathDone(false);
           setPhase("breath");
         }}
         onContinue={() => setPhase("transcript")}
@@ -275,6 +280,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
         onReady={() => {
           setError(null);
           setSeconds(0);
+          setBreathDone(false);
           setPhase("breath");
         }}
         onLeave={() => router.push(`/practice`)}

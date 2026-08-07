@@ -30,7 +30,7 @@ export default function DesignCheck() {
         />
       </div>
       <div className="relative h-dvh">
-        <HeldBreath question={QUESTION} />
+        <HeldBreath question={QUESTION} ready />
       </div>
       <div className="h-dvh">
         <Recording question={QUESTION} elapsedSeconds={47} />

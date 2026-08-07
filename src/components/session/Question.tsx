@@ -25,7 +25,9 @@ export default function Question({
       header={<SessionBar index={index} total={total} onClose={onLeave} />}
       footer={
         <div className="flex flex-col items-center gap-4">
-          <span className="text-[15px] text-ink-3">Aim for 60 to 90 seconds</span>
+          <span className="text-[15px] text-ink-3">
+            A moment to gather yourself first
+          </span>
           <Primary label="I'm ready" onClick={onReady} />
         </div>
       }
