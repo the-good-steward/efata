@@ -1,28 +1,59 @@
 @import "tailwindcss";
 
 /*
- * Efata theme.
+ * Efata theme, from the design export.
  *
- * Paper is the ground. Dusk is held back for the two moments when
- * someone is actually speaking — the held breath and the recording — so
- * a dark screen means "your turn" and nothing else.
+ * Paper is the ground. Dusk is held back for the two screens where
+ * someone is actually speaking, so a dark screen means "your turn" and
+ * nothing else.
+ *
+ * The legacy aliases below keep the screens that have not been rebuilt
+ * yet rendering correctly. They go as each one is ported.
  */
 @theme {
-  /* Paper: everything except speaking */
-  --color-ground: #f5f1e8;
-  --color-quiet: #f0ebdf;
-  --color-raised: #ede7da;
-  --color-hairline: #e2daca;
-  --color-track: #e7e0d0;
-  --color-edge: #d8d0be;
+  /* --- Paper: the ground for every screen except the two speaking ones --- */
+  --color-paper:        #F5F1E8;
+  --color-paper-quiet:  #F0EBDF;  /* the rewrite screen */
+  --color-card:         #EDE7DA;  /* raised card */
+  --color-track:        #E7E0D0;  /* progress + player track */
+  --color-hairline:     #E2DACA;  /* divider rules */
+  --color-edge:         #D8D0BE;  /* input, chip and button borders */
+  --color-clay-edge:    #E4D3C8;  /* border on a clay chip */
 
-  --color-ink: #1c2b33;
-  --color-ink-2: #46545c;
-  --color-ink-3: #4f5d57;
+  /* --- Ink on paper --- */
+  --color-ink:          #1C2B33;  /* primary text, primary button fill */
+  --color-ink-2:        #46545C;  /* secondary text */
+  --color-ink-3:        #4F5D57;  /* captions, labels, tertiary */
 
-  --color-seaglass: #275f61;
-  --color-clay: #8e4a38;
-  --color-lamp: #8a5e1f;
+  /* --- Accents on paper --- */
+  --color-sea:          #275F61;  /* the user's own voice, only */
+  --color-clay:         #8E4A38;  /* a flagged hedge, only */
+  --color-lamp:         #8A5E1F;  /* progress, only — never a CTA */
+
+  /* --- Dusk: held breath and recording only --- */
+  --color-dusk:         #1C2B33;
+  --color-dusk-deep:    #16232A;
+  --color-dusk-track:   #233139;
+  --color-dusk-line:    #2A3B45;
+  --color-dusk-edge:    #33454F;
+  --color-dusk-faint:   #4E5C64;
+  --color-dusk-3:       #7E8D95;
+  --color-dusk-2:       #9DACB4;
+  --color-dusk-1:       #B9C4C9;
+  --color-sea-dusk:     #8FAFAE;
+  --color-clay-dusk:    #D08E74;
+
+  /* --- Scrim behind the hedge sheet --- */
+  --color-scrim:        rgb(28 43 51 / 0.42);
+
+  /* --- Type --- */
+  --font-serif: "Source Serif 4", Georgia, serif;   /* questions, transcripts, the rewrite */
+  --font-sans:  "Work Sans", system-ui, sans-serif; /* body, UI, numbers */
+
+  /* --- Motion --- */
+  --animate-rise:   rise .55s cubic-bezier(.22,.61,.36,1) both;
+  --animate-breath: breath 5s cubic-bezier(.4,0,.2,1) forwards;
+  --animate-alive:  alive 2.4s ease-in-out infinite;
 
   /* Night: the held breath and the recording, and nowhere else */
   --color-night: #1c2b33;
@@ -46,8 +77,15 @@
    *
    * These go as the screens are rebuilt.
    */
-  --color-paper: #1c2b33;
-  --color-dusk: #f5f1e8;
+  /*
+   * Names the rebuilt components already use, pointing at the design
+   * tokens rather than redefining them. 'paper' and 'dusk' are the
+   * design's own names now and must not be overridden here.
+   */
+  --color-ground: #F5F1E8;
+  --color-quiet: #F0EBDF;
+  --color-raised: #EDE7DA;
+  --color-seaglass: #275F61;
   --color-parchment: #1c2b33;
   --color-paper-soft: #46545c;
   --color-muted: #4f5d57;
@@ -64,10 +102,31 @@
   --radius-field: 12px;
   --radius-card: 16px;
   --radius-sheet: 18px;
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes breath {
+    from { transform: scaleX(.06); opacity: .5; }
+    to   { transform: scaleX(1);   opacity: 1; }
+  }
+  @keyframes alive {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .35; }
+  }
 }
 
+/* The five seconds still has to pass — hold the full line instead of growing it. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise   { animation: none; }
+  .animate-breath { animation: none; transform: scaleX(1); }
+  .animate-alive  { animation: none; }
+}
+
+
 body {
-  background: var(--color-ground);
+  background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 17px;
