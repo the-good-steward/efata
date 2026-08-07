@@ -1,69 +1,58 @@
 /**
- * Days practised in the last fourteen.
+ * Days practised out of the last fourteen.
  *
- * Deliberately not a streak. A streak resets to zero on a missed day,
- * and for most people that is the moment they stop altogether, which
- * means the thing that brought them back becomes the reason they quit.
- * It also sits badly in an app that never grades anyone: a red zero
- * would be the one place it says you failed.
+ * Deliberately not a streak. A streak works by loss aversion, and its
+ * failure mode is that missing one day resets it to zero, which is
+ * usually the moment someone stops altogether. That is a poor fit for
+ * an app whose whole design avoids telling anyone they failed, used by
+ * people who already underrate themselves.
  *
- * This drifts instead of collapsing. Coming back on day three is as
- * easy as coming back on day one, and someone practising five days a
- * week forever is shown as consistent rather than as repeatedly
- * failing.
+ * This drifts instead of collapsing, so returning on day three is as
+ * easy as returning on day one, and someone who practises five days a
+ * week forever is shown a real habit rather than a broken counter.
  */
 export type PracticeDays = {
-  /** Distinct days with at least one answer, within the window. */
-  days: number;
+  daysPractised: number;
   window: number;
-  /** Whether today already counts. */
-  today: boolean;
-  /** One line describing the pattern, in the app's voice. */
+  practisedToday: boolean;
+  /** Oldest first, for a small fourteen day strip. */
+  days: { date: string; practised: boolean }[];
   note: string;
-  /** Oldest first, for a small strip of marks. */
-  marks: boolean[];
 };
 
 const WINDOW = 14;
 
-function dayKey(iso: string): string {
-  return iso.slice(0, 10);
-}
-
 export function buildPracticeDays(
-  answeredAt: string[],
+  timestamps: string[],
   now = new Date(),
 ): PracticeDays {
-  const practised = new Set(answeredAt.map(dayKey));
+  const practised = new Set(timestamps.map((t) => t.slice(0, 10)));
 
-  const marks: boolean[] = [];
+  const days: { date: string; practised: boolean }[] = [];
   for (let i = WINDOW - 1; i >= 0; i--) {
     const d = new Date(now);
     d.setUTCDate(d.getUTCDate() - i);
-    marks.push(practised.has(d.toISOString().slice(0, 10)));
+    const key = d.toISOString().slice(0, 10);
+    days.push({ date: key, practised: practised.has(key) });
   }
 
-  const days = marks.filter(Boolean).length;
-  const today = marks[marks.length - 1];
+  const count = days.filter((d) => d.practised).length;
+  const today = days[days.length - 1].practised;
 
-  let note: string;
-  if (days === 0) {
-    note = "Nothing yet. One drill takes about three minutes.";
-  } else if (days === 1) {
-    note = today
-      ? "First one done. Coming back tomorrow is the whole trick."
-      : "One day so far. Pick it up again today and it starts to add up.";
-  } else if (days >= 10) {
-    note = "That is close to daily. This is the point where people notice the change on real calls.";
-  } else if (days >= 5) {
-    note = today
-      ? "Steady. Most weeks with a few days in them beat one heavy week."
-      : "Steady so far. Today would keep it going.";
-  } else {
-    note = today
-      ? "Building. A few minutes on more days beats an hour on one."
-      : "A few days in. Today is worth three minutes.";
-  }
+  return {
+    daysPractised: count,
+    window: WINDOW,
+    practisedToday: today,
+    days,
+    note: noteFor(count, today),
+  };
+}
 
-  return { days, window: WINDOW, today, note, marks };
+function noteFor(count: number, today: boolean): string {
+  if (count === 0) return "Nothing yet. One drill takes about three minutes.";
+  if (count === 1) return "One day in. The second is the one that matters.";
+  if (count >= 12) return "Near enough every day. This is a habit now.";
+  if (count >= 7) return "More days than not. That is the part that compounds.";
+  if (today) return "Today is done. Come back tomorrow.";
+  return "Pick it up again today and the number moves.";
 }

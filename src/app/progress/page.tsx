@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
 import { buildProgress, type AttemptPoint } from "@/lib/progress";
 import { buildPracticeDays } from "@/lib/practice-days";
-import { PracticeDaysStrip } from "@/components/practice-days-strip";
+import { PracticeDaysStrip } from "@/components/practice-days";
 
 export const metadata = { title: "Progress · Efata" };
 

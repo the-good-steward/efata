@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
 import { DrillCard } from "@/components/drill-card";
-import { PracticeDaysStrip } from "@/components/practice-days-strip";
+import { PracticeDaysStrip } from "@/components/practice-days";
 import { buildPracticeDays } from "@/lib/practice-days";
 
 export const metadata = { title: "Today's drill · Efata" };
