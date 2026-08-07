@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
 import { buildProgress, type AttemptPoint } from "@/lib/progress";
+import { buildPracticeDays } from "@/lib/practice-days";
+import { PracticeDaysStrip } from "@/components/practice-days-strip";
 
 export const metadata = { title: "Progress · Efata" };
 
@@ -146,6 +148,7 @@ export default async function ProgressPage() {
   });
 
   const p = buildProgress(points);
+  const practiceDays = buildPracticeDays(points.map((x) => x.createdAt));
 
   const fillerNow = p.fillersPer100.recent ?? p.fillersPer100.series.at(-1) ?? null;
   const paceNow = p.pace.recent ?? p.pace.series.at(-1) ?? null;
@@ -178,7 +181,11 @@ export default async function ProgressPage() {
           </p>
         ) : (
           <>
-            <div className="mt-6 flex gap-3">
+            <div className="mt-6">
+              <PracticeDaysStrip data={practiceDays} />
+            </div>
+
+            <div className="mt-4 flex gap-3">
               <Stat value={String(p.answers)} label="answers" />
               <Stat value={String(p.questionsPractised)} label="questions" />
               {p.retriesTaken > 0 && (

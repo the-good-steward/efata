@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
 import { DrillCard } from "@/components/drill-card";
+import { PracticeDaysStrip } from "@/components/practice-days-strip";
+import { buildPracticeDays } from "@/lib/practice-days";
 
 export const metadata = { title: "Today's drill · Efata" };
 export const maxDuration = 60;
@@ -14,14 +16,26 @@ export default async function DrillPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: drills }, { data: runs }] = await Promise.all([
-    supabase.from("drills").select("id, move, why, prompt, rubric"),
-    supabase
-      .from("drill_runs")
-      .select("drill_id, created_at")
-      .order("created_at", { ascending: false })
-      .limit(50),
-  ]);
+  const [{ data: drills }, { data: runs }, { data: answered }] =
+    await Promise.all([
+      supabase.from("drills").select("id, move, why, prompt, rubric"),
+      supabase
+        .from("drill_runs")
+        .select("drill_id, created_at")
+        .order("created_at", { ascending: false })
+        .limit(50),
+      // Days counted from answers rather than drills started, so
+      // opening a drill and not speaking does not count as practice.
+      supabase
+        .from("attempts")
+        .select("created_at")
+        .order("created_at", { ascending: false })
+        .limit(200),
+    ]);
+
+  const practiceDays = buildPracticeDays(
+    (answered ?? []).map((a) => a.created_at as string),
+  );
 
   const all = drills ?? [];
   const done = runs ?? [];
@@ -46,7 +60,9 @@ export default async function DrillPage() {
       <div className="mx-auto w-full max-w-md">
         <AppHeader email={user.email} />
 
-        <p className="ef-label text-ink-3">Today&rsquo;s drill</p>
+        <PracticeDaysStrip data={practiceDays} />
+
+        <p className="ef-label text-ink-3 mt-10">Today&rsquo;s drill</p>
 
         {!drill ? (
           <p className="ef-body text-ink-2 mt-4">
