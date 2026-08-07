@@ -8,7 +8,11 @@ import {
   countFillers,
   scriptOverlap,
 } from "@/lib/transcribe";
-import { evaluateAnswer, type Rubric } from "@/lib/evaluation/evaluate";
+import {
+  evaluateAnswer,
+  currentEvalModel,
+  type Rubric,
+} from "@/lib/evaluation/evaluate";
 import { checkAnswerLimit, type Tier } from "@/lib/limits";
 import { recordFailure } from "@/lib/failures";
 
@@ -136,6 +140,9 @@ export async function submitAnswer(
       audio_path: uploadError ? null : path,
       transcript: transcript.text,
       scores: {
+        // Which model judged this, so the two can be compared later
+        // from the data rather than from memory.
+        eval_model: currentEvalModel(),
         script_overlap: previousRewrite
           ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
           : null,
@@ -226,6 +233,9 @@ export async function submitAnswer(
       feedback: result.feedback,
       improved_answer: result.improved_answer,
       scores: {
+        // Which model judged this, so the two can be compared later
+        // from the data rather than from memory.
+        eval_model: currentEvalModel(),
         script_overlap: previousRewrite
           ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
           : null,

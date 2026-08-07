@@ -2,7 +2,32 @@ import Anthropic from "@anthropic-ai/sdk";
 import { evaluation, type Evaluation } from "./schema";
 import { withRetry } from "@/lib/retry";
 
-const MODEL = "claude-sonnet-5";
+/**
+ * Which model scores an answer.
+ *
+ * Set EFATA_CHEAP_EVAL=true to use the faster, cheaper model. It is a
+ * switch rather than a swap so the two can be compared on real answers
+ * instead of argued about: run a few with it off, a few with it on,
+ * and read the difference.
+ *
+ * What cannot change either way: filler counts, words per minute and
+ * which phrases are marked in the transcript. Those are computed in
+ * code, not written by a model, so the numbers are identical.
+ *
+ * What might change: how the delivery sentence reads. A weaker model
+ * tends toward "your pace was steady but you hedged several times"
+ * where the current one writes "you knew your number and then took it
+ * back three times in one breath". The second is the product.
+ *
+ * Technical judgement and the rewrite are the parts worth paying for,
+ * so if the cheap model dulls them, this is not worth the saving.
+ */
+const FULL_MODEL = "claude-sonnet-5";
+const CHEAP_MODEL = "claude-haiku-4-5-20251001";
+
+function modelFor(): string {
+  return process.env.EFATA_CHEAP_EVAL === "true" ? CHEAP_MODEL : FULL_MODEL;
+}
 
 export type Rubric = "star" | "situational" | "technical";
 
@@ -124,6 +149,11 @@ LENGTH
 Return ONLY valid JSON, no markdown fences and no commentary:
 {"substance":{"score":1-5,"strengths":["..."],"gaps":["..."]},"delivery":{"score":1-5,"filler_words":0,"hedging":["..."],"pace_note":"..."},"feedback":"two or three sentences spoken directly to them","one_thing":"the single most valuable change for their retry","improved_answer":"the exact words to say, first person, no advice"}`;
 
+/** Exposed so an attempt can record which model judged it. */
+export function currentEvalModel(): string {
+  return modelFor();
+}
+
 export async function evaluateAnswer(params: {
   question: string;
   /** For a drill: the one habit being practised. */
@@ -196,7 +226,7 @@ They rebuilt the answer in their own words rather than repeating our rewrite. If
 
   const message = await withRetry("evaluation", () =>
     client.messages.create({
-    model: MODEL,
+    model: modelFor(),
     max_tokens: 8000,
     // Search only for technical answers, where there is a factual claim
     // worth checking and the reference criteria were not researched at
