@@ -45,6 +45,35 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
 
   return (
     <form action={formAction} className="mt-10 flex flex-col gap-12">
+      <section className="border-hairline border-b pb-10">
+        <p className="ef-label text-ink-3">How Efata works</p>
+
+        <div className="mt-5 flex flex-col gap-6">
+          <div>
+            <p className="font-serif text-ink text-[19px]">Practice sessions</p>
+            <p className="ef-body text-ink-2 mt-1">
+              Paste a job post you are applying for. Efata builds the questions
+              you are likely to face, you answer them out loud, and it shows you
+              how you came across.
+            </p>
+          </div>
+
+          <div>
+            <p className="font-serif text-ink text-[19px]">Daily drills</p>
+            <p className="ef-body text-ink-2 mt-1">
+              One question and one habit, about three minutes. Saying the number
+              and stopping. Cutting the apology. A session teaches you about one
+              job; a drill builds something you keep.
+            </p>
+          </div>
+        </div>
+
+        <p className="ef-caption text-ink-3 mt-5">
+          Sessions are the deep work, drills are the daily habit. Most people
+          get further with both than with either.
+        </p>
+      </section>
+
       <fieldset>
         <legend className="text-ink font-display text-xl">
           What kind of work are you going for?

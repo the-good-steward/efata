@@ -18,11 +18,40 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * so charging it against a quota punishes the case we most want.
  */
 export const LIMITS = {
-  free: { sessionsPerDay: 8, answersPerDay: 60 },
-  paid: { sessionsPerDay: 25, answersPerDay: 200 },
+  /**
+   * Two features, limited differently on purpose.
+   *
+   * A session is the thing people want and the expensive thing to
+   * give, so it is rationed. A drill costs about a seventh as much and
+   * is the daily habit, so it is available every day at both tiers.
+   *
+   * One drill a day rather than several: the point is returning
+   * tomorrow, not doing ten today, and a drill you can repeat endlessly
+   * stops being a daily thing.
+   */
+  free: { sessionsPerWeek: 1, drillsPerDay: 1, answersPerDay: 20 },
+  paid: { sessionsPerMonth: 15, drillsPerDay: 1, answersPerDay: 80 },
 } as const;
 
 export type Tier = keyof typeof LIMITS;
+
+function startOfWeekUtc(): string {
+  const now = new Date();
+  const day = now.getUTCDay();
+  // Monday as the first day, so a week does not reset mid-weekend.
+  const back = (day + 6) % 7;
+  const monday = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - back),
+  );
+  return monday.toISOString();
+}
+
+function startOfMonthUtc(): string {
+  const now = new Date();
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+  ).toISOString();
+}
 
 function startOfDayUtc(): string {
   const now = new Date();
@@ -56,27 +85,60 @@ export async function checkSessionLimit(
 ): Promise<LimitCheck> {
   if (limitsDisabled()) return { allowed: true };
 
+  const since = tier === "free" ? startOfWeekUtc() : startOfMonthUtc();
+
   const { count, error } = await supabase
     .from("sessions")
     .select("id", { count: "exact", head: true })
     .eq("user_id", userId)
-    .gte("created_at", startOfDayUtc());
+    .gte("created_at", since);
 
-  // Fail open on a counting error: blocking a paying user because a
-  // count query failed is worse than the cost of one extra session.
+  // Fail open on a counting error: blocking a real user because a
+  // count query failed is worse than one extra session.
   if (error) {
     console.error("Session limit check failed:", error);
     return { allowed: true };
   }
 
-  const cap = LIMITS[tier].sessionsPerDay;
+  const cap =
+    tier === "free"
+      ? LIMITS.free.sessionsPerWeek
+      : LIMITS.paid.sessionsPerMonth;
+
   if ((count ?? 0) >= cap) {
     return {
       allowed: false,
       message:
         tier === "free"
- ? `That's ${cap} new sets today. Practise the ones you already have, a second run at the same question does more than a fresh set.`
-          : `That's ${cap} sets today. Come back tomorrow.`,
+          ? "That is this week's session. A drill is waiting today, and a new session opens on Monday."
+          : `That is ${cap} sessions this month. Drills carry on daily.`,
+    };
+  }
+  return { allowed: true };
+}
+
+export async function checkDrillLimit(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<LimitCheck> {
+  if (limitsDisabled()) return { allowed: true };
+
+  const { count, error } = await supabase
+    .from("drill_runs")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", startOfDayUtc());
+
+  if (error) {
+    console.error("Drill limit check failed:", error);
+    return { allowed: true };
+  }
+
+  if ((count ?? 0) >= LIMITS.free.drillsPerDay) {
+    return {
+      allowed: false,
+      message:
+        "That is today's drill. Come back tomorrow, or start a practice session.",
     };
   }
   return { allowed: true };

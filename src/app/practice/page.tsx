@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { JobPostForm } from "@/components/job-post-form";
 import { AppHeader } from "@/components/app-header";
 import { SchemaWarning } from "@/components/schema-warning";
+import { TodaysDrill } from "@/components/todays-drill";
 
 /**
  * Server Actions inherit this page's limit, and generation runs web searches and takes up to a minute.
@@ -27,7 +28,12 @@ export default async function PracticePage() {
   // Run together rather than one after another. These were three
   // sequential round trips to Supabase, which is most of why a tap on
   // the navigation felt slow.
-  const [{ data: profile }, { data: sessions }] = await Promise.all([
+  const [
+    { data: profile },
+    { data: sessions },
+    { data: drills },
+    { data: drillRuns },
+  ] = await Promise.all([
     supabase
       .from("profiles")
       .select("onboarded_at")
@@ -38,9 +44,28 @@ export default async function PracticePage() {
       .select("id, title, created_at")
       .order("created_at", { ascending: false })
       .limit(10),
+    supabase.from("drills").select("id, move, why").limit(20),
+    supabase
+      .from("drill_runs")
+      .select("drill_id, created_at")
+      .order("created_at", { ascending: false })
+      .limit(50),
   ]);
 
   if (profile && !profile.onboarded_at) redirect("/onboarding");
+
+  const allDrills = drills ?? [];
+  const runs = drillRuns ?? [];
+  const seen = new Set(runs.map((r) => r.drill_id as string));
+  const unseen = allDrills.filter((d) => !seen.has(d.id));
+  const pool = unseen.length > 0 ? unseen : allDrills;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const seed = [...today].reduce((n, c) => n + c.charCodeAt(0), 0);
+  const drill = pool.length > 0 ? pool[seed % pool.length] : null;
+  const drillDoneToday = runs.some(
+    (r) => (r.created_at as string).slice(0, 10) === today,
+  );
 
   return (
     <main className="flex flex-1 flex-col px-6 py-16">
@@ -67,6 +92,17 @@ export default async function PracticePage() {
             A rehearsal, not a prediction.
           </p>
         </div>
+
+        {drill && (
+          <div className="mt-12">
+            <TodaysDrill
+              id={drill.id}
+              move={drill.move}
+              why={drill.why}
+              doneToday={drillDoneToday}
+            />
+          </div>
+        )}
 
         {sessions && sessions.length > 0 && (
           <div className="border-hairline mt-16 border-t pt-10">

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { recordFailure } from "@/lib/failures";
+import { checkDrillLimit } from "@/lib/limits";
 
 export type DrillState = { error?: string };
 
@@ -31,6 +32,9 @@ export async function startDrill(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const limit = await checkDrillLimit(supabase, user.id);
+  if (!limit.allowed) return { error: limit.message };
 
   const { data: drill } = await supabase
     .from("drills")
