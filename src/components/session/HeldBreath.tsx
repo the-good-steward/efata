@@ -26,7 +26,12 @@ export default function HeldBreath({
       ground="dusk-deep"
       footer={
         ready ? (
-          <Primary label="Start recording" dusk onClick={onStart} />
+          <div className="flex flex-col gap-3">
+            <Primary label="Start recording" dusk onClick={onStart} />
+            <p className="text-center text-[14px] text-dusk-faint">
+              The screen changes and a dot appears when it is live
+            </p>
+          </div>
         ) : undefined
       }
     >
