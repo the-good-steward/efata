@@ -6,6 +6,8 @@
  * transcript that mangles their words produces feedback about mistakes
  * they did not make, which is worse than no feedback.
  */
+import { withRetry } from "@/lib/retry";
+
 export type Transcript = {
   text: string;
   durationSeconds: number;
@@ -28,24 +30,33 @@ export async function transcribeAudio(
     language: "en",
   });
 
-  const response = await fetch(
-    `https://api.deepgram.com/v1/listen?${params.toString()}`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${apiKey}`,
-        "Content-Type": mimeType,
+  const response = await withRetry("transcription", async () => {
+    const res = await fetch(
+      `https://api.deepgram.com/v1/listen?${params.toString()}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${apiKey}`,
+          "Content-Type": mimeType,
+        },
+        body: audio,
       },
-      body: audio,
-    },
-  );
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(
-      `Transcription failed (${response.status}): ${detail.slice(0, 300)}`,
     );
-  }
+
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      // Carrying the status lets the retry helper tell a busy service
+      // from a rejected key.
+      throw Object.assign(
+        new Error(
+          `Transcription failed (${res.status}): ${detail.slice(0, 300)}`,
+        ),
+        { status: res.status },
+      );
+    }
+
+    return res;
+  });
 
   const data = await response.json();
   const alternative = data?.results?.channels?.[0]?.alternatives?.[0];

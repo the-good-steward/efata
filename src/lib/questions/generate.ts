@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generationResult, type GenerationResult } from "./schema";
+import { withRetry } from "@/lib/retry";
 
 // Must be a valid Claude API model string. Verify against
 // https://platform.claude.com/docs/en/about-claude/models/overview
@@ -126,7 +127,8 @@ export async function generateQuestions(
 
   const client = new Anthropic({ apiKey });
 
-  const message = await client.messages.create({
+  const message = await withRetry("generation", () =>
+    client.messages.create({
     model: MODEL,
     // Grounds the questions in what employers and clients actually ask
     // for this role, instead of the model recalling the genre from
@@ -171,7 +173,8 @@ ${jobPost}
 --- END JOB POST ---`,
       },
     ],
-  });
+    }),
+  );
 
   const textBlocks = message.content
     .filter((block): block is Anthropic.TextBlock => block.type === "text")

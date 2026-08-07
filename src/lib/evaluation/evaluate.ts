@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { evaluation, type Evaluation } from "./schema";
+import { withRetry } from "@/lib/retry";
 
 const MODEL = "claude-sonnet-5";
 
@@ -193,7 +194,8 @@ They rebuilt the answer in their own words rather than repeating our rewrite. If
 
   const client = new Anthropic({ apiKey });
 
-  const message = await client.messages.create({
+  const message = await withRetry("evaluation", () =>
+    client.messages.create({
     model: MODEL,
     max_tokens: 8000,
     // Search only for technical answers, where there is a factual claim
@@ -255,7 +257,8 @@ THEIR SPOKEN ANSWER (transcript, filler words preserved)
 Spoke for ${Math.round(params.durationSeconds)} seconds, ${words} words, about ${wpm} words per minute.`,
       },
     ],
-  });
+    }),
+  );
 
   // With search enabled the model narrates between searches and the
   // JSON arrives last, so joining every block and grabbing the
