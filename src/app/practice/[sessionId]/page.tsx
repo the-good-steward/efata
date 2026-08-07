@@ -5,6 +5,7 @@ import {
   PracticeRunner,
   type RunnerQuestion,
 } from "@/components/practice-runner";
+import { SessionRunner } from "@/components/session-runner";
 
 /**
  * Server Actions inherit this page's limit, and transcription plus evaluation for each answer.
@@ -97,6 +98,22 @@ export default async function SessionPage({
           scores: a.scores as RunnerQuestion["attempts"][number]["scores"],
         })),
     }));
+
+  /**
+   * The new session owns the whole viewport.
+   *
+   * Its screens are full-height and pin their own footer, so they
+   * cannot sit inside this page's header and container. Behind a switch
+   * until the feedback screens are wired too, so nobody is moved
+   * mid-session.
+   */
+  if (process.env.EFATA_NEW_SESSION === "true") {
+    return (
+      <div className="h-dvh">
+        <SessionRunner questions={questions} />
+      </div>
+    );
+  }
 
   return (
     <main className="flex flex-1 flex-col px-6 py-12">
