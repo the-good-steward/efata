@@ -77,7 +77,25 @@ export const evaluation = z.object({
     pace_note: z.union([z.string(), z.null()]).optional().transform((v) => (v ?? "").trim().slice(0, 300)),
   }),
   // Spoken directly to the person.
-  feedback: z.string().min(20).transform((v) => undash(v.trim())),
+  /**
+   * Trimmed to roughly sixty words if it runs long.
+   *
+   * The prompt asks for it; this stops an overrun landing on a phone
+   * screen it cannot fit, where it used to collide with the header and
+   * the action.
+   */
+  feedback: z
+    .string()
+    .min(20)
+    .transform((v) => {
+      const clean = undash(v.trim());
+      const words = clean.split(/\s+/);
+      if (words.length <= 70) return clean;
+      // Cut at the last sentence that fits, rather than mid-thought.
+      const truncated = words.slice(0, 70).join(" ");
+      const lastStop = truncated.lastIndexOf(".");
+      return lastStop > 60 ? truncated.slice(0, lastStop + 1) : truncated + "…";
+    }),
   // The single most valuable change for the retry.
   one_thing: capped(400),
   // Their own answer, restructured. Same facts, same story, tightened.

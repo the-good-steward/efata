@@ -23,13 +23,29 @@ export function Screen({
   children: ReactNode;
 }) {
   return (
-    <div className={`animate-rise flex h-full min-h-0 flex-col overflow-hidden ${GROUND[ground]}`}>
+    <div className={`animate-rise flex h-full min-h-0 flex-col ${GROUND[ground]}`}>
       {header}
-      <div className="flex min-h-0 flex-1 flex-col justify-center gap-6 px-8 pb-3 md:mx-auto md:w-[800px] md:px-0">
-        {children}
+      {/*
+        Centred when it fits, scrollable when it does not.
+        The rule was that nothing scrolls, and for a question that
+        holds. But a written read runs to eighty or ninety words on a
+        small phone, and with the body fixed it overflowed into the
+        header and the footer instead. Content that cannot fit has to
+        go somewhere, and a scrollable middle with the header and
+        action still pinned is far better than text sitting on top of
+        other text.
+      */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <div className="my-auto flex flex-col gap-6 px-8 py-4 md:mx-auto md:w-[800px] md:px-0">
+          {children}
+        </div>
       </div>
       {footer ? (
-        <div className="pb-safe px-6 md:mx-auto md:w-[800px] md:px-0">{footer}</div>
+        <div
+          className={`pb-safe shrink-0 px-6 pt-4 md:mx-auto md:w-[800px] md:px-0 ${GROUND[ground]}`}
+        >
+          {footer}
+        </div>
       ) : null}
     </div>
   );
