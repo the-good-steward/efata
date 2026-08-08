@@ -25,6 +25,16 @@ export function AppNav({ email }: { email?: string | null }) {
   const [startOpen, setStartOpen] = useState(false);
   const pathname = usePathname();
 
+  /*
+   * Hidden where its own actions already fill the screen.
+   *
+   * On the practice page the primary button starts a session, and the
+   * drill card sits below it. A floating button offering both is
+   * clutter there, and it was landing directly on top of the primary
+   * action in the same dark fill.
+   */
+  const startHidden = pathname === "/practice" || pathname === "/drill";
+
   return (
     <>
       <header className="flex items-center justify-between px-5 py-5">
@@ -109,36 +119,50 @@ export function AppNav({ email }: { email?: string | null }) {
         wherever they are, rather than requiring a trip back to a home
         page first.
       */}
-      <div className="fixed right-5 bottom-6 z-20 flex flex-col items-end gap-3">
-        {startOpen && (
-          <>
-            <Link
-              href="/practice"
-              onClick={() => setStartOpen(false)}
-              className="bg-paper border-edge text-ink rounded-full border px-5 py-3.5 text-[16px] font-medium shadow-sm"
-            >
-              Practice session
-            </Link>
-            <Link
-              href="/drill"
-              onClick={() => setStartOpen(false)}
-              className="bg-paper border-edge text-ink rounded-full border px-5 py-3.5 text-[16px] font-medium shadow-sm"
-            >
-              Daily drill
-            </Link>
-          </>
-        )}
+      {!startHidden && (
+        <div className="fixed right-5 bottom-6 z-20 flex flex-col items-end gap-3">
+          {startOpen && (
+            <>
+              <Link
+                href="/practice"
+                onClick={() => setStartOpen(false)}
+                className="bg-paper border-edge text-ink animate-rise rounded-full border px-5 py-3.5 text-[16px] font-medium shadow-sm"
+              >
+                Practice session
+              </Link>
+              <Link
+                href="/drill"
+                onClick={() => setStartOpen(false)}
+                className="bg-paper border-edge text-ink animate-rise rounded-full border px-5 py-3.5 text-[16px] font-medium shadow-sm"
+              >
+                Daily drill
+              </Link>
+            </>
+          )}
 
-        <button
-          type="button"
-          onClick={() => setStartOpen((o) => !o)}
-          aria-expanded={startOpen}
-          aria-label={startOpen ? "Close" : "Start something"}
-          className="bg-ink text-paper flex size-14 items-center justify-center rounded-full text-[26px] leading-none shadow-md"
-        >
-          {startOpen ? "✕" : "+"}
-        </button>
-      </div>
+          {/*
+            Sea glass rather than ink, so it never sits invisibly on top
+            of a primary button, and the mark rather than a plus, which
+            says whose button it is. The ring breathes slowly: enough to
+            find, not enough to nag.
+          */}
+          <button
+            type="button"
+            onClick={() => setStartOpen((o) => !o)}
+            aria-expanded={startOpen}
+            aria-label={startOpen ? "Close" : "Start something"}
+            className="bg-sea relative flex size-14 items-center justify-center rounded-full shadow-lg"
+          >
+            <span className="border-sea/40 animate-halo absolute inset-0 rounded-full border-2" />
+            {startOpen ? (
+              <span className="text-paper text-[24px] leading-none">✕</span>
+            ) : (
+              <Mark size={30} onLight={false} />
+            )}
+          </button>
+        </div>
+      )}
+
     </>
   );
 }
