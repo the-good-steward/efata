@@ -71,6 +71,11 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
   const [error, setError] = useState<string | null>(null);
   const [breathDone, setBreathDone] = useState(false);
 
+  // One submission per recording. Without this the effect re-fired
+  // when the attempt count changed after saving, which re-sent the
+  // answer and pulled the progress back below complete, so the button
+  // to continue appeared and then vanished.
+  const submittedRef = useRef<Blob | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -156,10 +161,13 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
   // it.
   useEffect(() => {
     if (phase !== "listen" || !blob) return;
+    if (submittedRef.current === blob) return;
+    submittedRef.current = blob;
 
-    let done = false;
+    let finished = false;
     const grow = setInterval(() => {
-      setAnalysisPct((p) => (done ? 100 : Math.min(p + 4, 95)));
+      if (finished) return;
+      setAnalysisPct((p) => Math.min(p + 4, 95));
     }, 700);
 
     (async () => {
@@ -174,14 +182,43 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
       } catch {
         setError("That took too long. Your answer may still have saved.");
       } finally {
-        done = true;
+        finished = true;
         setAnalysisPct(100);
         router.refresh();
       }
     })();
 
     return () => clearInterval(grow);
-  }, [phase, blob, question.linkId, attemptNumber, router]);
+    // Deliberately keyed on the recording alone. Anything else here
+    // would re-run this when the saved attempt arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, blob]);
+
+  /**
+   * The wait needs to look alive.
+   *
+   * A single line that never changes reads as stuck, and twenty seconds
+   * is long enough for someone to wonder. These describe the work, and
+   * the last one thanks them for waiting rather than pretending it is
+   * nearly done.
+   */
+  const WAITING = [
+    "Going through what you said. Twenty seconds or so.",
+    "Counting the fillers and working out your pace.",
+    "Looking for the places you softened it.",
+    "Writing your feedback now.",
+    "Still going. Thank you for your patience.",
+  ];
+  const [waitStep, setWaitStep] = useState(0);
+
+  useEffect(() => {
+    if (phase !== "listen") return;
+    const timer = setInterval(() => {
+      setWaitStep((w) => Math.min(w + 1, WAITING.length - 1));
+    }, 5000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   if (!question) return null;
 
@@ -226,6 +263,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
         playedPct={0}
         analysisPct={analysisPct}
         ready={ready}
+        waitingLine={WAITING[waitStep]}
         onTogglePlay={() => {
           if (!blob) return;
           if (!audioRef.current) {
@@ -239,6 +277,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
         onRerecord={() => {
           setSeconds(0);
           setBlob(null);
+          submittedRef.current = null;
           audioRef.current = null;
           setAnalysisPct(0);
           setBreathDone(false);
@@ -284,6 +323,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
         onContinue={() => {
           setSeconds(0);
           setBlob(null);
+          submittedRef.current = null;
           audioRef.current = null;
           setAnalysisPct(0);
           setBreathDone(false);
@@ -353,6 +393,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
           setIndex(index + 1);
           setSeconds(0);
           setBlob(null);
+          submittedRef.current = null;
           audioRef.current = null;
           setAnalysisPct(0);
           setBreathDone(false);

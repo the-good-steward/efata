@@ -12,6 +12,7 @@ export default function ListenBack({
   playedPct,
   analysisPct,
   ready,
+  waitingLine,
   onTogglePlay,
   onRerecord,
   onContinue,
@@ -25,6 +26,8 @@ export default function ListenBack({
   playedPct: number;
   analysisPct: number;
   ready: boolean;
+  /** Changes while it works, so the wait does not look stuck. */
+  waitingLine?: string;
   onTogglePlay?: () => void;
   onRerecord?: () => void;
   onContinue?: () => void;
@@ -64,7 +67,9 @@ export default function ListenBack({
       <div className="flex w-full flex-col gap-3">
         <Track pct={analysisPct} />
         <p className="text-[15px] text-ink-3">
-          {ready ? "Ready when you are." : "Going through what you said. Twenty seconds or so."}
+          {ready
+            ? "Ready when you are."
+            : (waitingLine ?? "Going through what you said. Twenty seconds or so.")}
         </p>
       </div>
     </Screen>
