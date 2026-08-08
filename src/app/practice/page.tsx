@@ -37,7 +37,7 @@ export default async function PracticePage() {
   ] = await Promise.all([
     supabase
       .from("profiles")
-      .select("onboarded_at")
+      .select("onboarded_at, cv_asked_at")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -54,6 +54,10 @@ export default async function PracticePage() {
   ]);
 
   if (profile && !profile.onboarded_at) redirect("/onboarding");
+
+  // Asked once, after onboarding, and never again whether they added
+  // one or not.
+  if (profile?.onboarded_at && !profile.cv_asked_at) redirect("/cv");
 
   const allDrills = drills ?? [];
   const runs = drillRuns ?? [];
