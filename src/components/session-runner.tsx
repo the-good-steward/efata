@@ -116,17 +116,30 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
         };
         recorder.onstop = () => {
           stream.getTracks().forEach((t) => t.stop());
-          setBlob(
-            new Blob(chunksRef.current, {
-              type: recorder.mimeType || "audio/webm",
-            }),
-          );
+          const recorded = new Blob(chunksRef.current, {
+            type: recorder.mimeType || "audio/webm",
+          });
+
+          // An empty recording means the microphone produced nothing.
+          // Sending it would cost a transcription and come back blank,
+          // so say so here rather than letting the next screen wait on
+          // something that will never arrive.
+          if (recorded.size < 1000) {
+            setError(
+              "That recording came through empty. Check your microphone is not muted, then try again.",
+            );
+            setPhase("question");
+            return;
+          }
+
+          setBlob(recorded);
         };
         recorder.start();
         recorderRef.current = recorder;
-      } catch {
+      } catch (mediaError) {
+        console.error("Microphone unavailable:", mediaError);
         setError(
-          "Efata couldn't reach your microphone. Allow it in your browser settings, then try again.",
+          "Efata lost access to your microphone. Check nothing else is using it, allow access when asked, then tap I'm ready again.",
         );
         setPhase("question");
       }
@@ -139,20 +152,40 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
 
   useEffect(() => {
     if (phase !== "recording") return;
-    const timer = setInterval(() => {
-      setSeconds((s) => {
-        // A hundred seconds is the ceiling. Past that it is a monologue
-        // rather than an answer, and the transcription costs more.
-        if (s + 1 >= MAX_SECONDS) stopRecording();
-        return s + 1;
-      });
-    }, 1000);
+    const timer = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(timer);
   }, [phase]);
 
+  /**
+   * The ceiling, watched from outside the timer.
+   *
+   * This used to call stop from inside the state updater, which runs
+   * during render, so React could run it more than once and tear the
+   * recording down mid-answer. That is what dropped people back to the
+   * question while they were still speaking.
+   */
+  useEffect(() => {
+    if (phase !== "recording") return;
+    if (seconds < MAX_SECONDS) return;
+    stopRecording();
+  }, [phase, seconds]);
+
   function stopRecording() {
-    recorderRef.current?.stop();
+    const recorder = recorderRef.current;
+
+    // Nothing to stop means the recorder was already torn down. Going
+    // to the listen screen with no recording would hang there forever,
+    // so send them back to the question with the reason instead.
+    if (!recorder) {
+      setError(
+        "The recording stopped before it could be saved. Tap I'm ready and give it another go.",
+      );
+      setPhase("question");
+      return;
+    }
+
     recorderRef.current = null;
+    recorder.stop();
     setPhase("listen");
   }
 
@@ -162,6 +195,8 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
   useEffect(() => {
     if (phase !== "listen" || !blob) return;
     if (submittedRef.current === blob) return;
+
+
     submittedRef.current = blob;
 
     let finished = false;
