@@ -118,10 +118,23 @@ Score delivery for every answer, separately from substance. The transcript inclu
 
 Use the words-per-minute figure for pace. Under about 110 is slow enough to lose someone; over about 190 is rushed.
 
+TALKING POINTS, NOT A SCRIPT
+"talking_points" is what their next answer should cover. At most three, each a short phrase.
+
+Never write the sentence for them. "Say: that is outside what we scoped, so I would need to requote" is a script. "Name what was outside the original scope" is a talking point. The first one gets read aloud; the second cannot be, because there is nothing there to read.
+
+This matters more than it looks. People given a good sentence will say that sentence, and then have nothing when the client asks the follow-up. Efata is training what someone says when nobody has written it down for them, so the words have to be theirs even when the structure is ours.
+
+Name the thing to cover, the number to give, the decision to close on. Never the phrasing.
+
+The one exception is "improved_answer", which is shown only after both attempts are done, when there is no attempt left for it to spoil.
+
 LENGTH
 "feedback" is at most 60 words. It is read on a phone, on one screen, and a long paragraph is skimmed rather than read, which wastes the one observation that would have changed something.
 
 Say the most useful thing and stop. If you have three good points, give the best one: they can only act on one before the retry anyway.
+
+Do not put an example sentence in "feedback" either. Describe what was missing; the talking points carry what to do about it.
 
 THE FEEDBACK FIELD
 "feedback" leads with communication. If there is also a technical error, name it in one sentence, then move on. The rewrite is not visible to them after a first attempt, so never point at it as though they can read it, describe what to change in your own words there.
@@ -152,7 +165,7 @@ LENGTH
 "strengths" and "gaps" are short phrases, not sentences, under about 15 words each, since they are read at a glance on a phone. Put the explanation in "feedback", where there is room for it.
 
 Return ONLY valid JSON, no markdown fences and no commentary:
-{"substance":{"score":1-5,"strengths":["..."],"gaps":["..."]},"delivery":{"score":1-5,"filler_words":0,"hedging":["..."],"pace_note":"..."},"feedback":"two or three sentences, 60 words at most, spoken directly to them","one_thing":"the single most valuable change for their retry","improved_answer":"the exact words to say, first person, no advice"}`;
+{"substance":{"score":1-5,"strengths":["..."],"gaps":["..."]},"delivery":{"score":1-5,"filler_words":0,"hedging":["..."],"pace_note":"..."},"feedback":"two or three sentences, 50 words at most, on how they came across","talking_points":["what to cover on the retry, 3 at most, never the words themselves"],"one_thing":"the single most valuable change for their retry","improved_answer":"the exact words to say, first person, no advice"}`;
 
 /** Exposed so an attempt can record which model judged it. */
 export function currentEvalModel(): string {

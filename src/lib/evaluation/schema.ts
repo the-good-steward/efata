@@ -97,6 +97,30 @@ export const evaluation = z.object({
       return lastStop > 60 ? truncated.slice(0, lastStop + 1) : truncated + "…";
     }),
   // The single most valuable change for the retry.
+  /**
+   * What to cover on the retry, as points rather than prose.
+   *
+   * Feedback written as sentences invites being read aloud, and a
+   * quoted example sentence guarantees it. Points name what belongs in
+   * the answer without supplying the words, so the sentence still has
+   * to be built by the person saying it. That is the whole difference
+   * between a script and a rehearsal.
+   */
+  talking_points: list(3, 120).transform((points) =>
+    points.filter((point) => {
+      /*
+       * Drop anything that is a sentence to recite rather than a thing
+       * to cover. The prompt asks for points; this is the backstop,
+       * because one scripted line among three teaches the habit the
+       * whole design is built to prevent.
+       */
+      const scripted =
+        /^(say|tell them|try saying|you could say)\b/i.test(point.trim()) ||
+        /["\u201c\u201d]/.test(point) ||
+        point.trim().split(/\s+/).length > 14;
+      return !scripted;
+    }),
+  ),
   one_thing: capped(400),
   // Their own answer, restructured. Same facts, same story, tightened.
   /**

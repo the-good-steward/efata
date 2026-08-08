@@ -351,6 +351,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
         index={index + 1}
         total={questions.length}
         read={latest.feedback ?? ""}
+        talkingPoints={latest.scores?.talking_points ?? []}
         fillerCount={fillerCount}
         wpm={wpm}
         nextLabel="Say it again"

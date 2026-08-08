@@ -254,6 +254,7 @@ export async function submitAnswer(
         eval_model: currentEvalModel(),
         script_overlap: overlapAgainstWhatTheySaw(transcript.text),
         one_thing: result.one_thing,
+        talking_points: result.talking_points,
         substance: result.substance,
         delivery: {
           ...result.delivery,
@@ -398,6 +399,7 @@ export async function rescoreAttempt(
       improved_answer: result.improved_answer,
       scores: {
         one_thing: result.one_thing,
+        talking_points: result.talking_points,
         substance: result.substance,
         delivery: {
           ...result.delivery,

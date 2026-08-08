@@ -23,6 +23,7 @@ export type RunnerQuestion = {
     scores: {
       script_overlap?: number | null;
       one_thing?: string | null;
+      talking_points?: string[];
       substance?: { score?: number };
       delivery?: {
         score?: number;
