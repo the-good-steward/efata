@@ -32,9 +32,19 @@ export function AppNav({ email }: { email?: string | null }) {
    * clutter there, and it was landing directly on top of the primary
    * action in the same dark fill.
    */
-  // Hidden only on the drill itself, where it would offer the page
-  // someone is already on.
-  const startHidden = pathname === "/drill";
+  /*
+   * Hidden where it would get in the way.
+   *
+   * On the drill it offers the page someone is already on. On practice
+   * it lands directly on top of the primary button, and the drill card
+   * is already on that page anyway, so it adds nothing but a collision.
+   * Inside a session nothing floats at all.
+   */
+  const startHidden =
+    pathname === "/drill" ||
+    pathname === "/practice" ||
+    pathname.startsWith("/practice/") ||
+    pathname === "/cv";
 
   return (
     <>
