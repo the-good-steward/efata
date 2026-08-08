@@ -29,11 +29,14 @@ export default function CvAsk({
         Most people undersell what they have already done.
       </h1>
       <p className="max-w-[60ch] text-[17px] leading-[1.7] text-ink-2 text-pretty md:text-[19px]">
-        Add your CV and we can point back at your own experience on the days you leave it out of an answer.
+        With one, half your questions come from work you have actually done, so
+        you are not inventing an example on the spot. And when you leave out
+        experience you already have, we can point back at it.
       </p>
       <Rule />
       <p className="text-[16px] leading-[1.7] text-ink-3 md:text-[17px]">
-        It stays on your device. Nobody else reads it.
+        Only used to shape your questions and your feedback. Nobody else reads
+        it, and we do not keep your phone number or address.
       </p>
     </Screen>
   );
