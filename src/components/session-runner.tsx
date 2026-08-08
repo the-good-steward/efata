@@ -208,6 +208,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
     "Looking for the places you softened it.",
     "Writing your feedback now.",
     "Still going. Thank you for your patience.",
+    "Nearly there. It is worth the wait.",
   ];
   const [waitStep, setWaitStep] = useState(0);
 

@@ -65,10 +65,10 @@ export default function ListenBack({
       </div>
 
       <div className="flex w-full flex-col gap-3">
-        <Track pct={analysisPct} />
+        {ready ? null : <Track pct={analysisPct} />}
         <p className="text-[15px] text-ink-3">
           {ready
-            ? "Ready when you are."
+            ? "No rush. Finish listening if you want to."
             : (waitingLine ?? "Going through what you said. Twenty seconds or so.")}
         </p>
       </div>
