@@ -190,6 +190,16 @@ export async function submitAnswer(
 
   // Answer keys are unreadable by clients on purpose, so the technical
   // rubric needs a server-side read to score against them.
+  const { data: cvRow } = await supabase
+    .from("cv_profiles")
+    .select("summary, confirmed_at")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const cv = cvRow?.confirmed_at
+    ? (cvRow.summary as Parameters<typeof evaluateAnswer>[0]["cv"])
+    : null;
+
   let answerKey = null;
   if (question.rubric === "technical") {
     try {
@@ -216,6 +226,7 @@ export async function submitAnswer(
       // On a drill the context field holds the move being practised.
       move: question.source === "curated" ? question.context : null,
       rubric: question.rubric,
+      cv,
       transcript: transcript.text,
       durationSeconds: transcript.durationSeconds,
       answerKey,

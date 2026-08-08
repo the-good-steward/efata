@@ -104,6 +104,15 @@ const LEVEL_GUIDANCE: Record<EnglishLevel, string> = {
  */
 export type JobPostImage = { mediaType: string; base64: string };
 
+/** What was read from their CV, when they have added one. */
+export type CvContext = {
+  headline: string;
+  roles: { title: string; employer?: string | null; period?: string | null; did: string[] }[];
+  tools: string[];
+  results: string[];
+  yearsExperience: number | null;
+};
+
 export async function generateQuestions(
   jobPost: string,
   englishLevel: EnglishLevel,
@@ -111,6 +120,7 @@ export async function generateQuestions(
   roles: RoleOption[] = [],
   customRole: string | null = null,
   images: JobPostImage[] = [],
+  cv: CvContext | null = null,
 ): Promise<GenerationResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set.");
@@ -174,7 +184,27 @@ export async function generateQuestions(
           })),
           {
             type: "text" as const,
-            text: `Experience level of the person practising: ${experienceLevel}. ${EXPERIENCE_GUIDANCE[experienceLevel]}
+            text: `${
+              cv
+                ? `THEIR CV
+${cv.headline}${cv.yearsExperience ? ` · about ${cv.yearsExperience} years` : ""}
+
+Roles:
+${cv.roles
+  .map(
+    (r) =>
+      `- ${r.title}${r.employer ? ` at ${r.employer}` : ""}${r.period ? ` (${r.period})` : ""}${
+        r.did.length ? `: ${r.did.join("; ")}` : ""
+      }`,
+  )
+  .join("\n")}
+
+Tools they list: ${cv.tools.join(", ") || "none listed"}
+${cv.results.length ? `Results they claim: ${cv.results.join("; ")}` : ""}
+
+`
+                : ""
+            }Experience level of the person practising: ${experienceLevel}. ${EXPERIENCE_GUIDANCE[experienceLevel]}
 
 English level: ${englishLevel}. ${LEVEL_GUIDANCE[englishLevel]}
 
@@ -189,11 +219,29 @@ ${roleCatalogue}${
             : ""
         }
 
-Write exactly 3 questions for this job post: 1 hypothetical and 2 technical. Count them before you return.
+Write exactly 4 questions for this job post: 2 hypothetical and 2 technical.
 
-Three with two attempts each is six spoken answers, which is about fifteen minutes and as much as anyone will do properly in one sitting. Because there are so few, every one has to earn its place: no warm-ups, no throat-clearing, nothing that could have been asked of someone in a different job.
+THE SHAPE
+${
+              cv
+                ? `They have given us their CV, so two of the four are anchored to what they have actually done:
 
-Weight it toward technical because that is where the questions have to be specific to this role. The situational one should be the money question, the one where poor communication costs them income: scope, rate, a deadline, or saying no.
+1. Hypothetical, from the job post. A situation this role would put them in.
+2. Hypothetical, from their own history. Something they have genuinely handled, drawn from a role on their CV.
+3. Technical, from the job post. What this employer would test.
+4. Technical, from their own history. A tool or a task their CV says they have used.
+
+For the two anchored questions, name the real thing: the employer, the role, the tool, the period. "You were at a real estate agency for eight months" is the point of having their CV. "Tell me about a time you handled a difficult client" is not, and is the question this app exists to avoid.
+
+Only anchor to what the CV actually says. Never invent a role, a tool, a client, or a result. If their CV is thin, ask about the tools it does list rather than inventing history.
+
+Do not label which is which. Order them so the anchored ones are not both together, and so it does not read as a pattern.`
+                : `They have not added a CV, so all four come from the job post: 2 hypothetical and 2 technical. Do not ask them to recall past experience, because someone early in their career freezes trying to remember a story worth telling.`
+            }
+
+Four with two attempts each is eight spoken answers, about twenty minutes. Because there are so few, every one has to earn its place: no warm-ups, nothing that could have been asked of someone in a different job.
+
+One of the hypotheticals should be the money question, the one where poor communication costs them income: scope, rate, a deadline, or saying no.
 
 --- JOB POST ---
 ${jobPost || "(the post is in the images above)"}

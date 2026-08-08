@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { checkSessionLimit, type Tier } from "@/lib/limits";
 import { cacheKey, readCache, writeCache } from "@/lib/questions/cache";
+import type { CvContext } from "@/lib/questions/generate";
 import { recordFailure } from "@/lib/failures";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -64,6 +65,18 @@ export async function createSession(
   const experienceLevel = (profile?.experience_level ??
     "beginner") as ExperienceLevel;
 
+  // Only a confirmed CV is used. An unchecked one could be misread, and
+  // questions built on a misreading are worse than generic ones.
+  const { data: cvRow } = await supabase
+    .from("cv_profiles")
+    .select("summary, confirmed_at")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const cv = cvRow?.confirmed_at
+    ? (cvRow.summary as CvContext | null)
+    : null;
+
   const { data: roleRows } = await supabase
     .from("roles")
     .select("slug, label, technical_focus");
@@ -78,7 +91,11 @@ export async function createSession(
   // key would only ever grow.
   const key = cacheKey(jobPost, experienceLevel, englishLevel);
 
-  let generated = images.length === 0 ? await readCache(admin, key) : null;
+  // Never cache when a CV is involved: those questions name someone's
+  // own roles and tools, and serving them to anyone else would leak
+  // their history.
+  const cacheable = images.length === 0 && !cv;
+  let generated = cacheable ? await readCache(admin, key) : null;
   const cacheHit = Boolean(generated);
 
   // Only a real generation costs money, so only a real generation is
@@ -101,6 +118,7 @@ export async function createSession(
       (roleRows ?? []) as RoleOption[],
       (profile?.custom_role as string | null) ?? null,
       images,
+      cv,
     );
   } catch (error) {
     await recordFailure({
@@ -112,7 +130,7 @@ export async function createSession(
     return { error: describeGenerationError(error) };
   }
 
-  if (!cacheHit && images.length === 0) await writeCache(admin, key, generated);
+  if (!cacheHit && cacheable) await writeCache(admin, key, generated);
 
   // maybeSingle, not single: an untagged session is fine, a crash is not.
   const { data: role } = generated.role_slug

@@ -118,6 +118,17 @@ Score delivery for every answer, separately from substance. The transcript inclu
 
 Use the words-per-minute figure for pace. Under about 110 is slow enough to lose someone; over about 190 is rushed.
 
+WHAT THEY ALREADY HAVE
+When their CV is given below, and their answer left out something it already covers, say so. This is the most useful thing you can tell this person: underselling experience they actually have is the most common and most expensive mistake they make.
+
+Point at it plainly, and name where it came from so they can check it: "you said you would need to learn their reporting tool, but your CV says two years of Google Data Studio, which is the same job."
+
+Two hard rules.
+
+Never suggest claiming anything the CV does not say. Not a tool they have not used, not a result they did not get, not a seniority they have not held. They may repeat it in a real interview, where the follow-up question would find it out and it would cost them the work.
+
+If the CV does not cover what they missed, say nothing about it. Silence is correct; a stretched connection teaches them to overstate.
+
 SCOPE, RATES AND SAYING NO: JUDGEMENT, NOT A RULE
 Do not treat every extra request as something to be pushed back on. Absorbing a small ask, done knowingly, is often the right call and is how good working relationships are built. A freelancer who requotes the first time a client asks for anything sounds rigid and can lose the work before the relationship exists.
 
@@ -207,6 +218,13 @@ export async function evaluateAnswer(params: {
   previousTranscript?: string | null;
   /** 0-100: how much of this retry matched the rewrite we showed them. */
   scriptOverlap?: number | null;
+  /** Their confirmed CV, when they have one. */
+  cv?: {
+    headline: string;
+    roles: { title: string; employer?: string | null; period?: string | null; did: string[] }[];
+    tools: string[];
+    results: string[];
+  } | null;
 }): Promise<Evaluation> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set.");
@@ -230,6 +248,26 @@ export async function evaluateAnswer(params: {
   // So: unverified criteria must not lower a score, but they are still
   // the starting point for what to name — checked with search first
   // where it matters.
+  const cvSection = params.cv
+    ? `\nTHEIR CV
+${params.cv.headline}
+Roles: ${
+        params.cv.roles
+          .map(
+            (r) =>
+              `${r.title}${r.employer ? ` at ${r.employer}` : ""}${
+                r.did.length ? ` (${r.did.join("; ")})` : ""
+              }`,
+          )
+          .join(" | ") || "none listed"
+      }
+Tools: ${params.cv.tools.join(", ") || "none listed"}${
+        params.cv.results.length
+          ? `\nResults: ${params.cv.results.join("; ")}`
+          : ""
+      }`
+    : "";
+
   const keySection = params.answerKey
     ? `\nWHAT A PRACTITIONER WOULD REACH FOR
 ${(params.answerKey.must_mention ?? []).join("; ")}
@@ -322,7 +360,7 @@ Judge them mainly on that. Say plainly whether they did it, and if not, what got
             : ""
         }QUESTION ASKED
 ${params.question}
-${keySection}${retrySection}
+${cvSection}${keySection}${retrySection}
 
 THEIR SPOKEN ANSWER (transcript, filler words preserved)
 """${params.transcript}"""
