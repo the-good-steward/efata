@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { AppHeader } from "@/components/app-header";
+import { AppNav } from "@/components/app-nav";
 import { buildProgress, type AttemptPoint } from "@/lib/progress";
 import { buildPracticeDays } from "@/lib/practice-days";
 import { PracticeDaysStrip } from "@/components/practice-days";
@@ -168,9 +168,11 @@ export default async function ProgressPage() {
         : "Not enough yet";
 
   return (
-    <main className="flex flex-1 flex-col px-5 py-8">
+    <div className="flex min-h-dvh flex-col">
+      <AppNav email={user.email} />
+      <main className="flex flex-1 flex-col px-5 pb-28">
       <div className="mx-auto w-full max-w-md">
-        <AppHeader email={user.email} />
+        
 
         <h1 className="ef-display text-paper">What&rsquo;s changed</h1>
 
@@ -254,5 +256,6 @@ export default async function ProgressPage() {
         )}
       </div>
     </main>
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { JobPostForm } from "@/components/job-post-form";
 import { AppHeader } from "@/components/app-header";
+import { AppNav } from "@/components/app-nav";
 import { SchemaWarning } from "@/components/schema-warning";
 import { HomeRunner } from "@/components/home-runner";
 import { TodaysDrill } from "@/components/todays-drill";
@@ -78,8 +79,11 @@ export default async function PracticePage() {
    */
   if (process.env.EFATA_NEW_SESSION === "true") {
     return (
-      <div className="h-dvh">
-        <HomeRunner questionCount={3} />
+      <div className="flex h-dvh flex-col">
+        <AppNav email={user.email} />
+        <div className="min-h-0 flex-1">
+          <HomeRunner questionCount={4} />
+        </div>
       </div>
     );
   }

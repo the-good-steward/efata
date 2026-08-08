@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { AppHeader } from "@/components/app-header";
+import { AppNav } from "@/components/app-nav";
 import { DrillCard } from "@/components/drill-card";
 import { PracticeDaysStrip } from "@/components/practice-days";
 import { buildPracticeDays } from "@/lib/practice-days";
@@ -56,9 +56,11 @@ export default async function DrillPage() {
   ).length;
 
   return (
-    <main className="flex flex-1 flex-col px-5 py-8">
+    <div className="flex min-h-dvh flex-col">
+      <AppNav email={user.email} />
+      <main className="flex flex-1 flex-col px-5 pb-28">
       <div className="mx-auto w-full max-w-md">
-        <AppHeader email={user.email} />
+        
 
         <PracticeDaysStrip data={practiceDays} />
 
@@ -92,5 +94,6 @@ export default async function DrillPage() {
         </Link>
       </div>
     </main>
+    </div>
   );
 }
