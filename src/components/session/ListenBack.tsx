@@ -39,13 +39,22 @@ export default function ListenBack({
       footer={
         <div className="flex flex-col gap-3">
           {ready ? <Primary label="What you said" onClick={onContinue} /> : null}
-          <Quiet label="Record it again" onClick={onRerecord} />
+          <Quiet
+            label={ready ? "Record it again instead" : "Start over instead"}
+            onClick={onRerecord}
+          />
         </div>
       }
     >
       <h1 className="text-center font-serif text-[29px] leading-[1.35] text-pretty md:text-[38px]">
-        Listen back while we go through it.
+        {ready ? "Your feedback is ready." : "We&rsquo;re checking your answer."}
       </h1>
+      {!ready && (
+        <p className="text-center text-[16px] leading-relaxed text-ink-2 text-pretty md:text-[17px]">
+          Nothing to do. Listen back while you wait, or record it again if you
+          would rather start over.
+        </p>
+      )}
 
       <div className="flex w-full flex-col gap-5 rounded-2xl bg-card p-6">
         <Eyebrow>{attempt === 2 ? "Second go" : "Your answer"} · {takeLength}</Eyebrow>

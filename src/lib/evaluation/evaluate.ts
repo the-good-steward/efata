@@ -218,7 +218,13 @@ Say explicitly what improved and what did not. If they fixed the main problem, l
           params.scriptOverlap != null && params.scriptOverlap >= 60
             ? `
 
-They reused about ${params.scriptOverlap}% of the exact wording from the rewrite we suggested. Do not score this as improvement: reciting a script is not the skill, and it will not survive a live call where no script exists. Say so warmly but plainly, and ask them to say it again in their own words.`
+They reused about ${params.scriptOverlap}% of the exact wording they had just read on screen. They are reading the feedback back rather than answering.
+
+Name it in the first sentence, plainly and without embarrassment: something like "that was my wording, not yours." Do not score it as improvement.
+
+Then say why it matters, because most people doing this think they are being diligent rather than cutting a corner. Efata trains what someone says when nobody has written it down for them. A client asks a follow-up, and a memorised line has nowhere to go. The point is not to produce a good sentence once; it is to be able to produce one every time, which only comes from building it yourself.
+
+Ask them to say it again with the screen ignored: same idea, their own words, out loud.`
             : params.scriptOverlap != null && params.scriptOverlap < 30
               ? `
 

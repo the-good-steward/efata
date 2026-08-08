@@ -78,14 +78,34 @@ export async function submitAnswer(
   // attempt 1 so the person can hear what changed.
   const { data: previous } = await supabase
     .from("attempts")
-    .select("attempt_number, transcript, improved_answer")
+    .select("attempt_number, transcript, improved_answer, feedback")
     .eq("session_question_id", sessionQuestionId)
     .order("attempt_number", { ascending: false })
     .limit(1);
 
   const attemptNumber = (previous?.[0]?.attempt_number ?? 0) + 1;
   const previousTranscript = previous?.[0]?.transcript ?? null;
+  /**
+   * What they could have read back.
+   *
+   * The rewrite is withheld until after the second attempt, so on a
+   * retry the thing actually on screen is the written feedback, which
+   * quotes the sentence a practitioner would say. That is what gets
+   * read aloud, so overlap is measured against both and the worse of
+   * the two counts.
+   */
   const previousRewrite = previous?.[0]?.improved_answer ?? null;
+  const previousFeedback = previous?.[0]?.feedback ?? null;
+
+  function overlapAgainstWhatTheySaw(text: string): number | null {
+    const sources = [previousRewrite, previousFeedback].filter(
+      (x): x is string => Boolean(x),
+    );
+    if (sources.length === 0) return null;
+    return Math.round(
+      Math.max(...sources.map((source) => scriptOverlap(text, source))) * 100,
+    );
+  }
 
   let transcript;
   try {
@@ -143,9 +163,7 @@ export async function submitAnswer(
         // Which model judged this, so the two can be compared later
         // from the data rather than from memory.
         eval_model: currentEvalModel(),
-        script_overlap: previousRewrite
-          ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
-          : null,
+        script_overlap: overlapAgainstWhatTheySaw(transcript.text),
         delivery: { filler_words: countFillers(transcript.text) },
         words_per_minute:
           transcript.durationSeconds > 0
@@ -203,9 +221,7 @@ export async function submitAnswer(
       answerKey,
       attemptNumber,
       previousTranscript,
-      scriptOverlap: previousRewrite
-        ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
-        : null,
+      scriptOverlap: overlapAgainstWhatTheySaw(transcript.text),
     });
   } catch (error) {
     await recordFailure({
@@ -236,9 +252,7 @@ export async function submitAnswer(
         // Which model judged this, so the two can be compared later
         // from the data rather than from memory.
         eval_model: currentEvalModel(),
-        script_overlap: previousRewrite
-          ? Math.round(scriptOverlap(transcript.text, previousRewrite) * 100)
-          : null,
+        script_overlap: overlapAgainstWhatTheySaw(transcript.text),
         one_thing: result.one_thing,
         substance: result.substance,
         delivery: {
