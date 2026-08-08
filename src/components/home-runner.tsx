@@ -24,6 +24,10 @@ export function HomeRunner({ questionCount }: { questionCount: number }) {
   const [files, setFiles] = useState<File[]>([]);
   const [pct, setPct] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Separate from the input the form submits: this one only opens the
+  // picker, so its value can be cleared after every pick without
+  // disturbing what is queued for upload.
+  const pickerRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -71,6 +75,7 @@ export function HomeRunner({ questionCount }: { questionCount: number }) {
   return (
     <form ref={formRef} action={formAction} className="h-full">
       <input type="hidden" name="job_post" value={text} />
+      {/* Submitted with the form. Kept in step with the list below. */}
       <input
         ref={inputRef}
         type="file"
@@ -78,9 +83,21 @@ export function HomeRunner({ questionCount }: { questionCount: number }) {
         accept="image/*"
         multiple
         className="hidden"
-        onChange={(e) => {
-          const picked = Array.from(e.target.files ?? []);
+        tabIndex={-1}
+      />
+
+      {/* Opens the picker. Cleared after each pick so choosing the same
+          file twice still fires a change event. */}
+      <input
+        ref={pickerRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(event) => {
+          const picked = Array.from(event.target.files ?? []);
           setFiles((current) => [...current, ...picked].slice(0, 6));
+          event.target.value = "";
         }}
       />
 
@@ -97,7 +114,7 @@ export function HomeRunner({ questionCount }: { questionCount: number }) {
         pastedText={text}
         screenshots={files.map((f, i) => ({ id: `${i}-${f.name}`, name: f.name }))}
         onPaste={setText}
-        onAddScreenshot={() => inputRef.current?.click()}
+        onAddScreenshot={() => pickerRef.current?.click()}
         onRemoveScreenshot={(id) =>
           setFiles((current) =>
             current.filter((f, i) => `${i}-${f.name}` !== id),

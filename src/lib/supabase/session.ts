@@ -63,7 +63,11 @@ export async function updateSession(request: NextRequest) {
     console.error("Supabase auth check failed:", error);
   }
 
-  const isPublicRoute = PUBLIC_ROUTES.includes(request.nextUrl.pathname);
+  // Exact match, except for the design harness, which has pages
+  // beneath it and holds nothing private.
+  const path = request.nextUrl.pathname;
+  const isPublicRoute =
+    PUBLIC_ROUTES.includes(path) || path.startsWith("/design-check/");
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();

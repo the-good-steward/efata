@@ -57,7 +57,9 @@ export default function Home({
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-3.5">
             <p className="text-[15px] leading-relaxed text-ink-3 text-pretty">
-              Screenshot it in parts if it&rsquo;s long. They&rsquo;re read in this order.
+              {screenshots.length === 0
+                ? "Pick one or several at once. Screenshot a long post in parts."
+                : "They\u2019re read in this order. Add more if the post carries on."}
             </p>
             <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap">
               {screenshots.map((s, i) => (
@@ -85,7 +87,9 @@ export default function Home({
                 className="flex h-26 flex-col items-center justify-center gap-1.5 rounded-2xl border-[1.5px] border-dashed border-edge text-ink-2 md:h-30 md:w-38"
               >
                 <span className="text-[22px] leading-none">+</span>
-                <span className="text-[14px] font-medium">Add another</span>
+                <span className="text-[14px] font-medium">
+                  {screenshots.length === 0 ? "Add a screenshot" : "Add another"}
+                </span>
               </button>
             </div>
           </div>
