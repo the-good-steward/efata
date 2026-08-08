@@ -23,7 +23,9 @@ export default function Home({
 }) {
   const [tab, setTab] = useState<"paste" | "shots">("paste");
   const buildLabel =
-    tab === "shots" && screenshots.length ? `Build from ${screenshots.length} screenshots` : "Build my questions";
+    tab === "shots" && screenshots.length
+      ? `Build from ${screenshots.length} screenshot${screenshots.length === 1 ? "" : "s"}`
+      : "Build my questions";
 
   return (
     <div className="flex h-full flex-col bg-paper text-ink">

@@ -25,7 +25,16 @@ export default function WhatYouSaid({
   onLeave?: () => void;
 }) {
   const [open, setOpen] = useState<Token | null>(null);
-  const word = ["none", "One softener", "Two softeners", "Three softeners", "Four softeners", "Five softeners"];
+  /**
+   * Counted nouns, written out to five and numeric after that. The
+   * fallback pluralises, since "1 softeners" and "2 left, tap it" are
+   * the kind of small wrongness that makes careful writing elsewhere
+   * look accidental.
+   */
+  const spelled = ["none", "One", "Two", "Three", "Four", "Five"];
+  const noun = hedgeCount === 1 ? "softener" : "softeners";
+  const counted = `${spelled[hedgeCount] ?? hedgeCount} ${noun}`;
+  const tapThem = hedgeCount === 1 ? "Tap it" : "Tap one";
 
   return (
     <>
@@ -52,8 +61,8 @@ export default function WhatYouSaid({
         </p>
         <p className="text-[14px] leading-relaxed text-ink-3 md:text-[15px]">
           {attempt === 2
-            ? `${hedgeCount} left, marked in clay. Tap it to see what it does.`
-            : `${word[hedgeCount] ?? `${hedgeCount} softeners`}, marked in clay. Tap one to see what it does.`}
+            ? `${counted} left, marked in clay. ${tapThem} to see what it does.`
+            : `${counted}, marked in clay. ${tapThem} to see what it does.`}
         </p>
       </Screen>
       {open ? <HedgeSheet word={open.text} note={open.note} onClose={() => setOpen(null)} /> : null}
