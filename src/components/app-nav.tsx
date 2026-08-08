@@ -22,7 +22,6 @@ const LINKS = [
 
 export function AppNav({ email }: { email?: string | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [startOpen, setStartOpen] = useState(false);
   const pathname = usePathname();
 
   /*
@@ -33,7 +32,9 @@ export function AppNav({ email }: { email?: string | null }) {
    * clutter there, and it was landing directly on top of the primary
    * action in the same dark fill.
    */
-  const startHidden = pathname === "/practice" || pathname === "/drill";
+  // Hidden only on the drill itself, where it would offer the page
+  // someone is already on.
+  const startHidden = pathname === "/drill";
 
   return (
     <>
@@ -119,48 +120,23 @@ export function AppNav({ email }: { email?: string | null }) {
         wherever they are, rather than requiring a trip back to a home
         page first.
       */}
+      {/*
+        One thing, always the same thing.
+        An expanding menu made the daily drill a second choice behind a
+        tap, and the drill is the habit worth building. So the button is
+        the drill, and nothing else: the mark, glowing gently, one tap
+        from anywhere.
+      */}
       {!startHidden && (
-        <div className="fixed right-5 bottom-6 z-20 flex flex-col items-end gap-3">
-          {startOpen && (
-            <>
-              <Link
-                href="/practice"
-                onClick={() => setStartOpen(false)}
-                className="bg-paper border-edge text-ink animate-rise rounded-full border px-5 py-3.5 text-[16px] font-medium shadow-sm"
-              >
-                Practice session
-              </Link>
-              <Link
-                href="/drill"
-                onClick={() => setStartOpen(false)}
-                className="bg-paper border-edge text-ink animate-rise rounded-full border px-5 py-3.5 text-[16px] font-medium shadow-sm"
-              >
-                Daily drill
-              </Link>
-            </>
-          )}
-
-          {/*
-            Sea glass rather than ink, so it never sits invisibly on top
-            of a primary button, and the mark rather than a plus, which
-            says whose button it is. The ring breathes slowly: enough to
-            find, not enough to nag.
-          */}
-          <button
-            type="button"
-            onClick={() => setStartOpen((o) => !o)}
-            aria-expanded={startOpen}
-            aria-label={startOpen ? "Close" : "Start something"}
-            className="bg-sea relative flex size-14 items-center justify-center rounded-full shadow-lg"
-          >
-            <span className="border-sea/40 animate-halo absolute inset-0 rounded-full border-2" />
-            {startOpen ? (
-              <span className="text-paper text-[24px] leading-none">✕</span>
-            ) : (
-              <Mark size={30} onLight={false} />
-            )}
-          </button>
-        </div>
+        <Link
+          href="/drill"
+          aria-label="Today's drill"
+          className="bg-sea fixed right-5 bottom-6 z-20 flex size-16 items-center justify-center rounded-full shadow-lg"
+        >
+          <span className="bg-sea/30 animate-halo absolute inset-0 rounded-full" />
+          <span className="border-sea/50 animate-halo absolute inset-0 rounded-full border-2 [animation-delay:1.2s]" />
+          <Mark size={34} onLight={false} />
+        </Link>
       )}
 
     </>
