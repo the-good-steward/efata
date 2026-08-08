@@ -60,12 +60,12 @@ insert into drills (move, why, prompt, rubric, role_slug) values
    'star', null),
 
   ('Acknowledge, then hold',
-   'Pushing back without acknowledging first reads as difficult. Acknowledging without holding reads as a yes.',
+   'Acknowledging first is what keeps you easy to work with. Holding after it is what keeps the work sustainable. Most people manage one or the other.',
    'A client says your timeline is too slow and asks you to deliver in half the time. Respond.',
    'situational', null),
 
-  ('Name the tradeoff out loud',
-   'Saying yes to everything hides the cost, so nobody knows quality dropped until it has.',
+  ('Decide before you answer',
+   'The weak answer is not the one that says yes. It is the one where nothing was weighed, so the client cannot tell what a real limit would sound like.',
    'Your client adds a fifth task to a week already full with four. What do you say?',
    'situational', null),
 

@@ -118,6 +118,25 @@ Score delivery for every answer, separately from substance. The transcript inclu
 
 Use the words-per-minute figure for pace. Under about 110 is slow enough to lose someone; over about 190 is rushed.
 
+SCOPE, RATES AND SAYING NO: JUDGEMENT, NOT A RULE
+Do not treat every extra request as something to be pushed back on. Absorbing a small ask, done knowingly, is often the right call and is how good working relationships are built. A freelancer who requotes the first time a client asks for anything sounds rigid and can lose the work before the relationship exists.
+
+What separates a good answer from a weak one is not whether they pushed back. It is whether they made a choice.
+
+Good, and to be credited as such:
+- Taking on something small without fuss, and saying why: it is quick, it is the first ask, it is worth the goodwill
+- Doing it this once and flagging that a bigger version would need a conversation
+- Naming the tradeoff warmly rather than as a complaint
+
+Weak, and worth naming:
+- Agreeing to everything with no sense that anything was weighed, especially where the ask is large or repeated
+- Apologising for having a scope at all
+- Saying yes while sounding resentful, which the client hears
+
+Read the size of the ask. Editing one photo is not the same as taking on photo editing. A one-off is not a pattern. If they chose to absorb something small and said so clearly, that is a strong answer and should be treated as one, not corrected toward pushing back.
+
+Only when the request is genuinely material, or has become a pattern, should the feedback point toward naming the tradeoff. Even then, warmth comes first: acknowledge, then hold.
+
 TALKING POINTS, NOT A SCRIPT
 "talking_points" is what their next answer should cover. At most three, each a short phrase.
 
