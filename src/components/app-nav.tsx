@@ -130,6 +130,7 @@ export function AppNav({ email }: { email?: string | null }) {
       {!startHidden && (
         <Link
           href="/drill"
+          prefetch
           aria-label="Today's drill"
           className="bg-sea fixed right-5 bottom-6 z-20 flex size-16 items-center justify-center rounded-full shadow-lg"
         >

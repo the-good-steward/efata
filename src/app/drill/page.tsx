@@ -9,6 +9,11 @@ import { buildPracticeDays } from "@/lib/practice-days";
 export const metadata = { title: "Today's drill · Efata" };
 export const maxDuration = 60;
 
+/** The window the strip draws, as a timestamp the query can use. */
+function fourteenDaysAgo(): string {
+  return new Date(Date.now() - 14 * 86400000).toISOString();
+}
+
 export default async function DrillPage() {
   const supabase = await createClient();
   const {
@@ -18,19 +23,26 @@ export default async function DrillPage() {
 
   const [{ data: drills }, { data: runs }, { data: answered }] =
     await Promise.all([
-      supabase.from("drills").select("id, move, why, prompt, rubric"),
+      supabase.from("drills").select("id, move, why, prompt, rubric").limit(30),
       supabase
         .from("drill_runs")
         .select("drill_id, created_at")
         .order("created_at", { ascending: false })
-        .limit(50),
+        .limit(40),
       // Days counted from answers rather than drills started, so
       // opening a drill and not speaking does not count as practice.
       supabase
         .from("attempts")
+        // Only the last fourteen days are drawn, so only those are
+        // fetched. Two hundred rows to render fourteen marks is a lot
+        // to send to a phone.
         .select("created_at")
+        .gte(
+          "created_at",
+          fourteenDaysAgo(),
+        )
         .order("created_at", { ascending: false })
-        .limit(200),
+        .limit(60),
     ]);
 
   const practiceDays = buildPracticeDays(
