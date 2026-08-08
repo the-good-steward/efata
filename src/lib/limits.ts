@@ -110,8 +110,8 @@ export async function checkSessionLimit(
       allowed: false,
       message:
         tier === "free"
-          ? "That is this week's session. A drill is waiting today, and a new session opens on Monday."
-          : `That is ${cap} sessions this month. Drills carry on daily.`,
+          ? "That is this week's session. Try today's daily drill instead: one question, one habit, about three minutes. A new session opens on Monday."
+          : `That is ${cap} sessions this month. Try today's daily drill instead, and a new month starts soon.`,
     };
   }
   return { allowed: true };

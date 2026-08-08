@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Home from "@/components/session/Home";
 import Building from "@/components/session/Building";
@@ -102,12 +103,20 @@ export function HomeRunner({ questionCount }: { questionCount: number }) {
       />
 
       {state.error && (
-        <p
+        <div
           role="alert"
-          className="bg-clay/10 text-clay px-6 py-3 text-[15px]"
+          className="bg-clay/10 flex flex-wrap items-center gap-x-3 gap-y-1 px-6 py-3"
         >
-          {state.error}
-        </p>
+          <p className="text-clay text-[15px]">{state.error}</p>
+          {state.error.includes("drill") && (
+            <Link
+              href="/drill"
+              className="text-sea min-h-11 text-[15px] font-medium underline underline-offset-4"
+            >
+              Go to today&rsquo;s drill
+            </Link>
+          )}
+        </div>
       )}
 
       <Home
