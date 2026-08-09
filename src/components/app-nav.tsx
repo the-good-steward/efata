@@ -23,6 +23,7 @@ const LINKS = [
 
 export function AppNav({ email }: { email?: string | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [startOpen, setStartOpen] = useState(false);
   const pathname = usePathname();
 
   /*
@@ -133,23 +134,65 @@ export function AppNav({ email }: { email?: string | null }) {
         page first.
       */}
       {/*
-        One thing, always the same thing.
-        An expanding menu made the daily drill a second choice behind a
-        tap, and the drill is the habit worth building. So the button is
-        the drill, and nothing else: the mark, glowing gently, one tap
-        from anywhere.
+        The two short things, one tap away.
+        A drill is the daily habit; a real conversation is the thing
+        someone arrives with a need for. Both are quick, and neither
+        should require a trip back to a home page first.
       */}
       {!startHidden && (
-        <Link
-          href="/drill"
-          prefetch
-          aria-label="Today's drill"
-          className="bg-sea fixed right-5 bottom-6 z-20 flex size-16 items-center justify-center rounded-full shadow-lg"
-        >
-          <span className="bg-sea/30 animate-halo absolute inset-0 rounded-full" />
-          <span className="border-sea/50 animate-halo absolute inset-0 rounded-full border-2 [animation-delay:1.2s]" />
-          <Mark size={34} onLight={false} />
-        </Link>
+        <div className="fixed right-5 bottom-6 z-20 flex flex-col items-end gap-3">
+          {startOpen && (
+            <>
+              <Link
+                href="/situation"
+                prefetch
+                onClick={() => setStartOpen(false)}
+                className="animate-rise bg-paper border-edge flex flex-col items-end rounded-2xl border px-5 py-3 shadow-md"
+              >
+                <span className="text-ink text-[16px] font-semibold">
+                  Something you have to say
+                </span>
+                <span className="text-ink-3 text-[13px]">
+                  A real conversation, coming up
+                </span>
+              </Link>
+
+              <Link
+                href="/drill"
+                prefetch
+                onClick={() => setStartOpen(false)}
+                className="animate-rise bg-paper border-edge flex flex-col items-end rounded-2xl border px-5 py-3 shadow-md"
+              >
+                <span className="text-ink text-[16px] font-semibold">
+                  Today&rsquo;s drill
+                </span>
+                <span className="text-ink-3 text-[13px]">
+                  One question, three minutes
+                </span>
+              </Link>
+            </>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setStartOpen((o) => !o)}
+            aria-expanded={startOpen}
+            aria-label={startOpen ? "Close" : "Practise something"}
+            className="bg-sea relative flex size-16 items-center justify-center rounded-full shadow-lg"
+          >
+            {!startOpen && (
+              <>
+                <span className="bg-sea/30 animate-halo absolute inset-0 rounded-full" />
+                <span className="border-sea/50 animate-halo absolute inset-0 rounded-full border-2 [animation-delay:1.2s]" />
+              </>
+            )}
+            {startOpen ? (
+              <span className="text-paper text-[24px] leading-none">✕</span>
+            ) : (
+              <Mark size={34} onLight={false} />
+            )}
+          </button>
+        </div>
       )}
 
     </>
