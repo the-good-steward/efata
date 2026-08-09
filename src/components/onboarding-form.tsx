@@ -58,7 +58,21 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
   const [english, setEnglish] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
+  const [query, setQuery] = useState("");
+
   const other = roles.find((r) => r.label.toLowerCase().includes("something"));
+
+  /*
+   * Matches on any word, so "accounting" finds "Bookkeeper /
+   * Accounting VA" rather than only matching from the start.
+   */
+  const matches = query.trim()
+    ? roles.filter(
+        (r) =>
+          r.id !== other?.id &&
+          r.label.toLowerCase().includes(query.trim().toLowerCase()),
+      )
+    : roles.filter((r) => r.id !== other?.id).slice(0, 6);
 
   return (
     <form ref={formRef} action={formAction} className="h-full">
@@ -82,12 +96,36 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
             What kind of work are you going for?
           </h1>
 
-          <div className="flex flex-col gap-2">
-            {roles.map((role) => (
+          {/*
+            One field that narrows as they type.
+            A long list is hard to scan on a phone and still misses
+            anyone whose training was not virtual assistance. Typing
+            filters what is there, and anything not on the list is
+            simply kept as they wrote it.
+          */}
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setRoleId("");
+              setCustomRole("");
+            }}
+            placeholder="Start typing: bookkeeper, nurse, designer…"
+            className="border-edge bg-card text-ink placeholder:text-ink-3/70 w-full rounded-[12px] border px-4 py-3.5 text-[17px] outline-none"
+            autoComplete="off"
+          />
+
+          <div className="flex max-h-[38vh] flex-col gap-2 overflow-y-auto">
+            {matches.map((role) => (
               <button
                 key={role.id}
                 type="button"
-                onClick={() => setRoleId(role.id)}
+                onClick={() => {
+                  setRoleId(role.id);
+                  setCustomRole("");
+                  setQuery(role.label);
+                }}
                 className={`rounded-[12px] border px-4 py-3.5 text-left text-[16px] ${
                   roleId === role.id
                     ? "border-sea bg-card text-ink font-semibold"
@@ -97,23 +135,29 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
                 {role.label}
               </button>
             ))}
+
+            {query.trim().length > 1 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomRole(query.trim());
+                  if (other) setRoleId(other.id);
+                }}
+                className={`rounded-[12px] border px-4 py-3.5 text-left text-[16px] ${
+                  customRole
+                    ? "border-sea bg-card text-ink font-semibold"
+                    : "border-edge text-ink-2"
+                }`}
+              >
+                Use &ldquo;{query.trim()}&rdquo;
+              </button>
+            )}
           </div>
 
-          <div className="flex flex-col gap-2">
-            <span className="text-[13px] uppercase tracking-[0.14em] text-ink-3">
-              Or type it
-            </span>
-            <input
-              type="text"
-              value={customRole}
-              onChange={(e) => {
-                setCustomRole(e.target.value);
-                if (e.target.value.trim() && other) setRoleId(other.id);
-              }}
-              placeholder="Nurse, teacher, engineer, anything"
-              className="border-edge bg-card text-ink placeholder:text-ink-3/70 w-full rounded-[12px] border px-4 py-3.5 text-[16px] outline-none"
-            />
-          </div>
+          <p className="text-[15px] leading-relaxed text-ink-3 text-pretty">
+            Anything counts, not only virtual assistance. You can still paste
+            any job post later.
+          </p>
         </Screen>
       )}
 
