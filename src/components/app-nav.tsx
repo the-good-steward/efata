@@ -15,6 +15,7 @@ import { Mark } from "@/components/logo";
 const LINKS = [
   { href: "/practice", label: "Practice" },
   { href: "/drill", label: "Daily drill" },
+  { href: "/situation", label: "Something you have to say" },
   { href: "/progress", label: "Progress" },
   { href: "/recall", label: "Log an interview" },
   { href: "/profile", label: "My profile" },
@@ -44,7 +45,8 @@ export function AppNav({ email }: { email?: string | null }) {
     pathname === "/drill" ||
     pathname === "/practice" ||
     pathname.startsWith("/practice/") ||
-    pathname === "/cv";
+    pathname === "/cv" ||
+    pathname === "/situation";
 
   return (
     <>
