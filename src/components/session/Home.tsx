@@ -13,6 +13,7 @@ export default function Home({
   onAddScreenshot,
   onRemoveScreenshot,
   onBuild,
+  shortcuts,
 }: {
   pastedText?: string;
   screenshots: Screenshot[];
@@ -20,6 +21,8 @@ export default function Home({
   onAddScreenshot?: () => void;
   onRemoveScreenshot?: (id: string) => void;
   onBuild?: () => void;
+  /** The two short practices, inline rather than floating over this. */
+  shortcuts?: React.ReactNode;
 }) {
   const [tab, setTab] = useState<"paste" | "shots">("paste");
   const buildLabel =
@@ -54,7 +57,7 @@ export default function Home({
             value={pastedText}
             onChange={(e) => onPaste?.(e.target.value)}
             placeholder="Paste the whole post. Nothing is sent anywhere until you tap build."
-            className="min-h-0 flex-1 resize-none rounded-2xl border border-edge bg-card p-5 text-[16px] leading-[1.7] text-ink placeholder:text-ink-3"
+            className="min-h-[26vh] flex-1 resize-none rounded-2xl border border-edge bg-card p-5 text-[16px] leading-[1.7] text-ink placeholder:text-ink-3"
           />
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-3.5">
@@ -97,10 +100,14 @@ export default function Home({
           </div>
         )}
 
-        <div className="flex flex-col gap-3 pb-8 md:flex-row md:items-center md:gap-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-5">
           <Primary label={buildLabel} onClick={onBuild} />
-          <span className="shrink-0 text-center text-[15px] text-ink-3">Takes about forty seconds</span>
+          <span className="shrink-0 text-center text-[15px] text-ink-3">
+            Takes about forty seconds
+          </span>
         </div>
+
+        {shortcuts ? <div className="pb-6">{shortcuts}</div> : <div className="pb-8" />}
       </div>
     </div>
   );
