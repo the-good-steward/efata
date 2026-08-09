@@ -47,7 +47,7 @@ export default function ListenBack({
       }
     >
       <h1 className="text-center font-serif text-[29px] leading-[1.35] text-pretty md:text-[38px]">
-        {ready ? "Your feedback is ready." : "We&rsquo;re checking your answer."}
+        {ready ? "Your feedback is ready." : "We\u2019re checking your answer."}
       </h1>
       {!ready && (
         <p className="text-center text-[16px] leading-relaxed text-ink-2 text-pretty md:text-[17px]">

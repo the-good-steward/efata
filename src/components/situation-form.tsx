@@ -143,11 +143,18 @@ export function SituationForm() {
         {typing ? "Record it instead" : "Somewhere you cannot speak? Type it"}
       </button>
 
-      <p className="ef-caption text-ink-3">
-        You will hear what they say, and answer it out loud. Efata does not
-        tell you what to say: you say it your way, then we go through how it
-        landed.
-      </p>
+      <div className="border-hairline flex flex-col gap-2 border-t pt-5">
+        <p className="ef-label text-ink-3">What happens next</p>
+        <p className="ef-body text-ink-2">
+          Efata turns what you described into the moment itself: your client
+          speaks first, in their words. You answer out loud, the way you would
+          answer them.
+        </p>
+        <p className="ef-body text-ink-2">
+          Then we go through how it landed. You will not be told what to say,
+          because you are the one who has to say it.
+        </p>
+      </div>
     </form>
   );
 }

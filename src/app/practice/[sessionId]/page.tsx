@@ -110,7 +110,18 @@ export default async function SessionPage({
   if (process.env.EFATA_NEW_SESSION === "true") {
     return (
       <div className="h-dvh">
-        <SessionRunner questions={questions} />
+        <SessionRunner
+          questions={questions}
+          /*
+           * One question and not a drill means it came from a
+           * situation someone described, so the screen should say so
+           * rather than presenting it as an exercise.
+           */
+          fromYourSituation={
+            questions.length === 1 &&
+            !(session.title ?? "").startsWith("Drill")
+          }
+        />
       </div>
     );
   }

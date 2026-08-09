@@ -56,7 +56,13 @@ function tokenise(transcript: string, hedges: string[]): Token[] {
   }));
 }
 
-export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
+export function SessionRunner({
+  questions,
+  fromYourSituation = false,
+}: {
+  questions: RunnerQuestion[];
+  fromYourSituation?: boolean;
+}) {
   const router = useRouter();
 
   const firstUnanswered = questions.findIndex((q) => q.attempts.length < 2);
@@ -496,6 +502,7 @@ export function SessionRunner({ questions }: { questions: RunnerQuestion[] }) {
         index={index + 1}
         total={questions.length}
         category={question.type === "technical" ? "Technical" : "Situational"}
+        fromYourSituation={fromYourSituation}
         question={question.body}
         why={question.context ?? "Answer it the way you would on a call."}
         onReady={() => {

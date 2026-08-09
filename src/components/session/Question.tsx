@@ -9,6 +9,7 @@ export default function Question({
   category,
   question,
   why,
+  fromYourSituation = false,
   onReady,
   onLeave,
 }: {
@@ -17,6 +18,8 @@ export default function Question({
   category: Category;
   question: string;
   why: string;
+  /** Their own situation, played back as the client's line. */
+  fromYourSituation?: boolean;
   onReady?: () => void;
   onLeave?: () => void;
 }) {
@@ -33,7 +36,14 @@ export default function Question({
       }
     >
       <div className="flex flex-col items-center gap-6 text-center">
-        <Eyebrow>{category}</Eyebrow>
+        <Eyebrow>{fromYourSituation ? "Your client says" : category}</Eyebrow>
+
+        {fromYourSituation && (
+          <p className="text-[15px] leading-relaxed text-ink-3 text-pretty">
+            This is the moment you described. Answer it the way you would
+            answer them.
+          </p>
+        )}
         <h1 className="font-serif text-[34px] leading-[1.32] text-pretty md:text-[48px]">{question}</h1>
         <p className="max-w-[56ch] text-[16px] leading-[1.7] text-ink-3 text-pretty md:text-[18px]">{why}</p>
       </div>
