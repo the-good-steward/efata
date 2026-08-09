@@ -130,34 +130,6 @@ export function HomeRunner({ questionCount }: { questionCount: number }) {
           )
         }
         onBuild={() => formRef.current?.requestSubmit()}
-        shortcuts={
-          /*
-           * Inline rather than floating.
-           * A round button in the corner of this page will always
-           * crowd the primary action, because they want the same
-           * space. Here they sit under it as what they are: the two
-           * shorter things, offered without competing.
-           */
-          <div className="border-hairline flex items-center gap-4 border-t pt-4">
-            <span className="ef-caption text-ink-3 shrink-0">
-              Short on time?
-            </span>
-            <Link
-              href="/drill"
-              prefetch
-              className="text-sea text-[15px] font-medium underline underline-offset-4"
-            >
-              Today&rsquo;s drill
-            </Link>
-            <Link
-              href="/situation"
-              prefetch
-              className="text-sea text-[15px] font-medium underline underline-offset-4"
-            >
-              Something you have to say
-            </Link>
-          </div>
-        }
       />
     </form>
   );

@@ -47,14 +47,15 @@ export function AppNav({ email }: { email?: string | null }) {
   // the page they are already on. Kept on practice, where it is the
   // only way to reach the short practices without opening the menu.
   const startHidden =
-    pathname === "/practice" ||
     pathname.startsWith("/practice/") ||
     pathname === "/drill" ||
     pathname === "/cv" ||
     pathname === "/onboarding" ||
     pathname === "/situation";
 
-  const lifted = false;
+  // On practice the primary button owns the bottom of the screen, so
+  // the mark sits above it rather than beside it.
+  const lifted = pathname === "/practice";
 
   return (
     <>

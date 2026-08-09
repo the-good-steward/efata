@@ -23,14 +23,22 @@ import { startSituation, type SituationState } from "@/app/situation/actions";
  * up weekly, and getting them wrong is what quietly shapes how a
  * client sees you.
  */
+/*
+ * Short labels in a grid rather than sentences in a list.
+ *
+ * Seven full sentences read as a wall to get through. These are
+ * prompts to recognise, not text to read, so each is two or three
+ * words and they sit as equal tiles.
+ */
 const EXAMPLES = [
-  "I do not understand what they are asking for and I have to ask again",
-  "They have not replied in four days and I need an answer to carry on",
-  "I need a day off next week",
-  "I sent something with a mistake in it and they have not noticed yet",
-  "They keep messaging me at eleven at night",
-  "A client wants me to take on work we never agreed",
-  "I need to raise my rate with a client I have had a while",
+  "Asking again",
+  "Chasing a reply",
+  "Needing a day off",
+  "Owning a mistake",
+  "Late-night messages",
+  "Work we never agreed",
+  "Raising my rate",
+  "Something I have not done",
 ];
 
 export function SituationForm() {
@@ -114,19 +122,20 @@ export function SituationForm() {
         </>
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <span className="ef-caption text-ink-3">
-          {typing
-            ? "Anything counts, however small"
-            : "Anything counts, however small"}
+          Anything counts, however small
         </span>
-        <ul className="flex flex-col gap-1.5">
+        <div className="grid grid-cols-2 gap-2">
           {EXAMPLES.map((example) => (
-            <li key={example} className="ef-body text-ink-2">
-              · {example}
-            </li>
+            <span
+              key={example}
+              className="border-edge text-ink-2 rounded-[12px] border px-3 py-3 text-center text-[14px] leading-snug"
+            >
+              {example}
+            </span>
           ))}
-        </ul>
+        </div>
       </div>
 
       {state.error && (

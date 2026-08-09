@@ -13,7 +13,6 @@ export default function Home({
   onAddScreenshot,
   onRemoveScreenshot,
   onBuild,
-  shortcuts,
 }: {
   pastedText?: string;
   screenshots: Screenshot[];
@@ -21,8 +20,6 @@ export default function Home({
   onAddScreenshot?: () => void;
   onRemoveScreenshot?: (id: string) => void;
   onBuild?: () => void;
-  /** The two short practices, inline rather than floating over this. */
-  shortcuts?: React.ReactNode;
 }) {
   const [tab, setTab] = useState<"paste" | "shots">("paste");
   const buildLabel =
@@ -107,7 +104,7 @@ export default function Home({
           </span>
         </div>
 
-        {shortcuts ? <div className="pb-6">{shortcuts}</div> : <div className="pb-8" />}
+        <div className="pb-8" />
       </div>
     </div>
   );
