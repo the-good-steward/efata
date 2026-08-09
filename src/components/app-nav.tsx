@@ -19,6 +19,7 @@ const LINKS = [
   { href: "/progress", label: "Progress" },
   { href: "/recall", label: "Log an interview" },
   { href: "/profile", label: "My profile" },
+  { href: "/guide", label: "How this works" },
 ];
 
 export function AppNav({ email }: { email?: string | null }) {

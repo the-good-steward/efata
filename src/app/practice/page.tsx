@@ -6,6 +6,7 @@ import { AppHeader } from "@/components/app-header";
 import { AppNav } from "@/components/app-nav";
 import { SchemaWarning } from "@/components/schema-warning";
 import { HomeRunner } from "@/components/home-runner";
+import { FirstVisitNudge } from "@/components/first-visit-nudge";
 import { TodaysDrill } from "@/components/todays-drill";
 
 /**
@@ -38,7 +39,7 @@ export default async function PracticePage() {
   ] = await Promise.all([
     supabase
       .from("profiles")
-      .select("onboarded_at, cv_asked_at")
+      .select("onboarded_at, cv_asked_at, guide_seen_at")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -81,6 +82,7 @@ export default async function PracticePage() {
     return (
       <div className="flex h-dvh flex-col">
         <AppNav email={user.email} />
+        {!profile?.guide_seen_at && <FirstVisitNudge />}
         <div className="min-h-0 flex-1">
           <HomeRunner questionCount={4} />
         </div>

@@ -54,6 +54,12 @@ const EXPECTED: {
     breaks: "Question caching, so every generation is paid for again",
   },
   {
+    migration: "0013",
+    table: "profiles",
+    column: "guide_seen_at",
+    breaks: "Remembering that someone has seen the guide",
+  },
+  {
     migration: "0010",
     table: "failures",
     breaks: "Failure logging, so problems leave no trace",
