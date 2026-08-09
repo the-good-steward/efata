@@ -126,16 +126,9 @@ export function SituationForm() {
         <span className="ef-caption text-ink-3">
           Anything counts, however small
         </span>
-        <div className="grid grid-cols-2 gap-2">
-          {EXAMPLES.map((example) => (
-            <span
-              key={example}
-              className="border-edge text-ink-2 rounded-[12px] border px-3 py-3 text-center text-[14px] leading-snug"
-            >
-              {example}
-            </span>
-          ))}
-        </div>
+        <p className="ef-body text-ink-2">
+          {EXAMPLES.join(" · ")}
+        </p>
       </div>
 
       {state.error && (
@@ -143,14 +136,6 @@ export function SituationForm() {
           {state.error}
         </p>
       )}
-
-      <button
-        type="button"
-        onClick={() => setTyping((t) => !t)}
-        className="text-ink-3 self-start text-[15px] underline underline-offset-4"
-      >
-        {typing ? "Record it instead" : "Somewhere you cannot speak? Type it"}
-      </button>
 
       <button
         type="button"

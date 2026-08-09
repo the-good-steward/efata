@@ -43,15 +43,15 @@ export function AppNav({ email }: { email?: string | null }) {
    * is already on that page anyway, so it adds nothing but a collision.
    * Inside a session nothing floats at all.
    */
-  // Hidden inside a session and on the pages it would offer someone
-  // the page they are already on. Kept on practice, where it is the
-  // only way to reach the short practices without opening the menu.
-  const startHidden =
-    pathname.startsWith("/practice/") ||
-    pathname === "/drill" ||
-    pathname === "/cv" ||
-    pathname === "/onboarding" ||
-    pathname === "/situation";
+  /*
+   * On every page except inside a session.
+   *
+   * A shortcut is only useful if it is where you are, and hiding it
+   * page by page meant it was never quite there when wanted. The one
+   * exception is a session in progress: nothing floats over someone who
+   * is about to speak, which is the whole point of those screens.
+   */
+  const startHidden = pathname.startsWith("/practice/");
 
   // On practice the primary button owns the bottom of the screen, so
   // the mark sits above it rather than beside it.
@@ -155,6 +155,7 @@ export function AppNav({ email }: { email?: string | null }) {
         >
           {startOpen && (
             <>
+              {pathname !== "/situation" && (
               <Link
                 href="/situation"
                 prefetch
@@ -168,7 +169,9 @@ export function AppNav({ email }: { email?: string | null }) {
                   A real conversation, coming up
                 </span>
               </Link>
+              )}
 
+              {pathname !== "/drill" && (
               <Link
                 href="/drill"
                 prefetch
@@ -182,6 +185,7 @@ export function AppNav({ email }: { email?: string | null }) {
                   One question, three minutes
                 </span>
               </Link>
+              )}
             </>
           )}
 
