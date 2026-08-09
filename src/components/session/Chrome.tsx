@@ -61,12 +61,24 @@ export function Rule({ dusk = false }: { dusk?: boolean }) {
 }
 
 /** 44px minimum height on every control below. */
-export function Primary({ label, onClick, dusk = false }: { label: string; onClick?: () => void; dusk?: boolean }) {
+export function Primary({
+  label,
+  onClick,
+  dusk = false,
+  disabled = false,
+}: {
+  label: string;
+  onClick?: () => void;
+  dusk?: boolean;
+  /** Used where a step cannot continue until something is chosen. */
+  disabled?: boolean;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-full px-8 py-4 text-[17px] font-semibold ${
+      disabled={disabled}
+      className={`w-full rounded-full px-8 py-4 text-[17px] font-semibold disabled:cursor-not-allowed disabled:opacity-40 ${
         dusk ? "bg-paper text-ink" : "bg-ink text-paper"
       }`}
     >

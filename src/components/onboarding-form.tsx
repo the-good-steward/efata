@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import {
   completeOnboarding,
   type OnboardingState,
 } from "@/app/onboarding/actions";
+import { Screen, Eyebrow, Primary, Quiet } from "@/components/session/Chrome";
 
 type Role = { id: string; label: string; description: string | null };
 
@@ -12,12 +13,12 @@ const EXPERIENCE = [
   {
     value: "beginner",
     label: "Just starting",
-    hint: "New to this kind of work, or fewer than about six months in.",
+    hint: "New to this, or fewer than about six months in.",
   },
   {
     value: "intermediate",
     label: "Some experience",
-    hint: "You've done the work for real clients and can hold your own.",
+    hint: "You have done the work for real clients.",
   },
   {
     value: "expert",
@@ -33,160 +34,182 @@ const ENGLISH = [
   { value: "fluent", label: "Fully fluent" },
 ];
 
+/**
+ * One question per screen.
+ *
+ * This used to be a single page carrying an explanation of the product,
+ * three questions and their hints all at once, which is a lot to meet
+ * before you have done anything. The session was rebuilt around one
+ * thing at a time and the way in should match, especially since this is
+ * the first thing anyone sees.
+ */
+type Step = "role" | "experience" | "english";
+
 export function OnboardingForm({ roles }: { roles: Role[] }) {
   const [state, formAction, pending] = useActionState<OnboardingState, FormData>(
     completeOnboarding,
     {},
   );
-  const [roleId, setRoleId] = useState("");
 
-  const otherRole = roles.find((role) => role.label === "Something else");
-  const showCustom = otherRole ? roleId === otherRole.id : false;
+  const [step, setStep] = useState<Step>("role");
+  const [roleId, setRoleId] = useState("");
+  const [customRole, setCustomRole] = useState("");
+  const [experience, setExperience] = useState("");
+  const [english, setEnglish] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const other = roles.find((r) => r.label.toLowerCase().includes("something"));
+  const needsCustom = roleId && roleId === other?.id;
 
   return (
-    <form action={formAction} className="mt-10 flex flex-col gap-12">
-      <section className="border-hairline border-b pb-10">
-        <p className="ef-label text-ink-3">How Efata works</p>
+    <form ref={formRef} action={formAction} className="h-full">
+      <input type="hidden" name="primary_role_id" value={roleId} />
+      <input type="hidden" name="custom_role" value={customRole} />
+      <input type="hidden" name="experience_level" value={experience} />
+      <input type="hidden" name="english_level" value={english} />
 
-        <div className="mt-5 flex flex-col gap-6">
-          <div>
-            <p className="font-serif text-ink text-[19px]">Practice sessions</p>
-            <p className="ef-body text-ink-2 mt-1">
-              Paste a job post you are applying for. Efata builds the questions
-              you are likely to face, you answer them out loud, and it shows you
-              how you came across.
-            </p>
-          </div>
-
-          <div>
-            <p className="font-serif text-ink text-[19px]">Daily drills</p>
-            <p className="ef-body text-ink-2 mt-1">
-              One question and one habit, about three minutes. Saying the number
-              and stopping. Cutting the apology. A session teaches you about one
-              job; a drill builds something you keep.
-            </p>
-          </div>
-        </div>
-
-        <p className="ef-caption text-ink-3 mt-5">
-          Sessions are the deep work, drills are the daily habit. Most people
-          get further with both than with either.
-        </p>
-      </section>
-
-      <fieldset>
-        <legend className="text-ink font-display text-xl">
-          What kind of work are you going for?
-        </legend>
-        <p className="text-ink-3 font-body mt-2 text-sm">
-          Pick the closest match, or choose &ldquo;Something else&rdquo; if
-          your work isn&rsquo;t listed. Either way you can paste any job post
-          and get questions for it.
-        </p>
-        <select
-          name="primary_role_id"
-          required
-          value={roleId}
-          onChange={(event) => setRoleId(event.target.value)}
-          className="border-edge text-ink focus:border-spoken mt-5 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
+      {step === "role" && (
+        <Screen
+          footer={
+            <Primary
+              label="Next"
+              onClick={() => setStep("experience")}
+              disabled={!roleId || (Boolean(needsCustom) && !customRole.trim())}
+            />
+          }
         >
-          <option value="" disabled className="bg-ink">
-            Choose a role
-          </option>
-          {roles.map((role) => (
-            <option key={role.id} value={role.id} className="bg-ink">
-              {role.label}
-            </option>
-          ))}
-        </select>
+          <Eyebrow>First of three</Eyebrow>
+          <h1 className="font-serif text-[31px] leading-[1.32] text-pretty md:text-[42px]">
+            What kind of work are you going for?
+          </h1>
 
-        {showCustom && (
-          <input
-            type="text"
-            name="custom_role"
-            required
-            placeholder="What do you call your work? e.g. legal transcriptionist"
-            className="border-edge text-ink placeholder:text-ink-3/60 focus:border-spoken mt-3 w-full rounded-sm border bg-transparent px-3 py-2.5 font-body text-sm outline-none"
-          />
-        )}
-      </fieldset>
+          <div className="flex flex-col gap-2">
+            {roles.map((role) => (
+              <button
+                key={role.id}
+                type="button"
+                onClick={() => setRoleId(role.id)}
+                className={`rounded-[12px] border px-4 py-3.5 text-left text-[16px] ${
+                  roleId === role.id
+                    ? "border-sea bg-card text-ink font-semibold"
+                    : "border-edge text-ink-2"
+                }`}
+              >
+                {role.label}
+              </button>
+            ))}
+          </div>
 
-      <fieldset>
-        <legend className="text-ink font-display text-xl">
-          How much experience do you have in it?
-        </legend>
-        <p className="text-ink-3 font-body mt-2 text-sm">
-          This sets how hard the questions are. Be honest rather than
- ambitious, questions pitched above you teach you less.
-        </p>
-        <div className="mt-5 flex flex-col gap-2">
-          {EXPERIENCE.map((option) => (
-            <label key={option.value} className="cursor-pointer">
-              <input
-                type="radio"
-                name="experience_level"
-                value={option.value}
-                required
-                className="peer sr-only"
-              />
-              <div className="border-hairline peer-checked:border-spoken peer-checked:bg-seaglass/10 rounded-sm border px-4 py-3 transition-colors">
-                <span className="text-ink font-body text-sm">
-                  {option.label}
-                </span>
-                <p className="text-ink-3 font-body mt-1 text-xs leading-relaxed">
-                  {option.hint}
-                </p>
-              </div>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+          {needsCustom && (
+            <input
+              type="text"
+              value={customRole}
+              onChange={(e) => setCustomRole(e.target.value)}
+              placeholder="What do you do?"
+              className="border-edge bg-card text-ink w-full rounded-[12px] border px-4 py-3.5 text-[16px] outline-none"
+            />
+          )}
 
-      <fieldset>
-        <legend className="text-ink font-display text-xl">
-          How do you feel speaking English at work?
-        </legend>
-        <p className="text-ink-3 font-body mt-2 text-sm">
-          Separate from experience. This changes how questions are worded, not
-          how hard they are.
-        </p>
-        <div className="mt-5 flex flex-col gap-2">
-          {ENGLISH.map((option) => (
-            <label key={option.value} className="cursor-pointer">
-              <input
-                type="radio"
-                name="english_level"
-                value={option.value}
-                required
-                className="peer sr-only"
-              />
-              <div className="border-hairline peer-checked:border-spoken peer-checked:bg-seaglass/10 rounded-sm border px-4 py-3 transition-colors">
-                <span className="text-ink font-body text-sm">
-                  {option.label}
-                </span>
-              </div>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {state.error && (
-        <p role="alert" className="font-body text-sm text-clay">
-          {state.error}
-        </p>
+          <p className="text-[15px] leading-relaxed text-ink-3 text-pretty">
+            Pick the closest. You can still paste any job post and get
+            questions for it.
+          </p>
+        </Screen>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="bg-ink text-ground w-full rounded-full px-6 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {pending ? "Saving…" : "Start practising"}
-      </button>
+      {step === "experience" && (
+        <Screen
+          footer={
+            <div className="flex flex-col gap-2">
+              <Primary
+                label="Next"
+                onClick={() => setStep("english")}
+                disabled={!experience}
+              />
+              <Quiet label="Back" onClick={() => setStep("role")} />
+            </div>
+          }
+        >
+          <Eyebrow>Second of three</Eyebrow>
+          <h1 className="font-serif text-[31px] leading-[1.32] text-pretty md:text-[42px]">
+            How much have you done so far?
+          </h1>
 
-      <p className="text-ink-3 font-body -mt-6 text-xs">
-        You can change any of this later.
-      </p>
+          <div className="flex flex-col gap-2">
+            {EXPERIENCE.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setExperience(option.value)}
+                className={`flex flex-col gap-1 rounded-[12px] border px-4 py-3.5 text-left ${
+                  experience === option.value
+                    ? "border-sea bg-card"
+                    : "border-edge"
+                }`}
+              >
+                <span className="text-ink text-[17px] font-medium">
+                  {option.label}
+                </span>
+                <span className="text-ink-3 text-[14px] leading-snug">
+                  {option.hint}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <p className="text-[15px] leading-relaxed text-ink-3 text-pretty">
+            This sets how hard the questions are. Nobody sees it.
+          </p>
+        </Screen>
+      )}
+
+      {step === "english" && (
+        <Screen
+          footer={
+            <div className="flex flex-col gap-2">
+              <Primary
+                label={pending ? "Setting up…" : "Start"}
+                onClick={() => formRef.current?.requestSubmit()}
+                disabled={!english || pending}
+              />
+              <Quiet label="Back" onClick={() => setStep("experience")} />
+            </div>
+          }
+        >
+          <Eyebrow>Last one</Eyebrow>
+          <h1 className="font-serif text-[31px] leading-[1.32] text-pretty md:text-[42px]">
+            How do you feel about English at work?
+          </h1>
+
+          <div className="flex flex-col gap-2">
+            {ENGLISH.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setEnglish(option.value)}
+                className={`rounded-[12px] border px-4 py-3.5 text-left text-[16px] ${
+                  english === option.value
+                    ? "border-sea bg-card text-ink font-semibold"
+                    : "border-edge text-ink-2"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          {state.error && (
+            <p role="alert" className="text-clay text-[16px]">
+              {state.error}
+            </p>
+          )}
+
+          <p className="text-[15px] leading-relaxed text-ink-3 text-pretty">
+            Answer honestly. It changes the wording of the questions, not how
+            hard they are.
+          </p>
+        </Screen>
+      )}
     </form>
   );
 }
