@@ -22,8 +22,7 @@ export default async function SituationPage() {
           Something you have to say
         </h1>
         <p className="ef-body text-ink-2 mt-3">
-          A conversation that is actually coming up. Practise it once here
-          before you have it for real.
+          Practise it once before you have it for real.
         </p>
 
         <div className="mt-8">

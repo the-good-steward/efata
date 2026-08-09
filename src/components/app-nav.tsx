@@ -42,12 +42,19 @@ export function AppNav({ email }: { email?: string | null }) {
    * is already on that page anyway, so it adds nothing but a collision.
    * Inside a session nothing floats at all.
    */
+  // Hidden inside a session and on the pages it would offer someone
+  // the page they are already on. Kept on practice, where it is the
+  // only way to reach the short practices without opening the menu.
   const startHidden =
-    pathname === "/drill" ||
-    pathname === "/practice" ||
     pathname.startsWith("/practice/") ||
+    pathname === "/drill" ||
     pathname === "/cv" ||
+    pathname === "/onboarding" ||
     pathname === "/situation";
+
+  // On practice the primary button sits at the bottom, so the floating
+  // one lifts clear of it rather than landing on top.
+  const lifted = pathname === "/practice";
 
   return (
     <>
@@ -140,7 +147,11 @@ export function AppNav({ email }: { email?: string | null }) {
         should require a trip back to a home page first.
       */}
       {!startHidden && (
-        <div className="fixed right-5 bottom-6 z-20 flex flex-col items-end gap-3">
+        <div
+          className={`fixed right-5 z-20 flex flex-col items-end gap-3 ${
+            lifted ? "bottom-28" : "bottom-6"
+          }`}
+        >
           {startOpen && (
             <>
               <Link

@@ -26,7 +26,6 @@ export function CvRunner({ existing }: { existing: CvSummary | null }) {
 
   const [skipped, setSkipped] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -84,16 +83,6 @@ export function CvRunner({ existing }: { existing: CvSummary | null }) {
         className="hidden"
         onChange={() => formRef.current?.requestSubmit()}
       />
-      <input
-        ref={cameraRef}
-        type="file"
-        name="cv"
-        accept="image/*"
-        capture="environment"
-        className="hidden"
-        onChange={() => formRef.current?.requestSubmit()}
-      />
-
       {state.error && (
         <p role="alert" className="bg-clay/10 text-clay px-6 py-3 text-[15px]">
           {state.error}
@@ -102,7 +91,6 @@ export function CvRunner({ existing }: { existing: CvSummary | null }) {
 
       <CvAsk
         onChooseFile={() => fileRef.current?.click()}
-        onTakePhoto={() => cameraRef.current?.click()}
         onSkip={() => setSkipped(true)}
       />
     </form>

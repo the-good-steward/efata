@@ -59,7 +59,6 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const other = roles.find((r) => r.label.toLowerCase().includes("something"));
-  const needsCustom = roleId && roleId === other?.id;
 
   return (
     <form ref={formRef} action={formAction} className="h-full">
@@ -74,11 +73,11 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
             <Primary
               label="Next"
               onClick={() => setStep("experience")}
-              disabled={!roleId || (Boolean(needsCustom) && !customRole.trim())}
+              disabled={!roleId && !customRole.trim()}
             />
           }
         >
-          <Eyebrow>First of three</Eyebrow>
+          <Eyebrow>1 of 3</Eyebrow>
           <h1 className="font-serif text-[31px] leading-[1.32] text-pretty md:text-[42px]">
             What kind of work are you going for?
           </h1>
@@ -100,20 +99,21 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
             ))}
           </div>
 
-          {needsCustom && (
+          <div className="flex flex-col gap-2">
+            <span className="text-[13px] uppercase tracking-[0.14em] text-ink-3">
+              Or type it
+            </span>
             <input
               type="text"
               value={customRole}
-              onChange={(e) => setCustomRole(e.target.value)}
-              placeholder="What do you do?"
-              className="border-edge bg-card text-ink w-full rounded-[12px] border px-4 py-3.5 text-[16px] outline-none"
+              onChange={(e) => {
+                setCustomRole(e.target.value);
+                if (e.target.value.trim() && other) setRoleId(other.id);
+              }}
+              placeholder="Nurse, teacher, engineer, anything"
+              className="border-edge bg-card text-ink placeholder:text-ink-3/70 w-full rounded-[12px] border px-4 py-3.5 text-[16px] outline-none"
             />
-          )}
-
-          <p className="text-[15px] leading-relaxed text-ink-3 text-pretty">
-            Pick the closest. You can still paste any job post and get
-            questions for it.
-          </p>
+          </div>
         </Screen>
       )}
 
@@ -130,7 +130,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
             </div>
           }
         >
-          <Eyebrow>Second of three</Eyebrow>
+          <Eyebrow>2 of 3</Eyebrow>
           <h1 className="font-serif text-[31px] leading-[1.32] text-pretty md:text-[42px]">
             How much have you done so far?
           </h1>
@@ -176,7 +176,7 @@ export function OnboardingForm({ roles }: { roles: Role[] }) {
             </div>
           }
         >
-          <Eyebrow>Last one</Eyebrow>
+          <Eyebrow>3 of 3</Eyebrow>
           <h1 className="font-serif text-[31px] leading-[1.32] text-pretty md:text-[42px]">
             How do you feel about English at work?
           </h1>

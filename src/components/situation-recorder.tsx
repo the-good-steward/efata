@@ -125,10 +125,7 @@ export function SituationRecorder({
       </button>
 
       <p className="ef-caption text-ink-3">
-        Out loud on purpose. Explaining the problem clearly is the first half
-        of the skill, and a client who cannot follow you cannot agree with you
-        either. Typing lets you edit until it sounds right, which is the part
-        that will not be there on the call.
+        Out loud on purpose. Explaining it clearly is half the skill.
       </p>
 
       {error && (
