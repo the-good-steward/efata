@@ -1,22 +1,23 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Working } from "@/components/working";
+import { SituationRecorder } from "@/components/situation-recorder";
 import { startSituation, type SituationState } from "@/app/situation/actions";
 
 /**
- * Describe a conversation that is coming up, and practise it.
+ * Describe a conversation that is coming up, out loud.
  *
- * The examples matter more than the field. Most people cannot name
- * their own situation cold, but recognise it instantly in someone
- * else's words.
+ * The examples are there because most people cannot name their own
+ * situation cold but recognise it instantly in someone else's words.
+ * They are prompts to speak from, not text to submit.
  */
 const EXAMPLES = [
-  "My client wants me to start handling their inbox, but that was never in what we agreed.",
-  "I need to raise my rate with a client I have had for a year.",
-  "I am going to miss Friday's deadline and they do not know yet.",
-  "They asked me to do something I have never done before and I do not want to lose the work.",
+  "A client wants me to take on work we never agreed",
+  "I need to raise my rate with a client I have had a while",
+  "I am going to miss a deadline and they do not know yet",
+  "They asked for something I have never done before",
 ];
 
 export function SituationForm() {
@@ -25,7 +26,11 @@ export function SituationForm() {
     startSituation,
     {},
   );
+  const [ready, setReady] = useState(false);
+  const [typing, setTyping] = useState(false);
   const [text, setText] = useState("");
+  const audioRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (state.sessionId) router.push(`/practice/${state.sessionId}`);
@@ -35,7 +40,7 @@ export function SituationForm() {
     return (
       <Working
         lines={[
-          "Reading your situation",
+          "Listening to your situation",
           "Working out what they would say",
           "Nearly there",
         ]}
@@ -45,34 +50,68 @@ export function SituationForm() {
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
-      <label className="flex flex-col gap-2">
-        <span className="ef-label text-ink-3">What is coming up?</span>
-        <textarea
-          name="situation"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={5}
-          required
-          placeholder="What do they want, and what makes it awkward to say?"
-          className="border-edge bg-card text-ink placeholder:text-ink-3/70 w-full rounded-[12px] border p-4 text-[17px] leading-relaxed outline-none"
-        />
-      </label>
+    <form ref={formRef} action={formAction} className="flex flex-col gap-6">
+      <input ref={audioRef} type="file" name="audio" className="hidden" />
+
+      {!typing ? (
+        <>
+          <SituationRecorder
+            onRecorded={(blob) => {
+              const transfer = new DataTransfer();
+              transfer.items.add(
+                new File([blob], "situation.webm", { type: blob.type }),
+              );
+              if (audioRef.current) audioRef.current.files = transfer.files;
+              setReady(true);
+            }}
+            onCleared={() => {
+              if (audioRef.current) audioRef.current.value = "";
+              setReady(false);
+            }}
+          />
+
+          {ready && (
+            <button
+              type="submit"
+              className="bg-sea text-paper w-full rounded-full px-8 py-4 text-[17px] font-semibold"
+            >
+              Put me in the moment
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          <label className="flex flex-col gap-2">
+            <span className="ef-label text-ink-3">What is coming up?</span>
+            <textarea
+              name="situation"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={5}
+              placeholder="What do they want, and what makes it awkward to say?"
+              className="border-edge bg-card text-ink placeholder:text-ink-3/70 w-full rounded-[12px] border p-4 text-[17px] leading-relaxed outline-none"
+            />
+          </label>
+          <button
+            type="submit"
+            className="bg-ink text-paper w-full rounded-full px-8 py-4 text-[17px] font-semibold"
+          >
+            Put me in the moment
+          </button>
+        </>
+      )}
 
       <div className="flex flex-col gap-2">
-        <span className="ef-caption text-ink-3">Or start from one of these</span>
-        <div className="flex flex-col gap-2">
+        <span className="ef-caption text-ink-3">
+          {typing ? "Not sure what to write?" : "Not sure what to say?"}
+        </span>
+        <ul className="flex flex-col gap-1.5">
           {EXAMPLES.map((example) => (
-            <button
-              key={example}
-              type="button"
-              onClick={() => setText(example)}
-              className="border-edge text-ink-2 rounded-[12px] border px-4 py-3 text-left text-[15px] leading-snug"
-            >
-              {example}
-            </button>
+            <li key={example} className="ef-body text-ink-2">
+              · {example}
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
       {state.error && (
@@ -82,10 +121,11 @@ export function SituationForm() {
       )}
 
       <button
-        type="submit"
-        className="bg-ink text-paper w-full rounded-full px-8 py-4 text-[17px] font-semibold transition-opacity hover:opacity-90"
+        type="button"
+        onClick={() => setTyping((t) => !t)}
+        className="text-ink-3 self-start text-[15px] underline underline-offset-4"
       >
-        Put me in the moment
+        {typing ? "Record it instead" : "Somewhere you cannot speak? Type it"}
       </button>
 
       <p className="ef-caption text-ink-3">

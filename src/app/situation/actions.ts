@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { buildSituationQuestion } from "@/lib/questions/situation";
 import { recordFailure } from "@/lib/failures";
 import { checkSessionLimit, type Tier } from "@/lib/limits";
+import { transcribeAudio } from "@/lib/transcribe";
 
 export type SituationState = { error?: string; sessionId?: string };
 
@@ -23,7 +24,45 @@ export async function startSituation(
   _prev: SituationState,
   formData: FormData,
 ): Promise<SituationState> {
-  const situation = String(formData.get("situation") ?? "").trim();
+  /**
+   * Spoken by default.
+   *
+   * Describing the problem out loud is the first half of the skill: a
+   * client who cannot follow your explanation cannot agree with it
+   * either. Typing lets someone edit until it is clear, which is
+   * exactly the part that does not transfer to a call.
+   *
+   * Typed text is still accepted, for a noisy room or anyone who
+   * cannot speak right now.
+   */
+  const audio = formData.get("audio");
+  let situation = String(formData.get("situation") ?? "").trim();
+
+  if (audio instanceof File && audio.size > 1000) {
+    const supabaseForUser = await createClient();
+    const {
+      data: { user: speaker },
+    } = await supabaseForUser.auth.getUser();
+
+    try {
+      const transcript = await transcribeAudio(
+        await audio.arrayBuffer(),
+        audio.type || "audio/webm",
+      );
+      situation = transcript.text.trim();
+    } catch (error) {
+      await recordFailure({
+        userId: speaker?.id ?? null,
+        stage: "situation_transcribe",
+        error,
+        context: { bytes: audio.size },
+      });
+      return {
+        error:
+          "Efata couldn't make out that recording. Try again somewhere quieter, or type it instead.",
+      };
+    }
+  }
 
   if (situation.length < MIN) {
     return {
