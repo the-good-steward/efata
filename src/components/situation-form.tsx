@@ -13,11 +13,24 @@ import { startSituation, type SituationState } from "@/app/situation/actions";
  * situation cold but recognise it instantly in someone else's words.
  * They are prompts to speak from, not text to submit.
  */
+/*
+ * Weighted toward the mundane.
+ *
+ * All four used to be crises, which made this look like somewhere you
+ * go when something has gone wrong. Most of what people fumble is
+ * much smaller: asking a question they think they should already know
+ * the answer to, chasing a message, saying they need a day. Those come
+ * up weekly, and getting them wrong is what quietly shapes how a
+ * client sees you.
+ */
 const EXAMPLES = [
+  "I do not understand what they are asking for and I have to ask again",
+  "They have not replied in four days and I need an answer to carry on",
+  "I need a day off next week",
+  "I sent something with a mistake in it and they have not noticed yet",
+  "They keep messaging me at eleven at night",
   "A client wants me to take on work we never agreed",
   "I need to raise my rate with a client I have had a while",
-  "I am going to miss a deadline and they do not know yet",
-  "They asked for something I have never done before",
 ];
 
 export function SituationForm() {
@@ -103,7 +116,9 @@ export function SituationForm() {
 
       <div className="flex flex-col gap-2">
         <span className="ef-caption text-ink-3">
-          {typing ? "Not sure what to write?" : "Not sure what to say?"}
+          {typing
+            ? "Anything counts, however small"
+            : "Anything counts, however small"}
         </span>
         <ul className="flex flex-col gap-1.5">
           {EXAMPLES.map((example) => (

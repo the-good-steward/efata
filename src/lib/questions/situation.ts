@@ -37,6 +37,8 @@ Write the client's line, not a question about the situation. "So you can take th
 
 Put it at the hardest point. Not the opening pleasantries, the sentence they have been dreading. If they have to say no, the client has just assumed yes. If they have to raise a rate, the client has just said the current one works well.
 
+Most of these are small, and small is not easy. Asking a question they feel they should already know the answer to, chasing a message without sounding impatient, saying they need a day off. These come up weekly and quietly shape how a client sees someone, so treat them as seriously as a rate conversation. Do not inflate them into a confrontation to make them feel worth practising.
+
 Keep the client reasonable. A rude client is easier, because being treated badly gives you permission. The hard version is a client who is warm, means well, and is quietly assuming something that does not work for them.
 
 Use their details: the actual task, the actual timeline, the actual relationship. Never invent a fact they did not give.
