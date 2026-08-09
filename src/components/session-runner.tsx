@@ -59,9 +59,11 @@ function tokenise(transcript: string, hedges: string[]): Token[] {
 export function SessionRunner({
   questions,
   fromYourSituation = false,
+  yourWords,
 }: {
   questions: RunnerQuestion[];
   fromYourSituation?: boolean;
+  yourWords?: string | null;
 }) {
   const router = useRouter();
 
@@ -503,6 +505,7 @@ export function SessionRunner({
         total={questions.length}
         category={question.type === "technical" ? "Technical" : "Situational"}
         fromYourSituation={fromYourSituation}
+        yourWords={yourWords}
         question={question.body}
         why={question.context ?? "Answer it the way you would on a call."}
         onReady={() => {

@@ -38,7 +38,7 @@ export default async function SessionPage({
 
   const { data: session } = await supabase
     .from("sessions")
-    .select("id, title")
+    .select("id, title, job_post")
     .eq("id", sessionId)
     .maybeSingle();
 
@@ -121,6 +121,7 @@ export default async function SessionPage({
             questions.length === 1 &&
             !(session.title ?? "").startsWith("Drill")
           }
+          yourWords={session.job_post ?? null}
         />
       </div>
     );
