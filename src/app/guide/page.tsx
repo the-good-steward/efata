@@ -6,35 +6,39 @@ import { AppNav } from "@/components/app-nav";
 export const metadata = { title: "How this works · Efata" };
 
 /**
- * The guide, always available, never in the way.
+ * Short enough to actually read.
  *
- * A tour that runs on first sign-in interrupts someone at the moment
- * they are keenest to try the thing, and is gone by the time they
- * actually want it. This sits in the menu instead: three cards, each
- * with what it is, how long it takes, and a way to start it.
+ * The first version explained each way in twice over, plus two asides
+ * and a note about the CV. A guide nobody finishes is worse than none,
+ * because it is the page someone opens when they are already unsure.
+ *
+ * One line each, then the three rules that surprise people.
  */
 const WAYS = [
   {
     title: "Practice session",
-    time: "About 20 minutes",
+    time: "20 min",
     href: "/practice",
-    what: "Paste the job post you are applying for. Efata builds four questions you are likely to face, and you answer them out loud.",
-    when: "Before an interview, or when you want a proper run at a role.",
+    line: "Paste a job post. Four questions, answered out loud.",
   },
   {
     title: "Daily drill",
-    time: "About 3 minutes",
+    time: "3 min",
     href: "/drill",
-    what: "One question and one habit. Saying the number and stopping. Cutting the apology at the start.",
-    when: "Every day, if you can. This is the one that builds something.",
+    line: "One question, one habit. The one to do every day.",
   },
   {
     title: "Something you have to say",
-    time: "About 5 minutes",
+    time: "5 min",
     href: "/situation",
-    what: "Describe a conversation coming up with a real client. Efata puts you in the moment and you answer it.",
-    when: "When you are dreading a message you have to send.",
+    line: "A real conversation coming up with a client.",
   },
+];
+
+const RULES = [
+  "You answer everything out loud.",
+  "You answer twice. The second one is where it changes.",
+  "Nothing is scored, and nobody else hears it.",
 ];
 
 export default async function GuidePage() {
@@ -50,63 +54,44 @@ export default async function GuidePage() {
 
       <main className="mx-auto w-full max-w-md flex-1 px-5 pb-28">
         <h1 className="ef-display text-ink mt-4">How this works</h1>
-        <p className="ef-body text-ink-2 mt-3">
-          Three ways in. All of them end with you speaking out loud, because
-          that is the part that fails on a real call.
-        </p>
 
-        <div className="mt-8 flex flex-col gap-4">
+        <div className="mt-7 flex flex-col gap-3">
           {WAYS.map((way) => (
-            <section key={way.title} className="bg-card rounded-[16px] p-5">
+            <Link
+              key={way.title}
+              href={way.href}
+              className="bg-card block rounded-[16px] p-4"
+            >
               <div className="flex items-baseline justify-between gap-3">
-                <h2 className="font-serif text-ink text-[21px]">{way.title}</h2>
+                <span className="font-serif text-ink text-[19px]">
+                  {way.title}
+                </span>
                 <span className="ef-caption text-ink-3 shrink-0">
                   {way.time}
                 </span>
               </div>
-              <p className="ef-body text-ink-2 mt-2">{way.what}</p>
-              <p className="ef-caption text-ink-3 mt-2">{way.when}</p>
-              <Link
-                href={way.href}
-                className="text-sea mt-4 inline-block text-[16px] font-medium underline underline-offset-4"
-              >
-                Try it
-              </Link>
-            </section>
+              <p className="ef-caption text-ink-2 mt-1">{way.line}</p>
+            </Link>
           ))}
         </div>
 
-        <section className="border-hairline mt-10 border-t pt-6">
-          <h2 className="ef-label text-ink-3">Two things worth knowing</h2>
+        <ul className="mt-8 flex flex-col gap-3">
+          {RULES.map((rule) => (
+            <li key={rule} className="ef-body text-ink-2 flex gap-3">
+              <span aria-hidden="true" className="text-sea">
+                ·
+              </span>
+              {rule}
+            </li>
+          ))}
+        </ul>
 
-          <p className="ef-body text-ink-2 mt-4">
-            <span className="text-ink font-semibold">You answer twice.</span>{" "}
-            The first time tells you how you came across. The second is where
-            it changes. Only after both do you see your own answer written
-            back stronger.
-          </p>
-
-          <p className="ef-body text-ink-2 mt-4">
-            <span className="text-ink font-semibold">Nothing is scored.</span>{" "}
-            No marks, no grades, no streak to break. Nobody else hears your
-            recordings.
-          </p>
-        </section>
-
-        <section className="border-hairline mt-8 border-t pt-6">
-          <h2 className="ef-label text-ink-3">Your CV</h2>
-          <p className="ef-body text-ink-2 mt-3">
-            If you add one, half your questions come from work you have
-            actually done, and Efata can point back at experience you leave
-            out of an answer.
-          </p>
-          <Link
-            href="/profile"
-            className="text-sea mt-4 inline-block text-[16px] font-medium underline underline-offset-4"
-          >
-            Add or change it
-          </Link>
-        </section>
+        <Link
+          href="/profile"
+          className="text-sea mt-8 inline-block text-[16px] underline underline-offset-4"
+        >
+          Add your CV for questions about your own work
+        </Link>
       </main>
     </div>
   );
