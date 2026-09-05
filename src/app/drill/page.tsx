@@ -17,9 +17,9 @@ function fourteenDaysAgo(): string {
 export default async function DrillPage({
   searchParams,
 }: {
-  searchParams: Promise<{ kind?: string }>;
+  searchParams: Promise<{ kind?: string; skip?: string }>;
 }) {
-  const { kind } = await searchParams;
+  const { kind, skip } = await searchParams;
   const wants: "habit" | "field" = kind === "field" ? "field" : "habit";
   const supabase = await createClient();
   const {
@@ -94,9 +94,20 @@ export default async function DrillPage({
   const unseen = relevant.filter((d) => !seen.has(d.id));
   const pool = unseen.length > 0 ? unseen : relevant;
 
+  /*
+   * The same drill all day, unless they ask for a different one.
+   *
+   * Sometimes it simply does not land: wrong day, does not apply, too
+   * close to yesterday's. Being stuck with it until tomorrow is a poor
+   * reason not to practise at all, so skipping steps through the pool
+   * rather than refusing.
+   */
   const today = new Date().toISOString().slice(0, 10);
   const seed = [...today].reduce((n, c) => n + c.charCodeAt(0), 0);
-  const drill = pool.length > 0 ? pool[seed % pool.length] : null;
+  const skipped = Math.max(0, Math.min(Number(skip) || 0, 20));
+  const drill =
+    pool.length > 0 ? pool[(seed + skipped) % pool.length] : null;
+  const canSkip = pool.length > 1;
 
   const todayRuns = done.filter(
     (r) => (r.created_at as string).slice(0, 10) === today,
@@ -147,6 +158,11 @@ export default async function DrillPage({
             why={drill.why}
             prompt={drill.prompt}
             doneToday={todayRuns > 0}
+            skipHref={
+              canSkip
+                ? `/drill?${wants === "field" ? "kind=field&" : ""}skip=${skipped + 1}`
+                : null
+            }
           />
         )}
 

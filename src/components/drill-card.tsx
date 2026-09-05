@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { startDrill, type DrillState } from "@/app/drill/actions";
 
@@ -16,12 +17,15 @@ export function DrillCard({
   why,
   prompt,
   doneToday,
+  skipHref,
 }: {
   id: string;
   move: string;
   why: string;
   prompt: string;
   doneToday: boolean;
+  /** Where a different drill lives, or null when there is only one. */
+  skipHref?: string | null;
 }) {
   const [state, formAction, pending] = useActionState<DrillState, FormData>(
     startDrill,
@@ -55,11 +59,22 @@ export function DrillCard({
         </button>
       </form>
 
-      {doneToday && (
-        <p className="ef-caption text-ink-3 mt-3 text-center">
-          You have already done one today. Another is fine.
-        </p>
-      )}
+      <div className="mt-4 flex flex-col items-center gap-2">
+        {doneToday && (
+          <p className="ef-caption text-ink-3">
+            You have already done one today. Another is fine.
+          </p>
+        )}
+
+        {skipHref && (
+          <Link
+            href={skipHref}
+            className="text-ink-3 hover:text-ink text-[15px] underline underline-offset-4 transition-colors"
+          >
+            Show me a different one
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
