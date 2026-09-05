@@ -54,6 +54,12 @@ const EXPECTED: {
     breaks: "Question caching, so every generation is paid for again",
   },
   {
+    migration: "0014",
+    table: "drills",
+    column: "kind",
+    breaks: "Field drills, the ones matched to someone's line of work",
+  },
+  {
     migration: "0013",
     table: "profiles",
     column: "guide_seen_at",

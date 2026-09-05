@@ -40,7 +40,7 @@ export default async function DrillPage({
         .maybeSingle(),
       supabase
         .from("drills")
-        .select("id, move, why, prompt, rubric, kind, role_slug")
+        .select("*")
         .limit(60),
       supabase
         .from("drill_runs")
@@ -82,7 +82,19 @@ export default async function DrillPage({
    * getting whichever came up; separating them means practising what
    * you meant to.
    */
-  const ofKind = all.filter((d) => (d.kind ?? "habit") === wants);
+  /*
+   * Tolerate the column not being there.
+   *
+   * Shipping code that filtered on 'kind' before the migration ran
+   * emptied the drill page completely, taking away ten working drills
+   * rather than merely failing to add the new ones. A row without the
+   * column is treated as a habit drill, which is what every existing
+   * row is.
+   */
+  const hasKinds = all.some((d) => d.kind !== undefined);
+  const ofKind = hasKinds
+    ? all.filter((d) => (d.kind ?? "habit") === wants)
+    : all;
 
   // Field drills are only useful if they match the work someone does.
   const relevant =
@@ -147,9 +159,11 @@ export default async function DrillPage({
 
         {!drill ? (
           <p className="ef-body text-ink-2 mt-6">
-            {wants === "field"
-              ? "No field drills for your line of work yet. The habit drills work for everyone in the meantime."
-              : "No drills are available yet."}
+            {!hasKinds
+              ? "Field drills need migration 0014. The habit drills are all here in the meantime."
+              : wants === "field"
+                ? "No field drills for your line of work yet. The habit drills work for everyone in the meantime."
+                : "No drills are available yet."}
           </p>
         ) : (
           <DrillCard
