@@ -14,16 +14,34 @@ function fourteenDaysAgo(): string {
   return new Date(Date.now() - 14 * 86400000).toISOString();
 }
 
-export default async function DrillPage() {
+export default async function DrillPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ kind?: string }>;
+}) {
+  const { kind } = await searchParams;
+  const wants: "habit" | "field" = kind === "field" ? "field" : "habit";
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: drills }, { data: runs }, { data: answered }] =
-    await Promise.all([
-      supabase.from("drills").select("id, move, why, prompt, rubric").limit(30),
+  const [
+    { data: profile },
+    { data: drills },
+    { data: runs },
+    { data: answered },
+  ] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("roles(slug)")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("drills")
+        .select("id, move, why, prompt, rubric, kind, role_slug")
+        .limit(60),
       supabase
         .from("drill_runs")
         .select("drill_id, created_at")
@@ -49,19 +67,36 @@ export default async function DrillPage() {
     (answered ?? []).map((a) => a.created_at as string),
   );
 
+  const roleSlug =
+    (profile?.roles as { slug?: string } | null)?.slug ?? null;
+
   const all = drills ?? [];
   const done = runs ?? [];
 
-  // Everything else before a repeat, so the same move does not come up
-  // twice while others have never been practised.
-  const seen = new Set(done.map((r) => r.drill_id as string));
-  const unseen = all.filter((d) => !seen.has(d.id));
-  const pool = unseen.length > 0 ? unseen : all;
+  /*
+   * Two kinds, chosen rather than mixed.
+   *
+   * A habit drill teaches one communication move and suits anyone. A
+   * field drill tests whether someone can explain something in their
+   * own work clearly, which is a different exercise. Mixing them means
+   * getting whichever came up; separating them means practising what
+   * you meant to.
+   */
+  const ofKind = all.filter((d) => (d.kind ?? "habit") === wants);
 
-  // Stable for the day: the same drill all day, a new one tomorrow.
+  // Field drills are only useful if they match the work someone does.
+  const relevant =
+    wants === "field"
+      ? ofKind.filter((d) => d.role_slug === roleSlug)
+      : ofKind;
+
+  const seen = new Set(done.map((r) => r.drill_id as string));
+  const unseen = relevant.filter((d) => !seen.has(d.id));
+  const pool = unseen.length > 0 ? unseen : relevant;
+
   const today = new Date().toISOString().slice(0, 10);
   const seed = [...today].reduce((n, c) => n + c.charCodeAt(0), 0);
-  const drill = pool[seed % Math.max(pool.length, 1)];
+  const drill = pool.length > 0 ? pool[seed % pool.length] : null;
 
   const todayRuns = done.filter(
     (r) => (r.created_at as string).slice(0, 10) === today,
@@ -76,11 +111,34 @@ export default async function DrillPage() {
 
         <PracticeDaysStrip data={practiceDays} />
 
-        <p className="ef-label text-ink-3 mt-10">Today&rsquo;s drill</p>
+        <div className="mt-10 flex gap-2">
+          <Link
+            href="/drill"
+            className={`flex-1 rounded-full border px-4 py-3 text-center text-[15px] ${
+              wants === "habit"
+                ? "border-sea bg-card text-ink font-semibold"
+                : "border-edge text-ink-2"
+            }`}
+          >
+            How you say it
+          </Link>
+          <Link
+            href="/drill?kind=field"
+            className={`flex-1 rounded-full border px-4 py-3 text-center text-[15px] ${
+              wants === "field"
+                ? "border-sea bg-card text-ink font-semibold"
+                : "border-edge text-ink-2"
+            }`}
+          >
+            Your field
+          </Link>
+        </div>
 
         {!drill ? (
-          <p className="ef-body text-ink-2 mt-4">
-            No drills are available yet.
+          <p className="ef-body text-ink-2 mt-6">
+            {wants === "field"
+              ? "No field drills for your line of work yet. The habit drills work for everyone in the meantime."
+              : "No drills are available yet."}
           </p>
         ) : (
           <DrillCard
