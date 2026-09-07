@@ -29,6 +29,11 @@ export type Verdict = {
   tone: "steady" | "work" | "thin";
 };
 
+/** "1 answer" rather than "1 answers". */
+function plural(n: number, one: string, many: string): string {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
 export function buildVerdict(
   answers: SessionAnswer[],
   totalQuestions: number,
@@ -104,7 +109,7 @@ export function buildVerdict(
 
   return {
     headline: "One thing to fix before a real call",
-    body: `Across ${answered} answers, ${first}${
+    body: `Across ${plural(answered, "answer", "answers")}, ${first}${
       rest.length > 0 ? `, and ${rest.join(", ")}` : ""
     }. ${
       improved > 0

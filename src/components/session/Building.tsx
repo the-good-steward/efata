@@ -39,7 +39,9 @@ export default function Building({
     >
       <div className="flex items-center gap-3">
         {ready ? <div className="size-[9px] rounded-full bg-sea" /> : <LiveDot />}
-        <Eyebrow>{ready ? `${questionCount} questions ready` : "Reading the post"}</Eyebrow>
+        <Eyebrow>{ready
+          ? `${questionCount === 1 ? "One question" : `${questionCount} questions`} ready`
+          : "Reading the post"}</Eyebrow>
       </div>
       <h1 className="font-serif text-[31px] leading-[1.32] text-pretty md:text-[44px]">
         Don&rsquo;t overthink your answers, and don&rsquo;t over-practise.

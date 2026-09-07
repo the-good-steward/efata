@@ -38,8 +38,13 @@ export default function SessionVerdict({
       <p className="max-w-[62ch] text-[17px] leading-[1.7] text-ink-2 text-pretty md:text-[19px]">{body}</p>
       <Rule />
       <p className="text-[16px] leading-[1.7] text-ink-3 md:text-[17px]">
-        {softenersBefore} softeners across the first attempts, {softenersAfter} across the retries. {questionCount}{" "}
-        questions.
+        {softenersBefore === 1 ? "One softener" : `${softenersBefore} softeners`}{" "}
+        across the first{" "}
+        {questionCount === 1 ? "attempt" : "attempts"}
+        {softenersAfter > 0 || questionCount > 1
+          ? `, ${softenersAfter} across the ${questionCount === 1 ? "retry" : "retries"}`
+          : ""}
+        . {questionCount === 1 ? "One question" : `${questionCount} questions`}.
       </p>
     </Screen>
   );
