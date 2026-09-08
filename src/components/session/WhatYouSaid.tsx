@@ -11,6 +11,7 @@ export default function WhatYouSaid({
   index,
   total,
   tokens,
+  question,
   hedgeCount,
   attempt,
   onContinue,
@@ -19,6 +20,9 @@ export default function WhatYouSaid({
   index: number;
   total: number;
   tokens: Token[];
+  /** Kept on screen: feedback about a question you cannot see is hard
+   *  to act on, and impossible to re-read before a retry. */
+  question?: string;
   hedgeCount: number;
   attempt: 1 | 2;
   onContinue?: () => void;
@@ -42,6 +46,11 @@ export default function WhatYouSaid({
         header={<SessionBar index={index} total={total} onClose={onLeave} />}
         footer={<Primary label={attempt === 2 ? "What moved" : "What it cost you"} onClick={onContinue} />}
       >
+        {question && (
+          <p className="text-[15px] leading-[1.5] text-ink-3 text-pretty md:text-[16px]">
+            {question}
+          </p>
+        )}
         <Eyebrow>What you said</Eyebrow>
         <p className="font-serif text-[25px] leading-[1.5] text-ink text-pretty md:text-[36px]">
           {tokens.map((t, i) =>

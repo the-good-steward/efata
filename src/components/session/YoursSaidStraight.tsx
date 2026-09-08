@@ -6,6 +6,7 @@ export default function YoursSaidStraight({
   index,
   total,
   rewrite,
+  question,
   playing,
   isLastQuestion,
   onTogglePlay,
@@ -14,6 +15,8 @@ export default function YoursSaidStraight({
   index: number;
   total: number;
   rewrite: string;
+  /** The question this answers, so the rewrite is not read alone. */
+  question?: string;
   playing: boolean;
   isLastQuestion: boolean;
   onTogglePlay?: () => void;
@@ -30,6 +33,11 @@ export default function YoursSaidStraight({
       footer={<Primary label={isLastQuestion ? "Finish the session" : "Next question"} onClick={onNext} />}
     >
       <div className="flex flex-col items-center gap-7 text-center">
+        {question && (
+          <p className="max-w-[52ch] text-[15px] leading-[1.5] text-ink-3 text-pretty md:text-[16px]">
+            {question}
+          </p>
+        )}
         <Eyebrow>Yours, said straight</Eyebrow>
         <p className="font-serif text-[27px] leading-[1.45] text-sea text-pretty md:text-[38px]">{rewrite}</p>
         <p className="max-w-[52ch] text-[15px] leading-[1.65] text-ink-3 text-pretty md:text-[17px]">

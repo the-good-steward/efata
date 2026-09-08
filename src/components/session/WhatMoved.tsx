@@ -23,6 +23,7 @@ export default function WhatMoved({
   index,
   total,
   summary,
+  question,
   fillerCount,
   previousFillerCount,
   wpm,
@@ -33,6 +34,8 @@ export default function WhatMoved({
   index: number;
   total: number;
   summary: string;
+  /** Kept on screen, so the rewrite can be read against it. */
+  question?: string;
   fillerCount: number;
   previousFillerCount: number;
   wpm: number;
@@ -45,6 +48,11 @@ export default function WhatMoved({
       header={<SessionBar index={index} total={total} onClose={onLeave} />}
       footer={<Primary label="Hear it said better" onClick={onContinue} />}
     >
+      {question && (
+        <p className="text-[15px] leading-[1.5] text-ink-3 text-pretty md:text-[16px]">
+          {question}
+        </p>
+      )}
       <Eyebrow>What moved</Eyebrow>
       <p className="font-serif text-[26px] leading-[1.5] text-ink text-pretty md:text-[34px]">{summary}</p>
       <div className="flex gap-3">

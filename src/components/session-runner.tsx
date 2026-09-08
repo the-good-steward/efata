@@ -342,6 +342,7 @@ export function SessionRunner({
     const hedges = delivery?.hedging ?? [];
     return (
       <WhatYouSaid
+        question={question.body}
         index={index + 1}
         total={questions.length}
         tokens={tokenise(latest.transcript, hedges)}
@@ -356,6 +357,7 @@ export function SessionRunner({
   if (phase === "read" && latest) {
     return (
       <WhatItCostYou
+        question={question.body}
         index={index + 1}
         total={questions.length}
         read={latest.feedback ?? ""}
@@ -405,6 +407,7 @@ export function SessionRunner({
     const first = attempts[0];
     return (
       <WhatMoved
+        question={question.body}
         index={index + 1}
         total={questions.length}
         summary={latest.feedback ?? ""}
@@ -425,6 +428,7 @@ export function SessionRunner({
     const isLast = index + 1 >= questions.length;
     return (
       <YoursSaidStraight
+        question={question.body}
         index={index + 1}
         total={questions.length}
         rewrite={latest.improved_answer}

@@ -363,7 +363,11 @@ ${
           params.move
             ? `THIS IS A DRILL. The one thing they are practising is: ${params.move}
 
-Judge them mainly on that. Say plainly whether they did it, and if not, what got in the way. Everything else is secondary here, and a long list of other observations would bury the one thing they came to work on. Keep the feedback to that move and one sentence of delivery.
+Lead with whether they did it, and if not, what got in the way.
+
+Everything else you would normally do still applies. The talking points, the specific thing a practitioner would have named, the softeners marked in their own words: a drill is short, not shallow, and stripping the feedback back to one line was making it worse than a session for no reason.
+
+What changes is only the order. The move they came to practise goes first, and the rest follows it rather than competing with it.
 
 `
             : ""

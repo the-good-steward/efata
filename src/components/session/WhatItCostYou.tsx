@@ -7,6 +7,7 @@ export default function WhatItCostYou({
   index,
   total,
   read,
+  question,
   talkingPoints,
   fillerCount,
   wpm,
@@ -19,6 +20,8 @@ export default function WhatItCostYou({
   index: number;
   total: number;
   read: string;
+  /** Kept on screen so the retry can be planned against it. */
+  question?: string;
   /** What the retry should cover. Never the words to say. */
   talkingPoints?: string[];
   fillerCount: number;
@@ -40,6 +43,11 @@ export default function WhatItCostYou({
         </div>
       }
     >
+      {question && (
+        <p className="text-[15px] leading-[1.5] text-ink-3 text-pretty md:text-[16px]">
+          {question}
+        </p>
+      )}
       <Eyebrow>What it cost you</Eyebrow>
       <p className="font-serif text-[26px] leading-[1.5] text-ink text-pretty md:text-[34px]">{read}</p>
       {talkingPoints && talkingPoints.length > 0 ? (
