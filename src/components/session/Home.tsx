@@ -13,6 +13,7 @@ export default function Home({
   onAddScreenshot,
   onRemoveScreenshot,
   onBuild,
+  belowFold,
 }: {
   pastedText?: string;
   screenshots: Screenshot[];
@@ -20,6 +21,8 @@ export default function Home({
   onAddScreenshot?: () => void;
   onRemoveScreenshot?: (id: string) => void;
   onBuild?: () => void;
+  /** Today's drill, under the form rather than behind the menu. */
+  belowFold?: React.ReactNode;
 }) {
   const [tab, setTab] = useState<"paste" | "shots">("paste");
   const buildLabel =
@@ -104,7 +107,7 @@ export default function Home({
           </span>
         </div>
 
-        <div className="pb-8" />
+        {belowFold ? <div className="pb-6">{belowFold}</div> : <div className="pb-8" />}
       </div>
     </div>
   );

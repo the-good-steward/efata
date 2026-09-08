@@ -17,9 +17,10 @@ function fourteenDaysAgo(): string {
 export default async function DrillPage({
   searchParams,
 }: {
-  searchParams: Promise<{ kind?: string; skip?: string }>;
+  searchParams: Promise<{ kind?: string; skip?: string; first?: string }>;
 }) {
-  const { kind, skip } = await searchParams;
+  const { kind, skip, first } = await searchParams;
+  const isFirst = first === "1";
   const wants: "habit" | "field" = kind === "field" ? "field" : "habit";
   const supabase = await createClient();
   const {
@@ -134,9 +135,23 @@ export default async function DrillPage({
 
         <PracticeDaysStrip data={practiceDays} />
 
+        {isFirst && (
+          <div className="border-sea/30 bg-sea/5 mt-8 rounded-[16px] border p-5">
+            <p className="ef-label text-sea">Start here</p>
+            <p className="ef-body text-ink mt-2">
+              Three minutes, and you will have done the whole thing once:
+              answer out loud, read what it heard, then say it again.
+            </p>
+            <p className="ef-caption text-ink-3 mt-2">
+              Practice sessions come from a job post and take about twenty
+              minutes. This needs nothing.
+            </p>
+          </div>
+        )}
+
         <div className="mt-10 flex gap-2">
           <Link
-            href="/drill"
+            href={isFirst ? "/drill?first=1" : "/drill"}
             className={`flex-1 rounded-full border px-4 py-3 text-center text-[15px] ${
               wants === "habit"
                 ? "border-sea bg-card text-ink font-semibold"
@@ -146,7 +161,7 @@ export default async function DrillPage({
             How you say it
           </Link>
           <Link
-            href="/drill?kind=field"
+            href={isFirst ? "/drill?kind=field&first=1" : "/drill?kind=field"}
             className={`flex-1 rounded-full border px-4 py-3 text-center text-[15px] ${
               wants === "field"
                 ? "border-sea bg-card text-ink font-semibold"

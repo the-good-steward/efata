@@ -84,7 +84,14 @@ export default async function PracticePage() {
         <AppNav email={user.email} />
         {!profile?.guide_seen_at && <FirstVisitNudge />}
         <div className="min-h-0 flex-1">
-          <HomeRunner questionCount={4} />
+          <HomeRunner
+            questionCount={4}
+            drill={
+              drill
+                ? { id: drill.id, move: drill.move, doneToday: drillDoneToday }
+                : null
+            }
+          />
         </div>
       </div>
     );

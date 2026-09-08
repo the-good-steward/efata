@@ -14,7 +14,14 @@ import { createSession, type SessionState } from "@/app/practice/actions";
  * followed by one, so the only thing a first-timer has to read happens
  * while they are already waiting.
  */
-export function HomeRunner({ questionCount }: { questionCount: number }) {
+export function HomeRunner({
+  questionCount,
+  drill,
+}: {
+  questionCount: number;
+  /** Today's drill, so it is visible without opening anything. */
+  drill?: { id: string; move: string; doneToday: boolean } | null;
+}) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState<SessionState, FormData>(
     createSession,
@@ -130,6 +137,27 @@ export function HomeRunner({ questionCount }: { questionCount: number }) {
           )
         }
         onBuild={() => formRef.current?.requestSubmit()}
+        belowFold={
+          drill ? (
+            <Link
+              href="/drill"
+              prefetch
+              className="border-sea/30 bg-sea/5 flex items-center justify-between gap-3 rounded-[12px] border px-4 py-3"
+            >
+              <span className="min-w-0">
+                <span className="text-sea block text-[12px] tracking-[0.14em] uppercase">
+                  {drill.doneToday ? "Done today" : "Today's drill · 3 min"}
+                </span>
+                <span className="text-ink block truncate text-[15px] font-medium">
+                  {drill.move}
+                </span>
+              </span>
+              <span className="text-sea shrink-0 text-[20px]" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          ) : null
+        }
       />
     </form>
   );

@@ -135,7 +135,15 @@ export async function confirmCv(): Promise<void> {
     .eq("user_id", user.id);
 
   revalidatePath("/practice");
-  redirect("/practice");
+  /*
+   * Straight to a drill, not the practice page.
+   *
+   * A session needs a job post they may not have to hand and twenty
+   * minutes they may not have either. A drill needs nothing, takes
+   * three, and teaches the whole loop: record, feedback, retry,
+   * rewrite. Someone who has done one knows what a session will be.
+   */
+  redirect("/drill?first=1");
 }
 
 /** Asked once. Skipping is recorded so it is not asked again. */
@@ -151,5 +159,5 @@ export async function skipCv(): Promise<void> {
     .update({ cv_asked_at: new Date().toISOString() })
     .eq("id", user.id);
 
-  redirect("/practice");
+  redirect("/drill?first=1");
 }
